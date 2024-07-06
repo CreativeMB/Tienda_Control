@@ -54,13 +54,12 @@ dependencies {
     // Firebase Authentication and Firestore
     implementation("com.google.firebase:firebase-auth")
     implementation("com.google.android.gms:play-services-auth:21.0.0")
-
     implementation("com.google.firebase:firebase-firestore")
     implementation("com.google.firebase:firebase-database:20.3.1")
-
     implementation("com.google.firebase:firebase-database-ktx:20.2.2")
     implementation("com.google.android.material:material:1.10.0")
     implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
     implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
+
 
 }
