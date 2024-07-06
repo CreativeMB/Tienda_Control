@@ -15,14 +15,23 @@
         android:theme="@style/Theme.TiendaControl"
         tools:targetApi="31">
         <activity
+            android:name=".VerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Ver"
+            android:exported="false" />
+        <activity
+            android:name=".Nuevo"
+            android:exported="false" />
+        <activity
             android:name=".login.Home"
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="false"/>
+            android:exported="false" />
         <activity
             android:name=".login.Register"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".login.Login"
             android:exported="true">
@@ -32,7 +41,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

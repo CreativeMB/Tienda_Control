@@ -22,4 +22,12 @@
     <string name="firestore_button">Firestore</string>
     <string name="realtime_database_button">Realtime</string>
     <string name="sensor_app_name">Firebase Realtime Database</string>
+
+
+
+    <string name="hint_nombre">Producto vendido:</string>
+    <string name="hint_telefono">Valor:</string>
+    <string name="hint_correo_electronico">Dtalles:</string>
+    <string name="btn_guarda">Nueva Venta</string>
+    <string name="menu_nuevo">Nueva Venta</string>
 </resources>

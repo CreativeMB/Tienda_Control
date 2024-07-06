@@ -9,6 +9,8 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.tiendacontrol.MainActivity;
 import com.example.tiendacontrol.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -76,7 +78,7 @@ public class Login extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Inicio de sesión exitoso, mostrar mensaje de éxito y redirigir a la actividad principal
                             Toast.makeText(Login.this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(Login.this, Home.class);
+                            Intent intent = new Intent(Login.this, MainActivity.class);
                             startActivity(intent);
                             finish(); // Cierra esta actividad para que el usuario no pueda volver atrás
                         } else {
