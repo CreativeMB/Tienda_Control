@@ -2,6 +2,6 @@
 <layer-list xmlns:android="http://schemas.android.com/apk/res/android">
     <item android:drawable="@color/Buton" /> <!-- Color de fondo -->
     <item>
-        <bitmap android:gravity="center" android:src="@drawable/icono" /> <!-- Imagen centrada -->
+        <bitmap android:gravity="center" android:src="@drawable/iconopng" /> <!-- Imagen centrada -->
     </item>
 </layer-list>

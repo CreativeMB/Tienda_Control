@@ -14,9 +14,9 @@
     <string name="messages_title">Mensajes con Firestore</string>
     <string name="enter_message_hint">Ingrese su mensaje</string>
     <string name="send_button_text">Enviar mensaje</string>
-    <string name="login_title">Inicio de sesión</string>
+    <string name="login_title">Bienvenido a Tienda Control</string>
     <string name="login_button">Iniciar sesión</string>
-    <string name="register_button">Registro</string>
+    <string name="register_button">¿Regitro por Aqui?</string>
     <string name="home_view_title">Vista del Home</string>
     <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
