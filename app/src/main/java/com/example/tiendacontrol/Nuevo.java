@@ -1,5 +1,6 @@
 package com.example.tiendacontrol;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -18,7 +19,7 @@ public class Nuevo extends AppCompatActivity {
 
     EditText txtNombre, txtTelefono, txtCorreoElectronico;
     Button btnGuarda;
-
+    int id = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,6 +43,7 @@ public class Nuevo extends AppCompatActivity {
                     if (id > 0) {
                         Toast.makeText(Nuevo.this, "REGISTRO GUARDADO", Toast.LENGTH_LONG).show();
                         limpiar();
+                        verRegistro();
                     } else {
                         Toast.makeText(Nuevo.this, "ERROR AL GUARDAR REGISTRO", Toast.LENGTH_LONG).show();
                     }
@@ -57,5 +59,10 @@ public class Nuevo extends AppCompatActivity {
         txtTelefono.setText("");
         txtCorreoElectronico.setText("");
 
+    }
+    private void verRegistro(){
+        Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("ID", id);
+        startActivity(intent);
     }
 }

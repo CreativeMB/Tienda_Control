@@ -67,6 +67,7 @@ public class Editar extends AppCompatActivity {
                     if(correcto){
                         Toast.makeText(Editar.this, "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();
                         verRegistro();
+
                     } else {
                         Toast.makeText(Editar.this, "ERROR AL MODIFICAR REGISTRO", Toast.LENGTH_LONG).show();
                     }
@@ -78,7 +79,7 @@ public class Editar extends AppCompatActivity {
     }
 
     private void verRegistro(){
-        Intent intent = new Intent(this, VerActivity.class);
+        Intent intent = new Intent(this, MainActivity.class);
         intent.putExtra("ID", id);
         startActivity(intent);
     }

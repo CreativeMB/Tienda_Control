@@ -2,24 +2,17 @@ package com.example.tiendacontrol;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.Bd.BdVentas;
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.entidades.Ventas;
-import com.example.tiendacontrol.login.Login;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.util.ArrayList;
@@ -60,14 +53,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         txtBuscar.setOnQueryTextListener(this);
     }
 
-//    public boolean onCreateOptionsMenu(Menu menu){
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
 //        MenuInflater inflater = getMenuInflater();
 //        inflater.inflate(R.menu.menu_principal, menu);
 //        return true;
 //    }
 //
-//    public boolean onOptionsItemSelected(MenuItem item){
-//        switch (item.getItemId()){
+//    @Override
+//    public boolean onOptionsItemSelected(MenuItem item) {
+//        switch (item.getItemId()) {
 //            case R.id.menuNuevo:
 //                nuevoRegistro();
 //                return true;
@@ -92,4 +88,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter.filtrado(s);
         return false;
     }
+
+
 }
