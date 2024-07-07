@@ -27,7 +27,7 @@
         android:layout_marginTop="16dp"
         android:padding="20dp"
         android:text="@string/login_title"
-        android:textColor="@color/Buton"
+        android:textColor="@color/black"
         android:textSize="15sp"
         android:textStyle="bold"
         android:gravity="center"

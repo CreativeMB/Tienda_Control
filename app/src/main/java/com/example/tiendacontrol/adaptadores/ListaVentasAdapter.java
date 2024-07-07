@@ -24,10 +24,10 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
     ArrayList<Ventas> listaVentas;
     ArrayList<Ventas> listaOriginal;
 
-    public ListaVentasAdapter(ArrayList<Ventas> listaContactos) {
-        this.listaVentas = listaContactos;
+    public ListaVentasAdapter(ArrayList<Ventas> listaVentas) {
+        this.listaVentas = listaVentas;
         listaOriginal = new ArrayList<>();
-        listaOriginal.addAll(listaContactos);
+        listaOriginal.addAll(listaVentas);
     }
 
     @NonNull
