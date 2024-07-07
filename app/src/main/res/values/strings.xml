@@ -9,14 +9,14 @@
     <string name="name_hint">Nombre</string>
     <string name="email_hint">Correo electrónico</string>
     <string name="password_hint">Contraseña</string>
-    <string name="register_button_text">Registrar</string>
+    <string name="register_button_text">Registro</string>
     <string name="login_button_text">Login</string>
     <string name="messages_title">Mensajes con Firestore</string>
     <string name="enter_message_hint">Ingrese su mensaje</string>
     <string name="send_button_text">Enviar mensaje</string>
     <string name="login_title">Inicio de sesión</string>
     <string name="login_button">Iniciar sesión</string>
-    <string name="register_button">Registrar</string>
+    <string name="register_button">Registro</string>
     <string name="home_view_title">Vista del Home</string>
     <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
