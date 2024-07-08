@@ -36,7 +36,7 @@ public class Nuevo extends AppCompatActivity {
             @Override
             public void onClick(View view) {
 
-                if(!txtProducto.getText().toString().equals("") && !txtValor.getText().toString().equals("")) {
+                if(!txtProducto.getText().toString().equals("") && !txtValor.getText().toString().equals("") && !txtDetalles.getText().toString().equals("") && !txtCantidad.getText().toString().equals("")) {
 
                     BdVentas bdVentas = new BdVentas(Nuevo.this);
                     long id = bdVentas.insertarVenta(txtProducto.getText().toString(), txtValor.getText().toString(), txtDetalles.getText().toString(), txtCantidad.getText().toString());

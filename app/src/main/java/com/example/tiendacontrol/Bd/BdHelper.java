@@ -20,22 +20,12 @@ public class BdHelper extends SQLiteOpenHelper {
 
         sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_VENTAS + " (" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "producto TEXT NOT NULL UNIQUE," +
-                "valor INTEGER NOT NULL UNIQUE," + // O "valor REAL NOT NULL UNIQUE" si es decimal
-                "detalles TEXT NOT NULL UNIQUE," +
+                "producto TEXT NOT NULL," +
+                "valor INTEGER NOT NULL," +
+                "detalles TEXT NOT NULL," +
                 "cantidad INTEGER" +
                 ");");
     }
-//    @Override
-//    public void onCreate(SQLiteDatabase sqLiteDatabase) {
-//
-//        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_VENTAS + "(" +
-//                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-//                "producto TEXT NOT NULL," +
-//                "valor TEXT NOT NULL," +
-//                "detalles TEXT NOT NULL," +
-//                "cantidad TEXT)");
-//    }
 
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {
