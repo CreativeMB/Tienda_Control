@@ -15,6 +15,15 @@
         android:orientation="vertical">
 
         <TextView
+
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:textColor="@color/Buton"
+            android:textSize="25dp"
+            android:text="Nuevo Gasto" />
+
+        <TextView
             android:id="@+id/viewProducto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
