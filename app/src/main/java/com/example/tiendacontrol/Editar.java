@@ -16,7 +16,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class Editar extends AppCompatActivity {
 
-    EditText txtNombre, txtTelefono, txtCorreo;
+    EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
     FloatingActionButton fabEditar, fabEliminar;
     boolean correcto = false;
@@ -29,9 +29,10 @@ public class Editar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ver);
 
-        txtNombre = findViewById(R.id.txtNombre);
-        txtTelefono = findViewById(R.id.txtTelefono);
-        txtCorreo = findViewById(R.id.txtCorreoElectronico);
+        txtProducto = findViewById(R.id.txtProducto);
+        txtValor = findViewById(R.id.txtValor);
+        txtDetalles = findViewById(R.id.txtDetalles);
+        txtCantidad = findViewById(R.id.txtCantidad);
         btnGuarda = findViewById(R.id.btnGuarda);
         fabEditar = findViewById(R.id.fabEditar);
         fabEditar.setVisibility(View.INVISIBLE);
@@ -53,16 +54,17 @@ public class Editar extends AppCompatActivity {
         venta = bdVentas.verVenta(id);
 
         if (venta != null) {
-            txtNombre.setText(venta.getNombre());
-            txtTelefono.setText(venta.getTelefono());
-            txtCorreo.setText(venta.getCorreo_electornico());
+            txtProducto.setText(venta.getProducto());
+            txtValor.setText(venta.getValor());
+            txtDetalles.setText(venta.getDetalles());
+            txtCantidad.setText(venta.getCantidad());
         }
 
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!txtNombre.getText().toString().equals("") && !txtTelefono.getText().toString().equals("")) {
-                    correcto = bdVentas.editarVenta(id, txtNombre.getText().toString(), txtTelefono.getText().toString(), txtCorreo.getText().toString());
+                if (!txtProducto.getText().toString().equals("") && !txtValor.getText().toString().equals("")) {
+                    correcto = bdVentas.editarVenta(id, txtProducto.getText().toString(), txtValor.getText().toString(), txtDetalles.getText().toString(), txtCantidad.getText().toString());
 
                     if(correcto){
                         Toast.makeText(Editar.this, "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();

@@ -22,7 +22,7 @@ public class BdVentas extends BdHelper{
         this.context = context;
     }
 
-    public long insertarVenta(String nombre, String telefono, String correo_electronico) {
+    public long insertarVenta(String producto, String valor, String detalles, String cantidad) {
 
         long id = 0;
 
@@ -31,9 +31,10 @@ public class BdVentas extends BdHelper{
             SQLiteDatabase db = dbHelper.getWritableDatabase();
 
             ContentValues values = new ContentValues();
-            values.put("nombre", nombre);
-            values.put("telefono", telefono);
-            values.put("correo_electronico", correo_electronico);
+            values.put("producto", producto);
+            values.put("valor", valor);
+            values.put("detalles", detalles);
+            values.put("cantidad", cantidad);
 
             id = db.insert(TABLE_VENTAS, null, values);
         } catch (Exception ex) {
@@ -52,15 +53,16 @@ public class BdVentas extends BdHelper{
         Ventas venta;
         Cursor cursorVentas;
 
-        cursorVentas = db.rawQuery("SELECT * FROM " + TABLE_VENTAS + " ORDER BY nombre ASC", null);
+        cursorVentas = db.rawQuery("SELECT * FROM " + TABLE_VENTAS + " ORDER BY producto ASC", null);
 
         if (cursorVentas.moveToFirst()) {
             do {
                 venta= new Ventas();
                 venta.setId(cursorVentas.getInt(0));
-                venta.setNombre(cursorVentas.getString(1));
-                venta.setTelefono(cursorVentas.getString(2));
-                venta.setCorreo_electornico(cursorVentas.getString(3));
+                venta.setProducto(cursorVentas.getString(1));
+                venta.setValor(cursorVentas.getString(2));
+                venta.setDetalles(cursorVentas.getString(3));
+                venta.setCantidad(cursorVentas.getString(4));
                 listaVentas.add(venta);
             } while (cursorVentas.moveToNext());
         }
@@ -83,9 +85,10 @@ public class BdVentas extends BdHelper{
         if (cursorVentas.moveToFirst()) {
             venta= new Ventas();
             venta.setId(cursorVentas.getInt(0));
-            venta.setNombre(cursorVentas.getString(1));
-            venta.setTelefono(cursorVentas.getString(2));
-            venta.setCorreo_electornico(cursorVentas.getString(3));
+            venta.setProducto(cursorVentas.getString(1));
+            venta.setValor(cursorVentas.getString(2));
+            venta.setDetalles(cursorVentas.getString(3));
+            venta.setCantidad(cursorVentas.getString(4));
         }
 
         cursorVentas.close();
@@ -93,7 +96,7 @@ public class BdVentas extends BdHelper{
         return venta;
     }
 
-    public boolean editarVenta(int id, String nombre, String telefono, String correo_electronico) {
+    public boolean editarVenta(int id, String producto, String valor, String detalles, String cantidad) {
 
         boolean correcto = false;
 
@@ -101,7 +104,7 @@ public class BdVentas extends BdHelper{
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
         try {
-            db.execSQL("UPDATE " + TABLE_VENTAS + " SET nombre = '" + nombre + "', telefono = '" + telefono + "', correo_electronico = '" + correo_electronico + "' WHERE id='" + id + "' ");
+            db.execSQL("UPDATE " + TABLE_VENTAS + " SET producto = '" + producto + "', valor = '" + valor + "', detalles = '" + detalles + "', cantidad = '" + cantidad + "' WHERE id='" + id + "' ");
             correcto = true;
         } catch (Exception ex) {
             ex.toString();

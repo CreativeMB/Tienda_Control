@@ -10,51 +10,67 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight=".9"
+        android:layout_margin="40dp"
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/viewNombre"
+            android:id="@+id/viewProducto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hint_nombre" />
+            android:text="@string/hint_Producto" />
 
         <EditText
-            android:id="@+id/txtNombre"
+            android:id="@+id/txtProducto"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textPersonName"
-            android:labelFor="@+id/viewNombre"
+            android:inputType="text"
+            android:labelFor="@+id/viewProducto"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/viewTelefono"
+            android:id="@+id/viewValor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hint_telefono" />
+            android:text="@string/hint_Valor" />
 
         <EditText
-            android:id="@+id/txtTelefono"
+            android:id="@+id/txtValor"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="phone"
-            android:labelFor="@+id/viewTelefono"
+            android:inputType="number"
+            android:labelFor="@+id/viewValor"
             android:textSize="18sp" />
 
         <TextView
-            android:id="@+id/viewCorreo"
+            android:id="@+id/viewDetalles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hint_correo_electronico" />
+            android:text="@string/hint_Detalles" />
 
         <EditText
-            android:id="@+id/txtCorreoElectronico"
+            android:id="@+id/txtDetalles"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:inputType="textEmailAddress"
-            android:labelFor="@+id/viewCorreo"
+            android:inputType="text"
+            android:labelFor="@+id/viewDetalles"
+            android:textSize="18sp" />
+
+        <TextView
+            android:id="@+id/viewCantidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/hint_Cantidad" />
+
+        <EditText
+            android:id="@+id/txtCantidad"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:inputType="number"
+            android:labelFor="@+id/viewCantidad"
             android:textSize="18sp" />
 
         <Button
@@ -62,6 +78,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
+            android:backgroundTint="@color/Buton"
             android:text="@string/btn_guarda" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -69,8 +86,9 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="15dp"
+            android:layout_marginRight="1dp"
             android:layout_marginBottom="20dp"
+            android:backgroundTint="@color/Buton"
             android:clickable="true"
             android:src="@android:drawable/ic_menu_edit" />
 
@@ -79,25 +97,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="bottom|end"
-            android:layout_marginRight="15dp"
+            android:layout_marginRight="1dp"
+            android:backgroundTint="@color/Buton"
             android:clickable="true"
             android:src="@android:drawable/ic_delete" />
 
     </LinearLayout>
-    <!--
-        <com.google.android.material.bottomappbar.BottomAppBar
-            android:id="@+id/bottomAppBar"
-            style="@style/Widget.MaterialComponents.BottomAppBar.Colored"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom"
-            tools:ignore="BottomAppBar">
 
-            <ImageButton
-                android:id="@+id/imageButton"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                app:srcCompat="@drawable/ic_edit" />
-
-        </com.google.android.material.bottomappbar.BottomAppBar>-->
 </LinearLayout>

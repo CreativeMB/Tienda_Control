@@ -39,9 +39,10 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ContactoViewHolder holder, int position) {
-        holder.viewNombre.setText(listaVentas.get(position).getNombre());
-        holder.viewTelefono.setText(listaVentas.get(position).getTelefono());
-        holder.viewCorreo.setText(listaVentas.get(position).getCorreo_electornico());
+        holder.viewProducto.setText(listaVentas.get(position).getProducto());
+        holder.viewValor.setText(listaVentas.get(position).getValor());
+        holder.viewDetalles.setText(listaVentas.get(position).getDetalles());
+        holder.viewCantidad.setText(listaVentas.get(position).getCantidad());
     }
 
     public void filtrado(final String txtBuscar) {
@@ -52,13 +53,13 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
         } else {
             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
                 List<Ventas> collecion = listaVentas.stream()
-                        .filter(i -> i.getNombre().toLowerCase().contains(txtBuscar.toLowerCase()))
+                        .filter(i -> i.getProducto().toLowerCase().contains(txtBuscar.toLowerCase()))
                         .collect(Collectors.toList());
                 listaVentas.clear();
                 listaVentas.addAll(collecion);
             } else {
                 for (Ventas c : listaOriginal) {
-                    if (c.getNombre().toLowerCase().contains(txtBuscar.toLowerCase())) {
+                    if (c.getProducto().toLowerCase().contains(txtBuscar.toLowerCase())) {
                         listaVentas.add(c);
                     }
                 }
@@ -74,14 +75,15 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
 
     public class ContactoViewHolder extends RecyclerView.ViewHolder {
 
-        TextView viewNombre, viewTelefono, viewCorreo;
+        TextView viewProducto, viewValor, viewDetalles, viewCantidad;
 
         public ContactoViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            viewNombre = itemView.findViewById(R.id.viewNombre);
-            viewTelefono = itemView.findViewById(R.id.viewTelefono);
-            viewCorreo = itemView.findViewById(R.id.viewCorreo);
+            viewProducto = itemView.findViewById(R.id.viewProducto);
+            viewValor = itemView.findViewById(R.id.viewValor);
+            viewDetalles = itemView.findViewById(R.id.viewDetalles);
+            viewCantidad = itemView.findViewById(R.id.viewCantidad);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

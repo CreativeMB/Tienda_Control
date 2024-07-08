@@ -25,9 +25,12 @@
 
 
 
-    <string name="hint_nombre">Producto vendido:</string>
-    <string name="hint_telefono">Valor:</string>
-    <string name="hint_correo_electronico">Dtalles:</string>
-    <string name="btn_guarda">Nueva Venta</string>
+    <string name="hint_Producto">Producto:</string>
+    <string name="hint_Valor">Valor:</string>
+    <string name="hint_Detalles">Dtalles:</string>
+    <string name="hint_Cantidad">Cantidad:</string>
+
+
+    <string name="btn_guarda">Guardar</string>
     <string name="menu_nuevo">Nueva Venta</string>
 </resources>

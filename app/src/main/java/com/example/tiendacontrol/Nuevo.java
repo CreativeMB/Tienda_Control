@@ -17,7 +17,7 @@ import com.example.tiendacontrol.Bd.BdVentas;
 
 public class Nuevo extends AppCompatActivity {
 
-    EditText txtNombre, txtTelefono, txtCorreoElectronico;
+    EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
     int id = 0;
     @Override
@@ -26,19 +26,20 @@ public class Nuevo extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.nuevo);
 
-        txtNombre = findViewById(R.id.txtNombre);
-        txtTelefono = findViewById(R.id.txtTelefono);
-        txtCorreoElectronico = findViewById(R.id.txtCorreoElectronico);
+        txtProducto = findViewById(R.id.txtProducto);
+        txtValor = findViewById(R.id.txtValor);
+        txtDetalles = findViewById(R.id.txtDetalles);
+        txtCantidad = findViewById(R.id.txtCantidad);
         btnGuarda = findViewById(R.id.btnGuarda);
 
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-                if(!txtNombre.getText().toString().equals("") && !txtTelefono.getText().toString().equals("")) {
+                if(!txtProducto.getText().toString().equals("") && !txtValor.getText().toString().equals("")) {
 
-                    BdVentas dbContactos = new BdVentas(Nuevo.this);
-                    long id = dbContactos.insertarVenta(txtNombre.getText().toString(), txtTelefono.getText().toString(), txtCorreoElectronico.getText().toString());
+                    BdVentas bdVentas = new BdVentas(Nuevo.this);
+                    long id = bdVentas.insertarVenta(txtProducto.getText().toString(), txtValor.getText().toString(), txtDetalles.getText().toString(), txtCantidad.getText().toString());
 
                     if (id > 0) {
                         Toast.makeText(Nuevo.this, "REGISTRO GUARDADO", Toast.LENGTH_LONG).show();
@@ -55,9 +56,10 @@ public class Nuevo extends AppCompatActivity {
     }
 
     private void limpiar() {
-        txtNombre.setText("");
-        txtTelefono.setText("");
-        txtCorreoElectronico.setText("");
+        txtProducto.setText("");
+        txtValor.setText("");
+        txtDetalles.setText("");
+        txtCantidad.setText("");
 
     }
     private void verRegistro(){

@@ -21,7 +21,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class VerActivity extends AppCompatActivity {
 
-    EditText txtNombre, txtTelefono, txtCorreo;
+    EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
     FloatingActionButton fabEditar, fabEliminar;
 
@@ -34,9 +34,10 @@ public class VerActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_ver);
-        txtNombre = findViewById(R.id.txtNombre);
-        txtTelefono = findViewById(R.id.txtTelefono);
-        txtCorreo = findViewById(R.id.txtCorreoElectronico);
+        txtProducto = findViewById(R.id.txtProducto);
+        txtValor = findViewById(R.id.txtValor);
+        txtDetalles = findViewById(R.id.txtDetalles);
+        txtCantidad = findViewById(R.id.txtCantidad);
         fabEditar = findViewById(R.id.fabEditar);
         fabEliminar = findViewById(R.id.fabEliminar);
         btnGuarda = findViewById(R.id.btnGuarda);
@@ -57,12 +58,14 @@ public class VerActivity extends AppCompatActivity {
         venta = bdVentas.verVenta(id);
 
         if(venta != null){
-            txtNombre.setText(venta.getNombre());
-            txtTelefono.setText(venta.getTelefono());
-            txtCorreo.setText(venta.getCorreo_electornico());
-            txtNombre.setInputType(InputType.TYPE_NULL);
-            txtTelefono.setInputType(InputType.TYPE_NULL);
-            txtCorreo.setInputType(InputType.TYPE_NULL);
+            txtProducto.setText(venta.getProducto());
+            txtValor.setText(venta.getValor());
+            txtDetalles.setText(venta.getDetalles());
+            txtCantidad.setText(venta.getCantidad());
+            txtProducto.setInputType(InputType.TYPE_NULL);
+            txtValor.setInputType(InputType.TYPE_NULL);
+            txtDetalles.setInputType(InputType.TYPE_NULL);
+            txtCantidad.setInputType(InputType.TYPE_NULL);
         }
 
         fabEditar.setOnClickListener(new View.OnClickListener() {
