@@ -32,4 +32,7 @@
 
     <string name="btn_guarda">Guardar</string>
     <string name="menu_nuevo">Nueva Venta</string>
+    <string name="menu_Gasto">Nuevo Gasto</string>
+    <string name="mes">Mes</string>
+    <string name="ano">Año</string>
 </resources>
