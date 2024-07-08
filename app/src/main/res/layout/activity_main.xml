@@ -103,7 +103,6 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Total gasto"
-
                 android:textColor="#BA1735"
                 android:textSize="18sp" />
         </LinearLayout>
