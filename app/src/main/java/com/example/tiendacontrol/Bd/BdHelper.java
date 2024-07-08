@@ -1,5 +1,6 @@
 package com.example.tiendacontrol.Bd;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -33,5 +34,16 @@ public class BdHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE " + TABLE_VENTAS);
         onCreate(sqLiteDatabase);
 
+    }
+    // Método para insertar un nuevo registro con valor negativo
+    public void insertarGasto(String producto, double valor, String detalles, int cantidad) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("producto", producto);
+        values.put("valor", valor); // Puede ser positivo o negativo
+        values.put("detalles", detalles);
+        values.put("cantidad", cantidad);
+        db.insert(TABLE_VENTAS, null, values);
+        db.close();
     }
 }

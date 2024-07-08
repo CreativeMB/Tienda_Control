@@ -20,6 +20,14 @@ public class Ventas {
         return valor;
     }
 
+    public double getValorAsDouble() {
+        try {
+            return Double.parseDouble(valor);
+        } catch (NumberFormatException e) {
+            return 0.0;  // Manejar el caso donde no se puede convertir a double
+        }
+    }
+
     public String getDetalles() {
         return detalles;
     }
