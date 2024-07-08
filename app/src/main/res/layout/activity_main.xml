@@ -80,7 +80,6 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-
                 android:text="Total venta"
                 android:textColor="#327A35"
                 android:textSize="18sp" />
