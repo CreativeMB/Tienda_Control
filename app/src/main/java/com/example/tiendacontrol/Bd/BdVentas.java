@@ -11,7 +11,10 @@ import androidx.annotation.Nullable;
 
 import com.example.tiendacontrol.entidades.Ventas;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 public class BdVentas extends BdHelper{
 
@@ -35,7 +38,7 @@ public class BdVentas extends BdHelper{
             values.put("valor", valor);
             values.put("detalles", detalles);
             values.put("cantidad", cantidad);
-
+            values.put("fecha_registro", obtenerFechaActual());
             id = db.insert(TABLE_VENTAS, null, values);
         } catch (Exception ex) {
             ex.toString();
@@ -63,6 +66,7 @@ public class BdVentas extends BdHelper{
                 venta.setValor(cursorVentas.getString(2));
                 venta.setDetalles(cursorVentas.getString(3));
                 venta.setCantidad(cursorVentas.getString(4));
+                venta.setFechaRegistro(cursorVentas.getString(5));
                 listaVentas.add(venta);
             } while (cursorVentas.moveToNext());
         }
@@ -134,6 +138,11 @@ public class BdVentas extends BdHelper{
         }
 
         return correcto;
+    }
+    private String obtenerFechaActual() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 
 }

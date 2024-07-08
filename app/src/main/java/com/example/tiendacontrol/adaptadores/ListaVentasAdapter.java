@@ -24,6 +24,7 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
     ArrayList<Ventas> listaVentas;
     ArrayList<Ventas> listaOriginal;
 
+
     public ListaVentasAdapter(ArrayList<Ventas> listaVentas) {
         this.listaVentas = listaVentas;
         listaOriginal = new ArrayList<>();
@@ -43,6 +44,7 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
         holder.viewValor.setText(listaVentas.get(position).getValor());
         holder.viewDetalles.setText(listaVentas.get(position).getDetalles());
         holder.viewCantidad.setText(listaVentas.get(position).getCantidad());
+        holder.viewFecha.setText(listaVentas.get(position).getFechaRegistro());
     }
 
     public void filtrado(final String txtBuscar) {
@@ -75,7 +77,7 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
 
     public class ContactoViewHolder extends RecyclerView.ViewHolder {
 
-        TextView viewProducto, viewValor, viewDetalles, viewCantidad;
+        TextView viewProducto, viewValor, viewDetalles, viewCantidad, viewFecha;
 
         public ContactoViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -84,6 +86,7 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
             viewValor = itemView.findViewById(R.id.viewValor);
             viewDetalles = itemView.findViewById(R.id.viewDetalles);
             viewCantidad = itemView.findViewById(R.id.viewCantidad);
+            viewFecha = itemView.findViewById(R.id.viewFecha);
 
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override

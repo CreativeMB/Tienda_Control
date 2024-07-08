@@ -8,6 +8,13 @@ public class Ventas {
     private String detalles;
     private String cantidad;
 
+
+    private String fechaRegistro;
+
+    public String getFechaRegistro() {
+        return fechaRegistro;
+    }
+
     public String getProducto() {
         return producto;
     }
@@ -55,6 +62,11 @@ public class Ventas {
     public void setCantidad(String cantidad) {
         this.cantidad = cantidad;
     }
+
+    public void setFechaRegistro(String fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
+    }
+
 
 
 

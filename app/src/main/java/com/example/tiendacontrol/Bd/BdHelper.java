@@ -7,6 +7,10 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 import androidx.annotation.Nullable;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class BdHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 2;
@@ -24,7 +28,8 @@ public class BdHelper extends SQLiteOpenHelper {
                 "producto TEXT NOT NULL," +
                 "valor INTEGER NOT NULL," +
                 "detalles TEXT NOT NULL," +
-                "cantidad INTEGER" +
+                "cantidad INTEGER," +
+                "fecha_registro TEXT" +
                 ");");
     }
 
@@ -43,7 +48,13 @@ public class BdHelper extends SQLiteOpenHelper {
         values.put("valor", valor); // Puede ser positivo o negativo
         values.put("detalles", detalles);
         values.put("cantidad", cantidad);
+        values.put("fecha_registro", obtenerFechaActual());
         db.insert(TABLE_VENTAS, null, values);
         db.close();
+    }
+    private String obtenerFechaActual() {
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 }
