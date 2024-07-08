@@ -7,4 +7,5 @@
     <color name="white">#FFFFFFFF</color>
     <color name="texinicio">#FFAA00FF</color>
     <color name="Buton">#2196F3</color>
+    <color name="toolbarBackground">#2196F3</color>
 </resources>

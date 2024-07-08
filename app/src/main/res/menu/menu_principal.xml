@@ -5,17 +5,21 @@
     <item
         android:id="@+id/nuevaVenta"
         android:orderInCategory="100"
-        android:title="@string/menu_nuevo" />
+        android:title="@string/menu_nuevo"
+        app:showAsAction="never" />
     <item
         android:id="@+id/nuevaGasto"
         android:orderInCategory="100"
-        android:title="@string/menu_Gasto" />
+        android:title="@string/menu_Gasto"
+        app:showAsAction="never" />
     <item
         android:id="@+id/mes"
         android:orderInCategory="100"
-        android:title="@string/mes" />
+        android:title="@string/mes"
+        app:showAsAction="never" />
     <item
-        android:id="@+id/año"
+        android:id="@+id/ano"
         android:orderInCategory="100"
-        android:title="@string/ano" />
+        android:title="@string/ano"
+        app:showAsAction="never" />
 </menu>

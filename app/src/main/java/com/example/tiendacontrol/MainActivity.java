@@ -1,14 +1,18 @@
 package com.example.tiendacontrol;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -31,6 +35,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     ListaVentasAdapter adapter;
     TextView textVenta, textTotal, textGasto;
 
+    Toolbar toolbar;
+    private static final int NUEVA_VENTA = 1;
+    private static final int NUEVA_GASTO = 2;
+    private static final int MES = 3;
+    private static final int ANO = 4;
+    
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +56,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textVenta = findViewById(R.id.textVenta);
         textTotal = findViewById(R.id.textTotal);
         textGasto = findViewById(R.id.textGasto);
+        toolbar = findViewById(R.id.toolbar);
+
+
+
+        setSupportActionBar(toolbar);
+        getSupportActionBar().setTitle("Tienda Control");
+        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+
 
 
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
@@ -76,6 +96,32 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
     }
+
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_principal, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case NUEVA_VENTA:
+                nuevoRegistro();
+                return true;
+            case NUEVA_GASTO:
+                nuevoGasto();
+                return true;
+            case MES:
+                // Código para la opción "Mes"
+                return true;
+            case ANO:
+                // Código para la opción "Año"
+                return true;
+            default:
+                return super.onOptionsItemSelected(item);
+        }
+    }
+
 
     private void nuevoRegistro() {
         Intent intent = new Intent(this, Nuevo.class);
@@ -141,5 +187,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         textGasto.setText(sumaFormateadaStr);
     }
+
+
 
 }
