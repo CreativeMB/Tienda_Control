@@ -32,6 +32,7 @@ public class Nuevo extends AppCompatActivity {
         txtCantidad = findViewById(R.id.txtCantidad);
         btnGuarda = findViewById(R.id.btnGuarda);
 
+
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
