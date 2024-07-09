@@ -21,7 +21,7 @@
     <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
     <string name="realtime_database_button">Realtime</string>
-    <string name="sensor_app_name">Firebase Realtime Database</string>
+    <string name="Edicion">Administra</string>
 
 
     <string name="hint_Producto">Producto:</string>
