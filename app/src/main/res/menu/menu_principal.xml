@@ -18,8 +18,9 @@
         android:title="@string/mes"
         app:showAsAction="never" />
     <item
-        android:id="@+id/ano"
+        android:id="@+id/EXPORTAR"
         android:orderInCategory="100"
-        android:title="@string/ano"
+        android:title="@string/exportar"
         app:showAsAction="never" />
+
 </menu>

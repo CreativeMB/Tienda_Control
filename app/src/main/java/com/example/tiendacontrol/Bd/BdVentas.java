@@ -19,7 +19,7 @@ import java.util.Locale;
 public class BdVentas extends BdHelper{
 
     Context context;
-
+    public static final String TABLE_NAME = "ventas";
     public BdVentas(@Nullable Context context) {
         super(context);
         this.context = context;

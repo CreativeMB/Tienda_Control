@@ -34,5 +34,5 @@
     <string name="menu_nuevo">Nueva Venta</string>
     <string name="menu_Gasto">Nuevo Gasto</string>
     <string name="mes">Mes</string>
-    <string name="ano">Año</string>
+    <string name="exportar">Exportar Datos</string>
 </resources>
