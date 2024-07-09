@@ -60,13 +60,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textGasto = findViewById(R.id.textGasto);
         toolbar = findViewById(R.id.toolbar);
 
-
-
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Tienda Control");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-
 
 
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
