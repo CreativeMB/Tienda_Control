@@ -21,22 +21,25 @@
         <activity
             android:name=".Gasto"
             android:exported="false" /> <!-- Actividades -->
-        <activity
-            android:name=".login.Login"
-            android:exported="true"
-            android:theme="@style/SplashTheme">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity android:name=".MainActivity" />
+
+
+
+
+        <activity android:name=".MainActivity"
+            android:exported="true">
+
+        <intent-filter>
+            <action android:name="android.intent.action.MAIN" />
+
+            <category android:name="android.intent.category.LAUNCHER" />
+        </intent-filter></activity>
         <activity android:name=".VerActivity" />
         <activity android:name=".Editar" />
         <activity android:name=".Nuevo" />
         <activity android:name=".login.Home" />
         <activity android:name=".login.Register" />
+        <activity android:name=".login.Login"/>
     </application>
 
 </manifest>

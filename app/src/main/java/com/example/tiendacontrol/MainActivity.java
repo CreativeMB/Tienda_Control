@@ -129,11 +129,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
 
     private void nuevoRegistro() {
-        Intent intent = new Intent(this, Nuevo.class);
+        Intent intent = new Intent(this, com.example.tiendacontrol.IngresoDialogFragment.class);
         startActivity(intent);
     }
     private void nuevoGasto() {
-        Intent intent = new Intent(this, Gasto.class);
+        Intent intent = new Intent(this, GastoDialogFragment.class);
         startActivity(intent);
     }
 
