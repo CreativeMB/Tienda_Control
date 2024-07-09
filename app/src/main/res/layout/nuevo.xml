@@ -1,102 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Nuevo">
+    android:padding="16dp">
 
-<!--    <androidx.appcompat.widget.Toolbar-->
-<!--        android:id="@+id/toolbar"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:background="@color/toolbarBackground"-->
-<!--        android:minHeight="?attr/actionBarSize"-->
-<!--        android:theme="?attr/actionBarTheme" />-->
-
-    <LinearLayout
+    <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/toolbar"
-        android:layout_margin="40dp"
-        android:orientation="vertical">
+        android:layout_height="wrap_content">
 
-        <TextView
+        <LinearLayout
+            android:id="@+id/content_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center"
-            android:textColor="@color/Buton"
-            android:textSize="25dp"
-            android:text="Nuevo Ingreso" />
+            android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/viewProducto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hint_Producto" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:textColor="@color/Buton"
+                android:textSize="25dp"
+                android:text="Nuevo Ingreso" />
 
-        <EditText
-            android:id="@+id/txtProducto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text"
-            android:labelFor="@+id/viewProducto"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/viewProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_Producto" />
 
-        <TextView
-            android:id="@+id/viewValor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hint_Valor" />
+            <EditText
+                android:id="@+id/txtProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"
+                android:labelFor="@+id/viewProducto"
+                android:textSize="18sp" />
 
-        <EditText
-            android:id="@+id/txtValor"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:labelFor="@+id/viewValor"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/viewValor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_Valor" />
 
-        <TextView
-            android:id="@+id/viewDetalles"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hint_Detalles" />
+            <EditText
+                android:id="@+id/txtValor"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:labelFor="@+id/viewValor"
+                android:textSize="18sp" />
 
-        <EditText
-            android:id="@+id/txtDetalles"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="text"
-            android:labelFor="@+id/viewDetalles"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/viewDetalles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_Detalles" />
 
-        <TextView
-            android:id="@+id/viewCantidad"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="@string/hint_Cantidad" />
+            <EditText
+                android:id="@+id/txtDetalles"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="text"
+                android:labelFor="@+id/viewDetalles"
+                android:textSize="18sp" />
 
-        <EditText
-            android:id="@+id/txtCantidad"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:inputType="number"
-            android:labelFor="@+id/viewCantidad"
-            android:textSize="18sp" />
+            <TextView
+                android:id="@+id/viewCantidad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_Cantidad" />
 
-        <Button
-            android:id="@+id/btnGuarda"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:backgroundTint="@color/Buton"
-            android:text="@string/btn_guarda"
-            android:textSize="18sp" />
-    </LinearLayout>
+            <EditText
+                android:id="@+id/txtCantidad"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:inputType="number"
+                android:labelFor="@+id/viewCantidad"
+                android:textSize="18sp" />
+
+            <!-- Botón dentro del LinearLayout para que se desplace con el contenido -->
+            <Button
+                android:id="@+id/btnGuarda"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:backgroundTint="@color/Buton"
+                android:text="@string/btn_guarda"
+                android:textSize="18sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
 </RelativeLayout>

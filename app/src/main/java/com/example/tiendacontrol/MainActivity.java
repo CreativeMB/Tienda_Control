@@ -13,11 +13,13 @@ import android.widget.TextView;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.Bd.BdVentas;
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
+import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.entidades.Ventas;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -80,14 +82,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         fabGAsto.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nuevoGasto();
+                GastoDialogFragment dialogFragment = new GastoDialogFragment();
+                dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             }
         });;
 
         fabNuevo.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                nuevoRegistro();
+                FragmentManager fragmentManager = getSupportFragmentManager();
+                com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+                ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
             }
         });
 
