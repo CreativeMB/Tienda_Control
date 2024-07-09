@@ -114,7 +114,6 @@
             android:layout_height="50dp"
             android:background="@color/Buton"
             android:gravity="left" />
-
     </FrameLayout>
 
     <!-- FloatingActionButton superpuesto -->
@@ -141,5 +140,6 @@
         android:focusable="true"
         android:src="@android:drawable/ic_delete"
         app:backgroundTint="@color/Buton" />
+
 
 </FrameLayout>
