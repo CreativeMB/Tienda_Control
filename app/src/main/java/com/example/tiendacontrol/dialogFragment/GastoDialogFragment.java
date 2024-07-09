@@ -1,5 +1,5 @@
 package com.example.tiendacontrol.dialogFragment;
-import android.app.Dialog;
+
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -11,22 +11,15 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.fragment.app.DialogFragment;
-
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.MainActivity;
 import com.example.tiendacontrol.R;
 
-public class GastoDialogFragment extends DialogFragment {
+public class GastoDialogFragment extends BottomSheetDialogFragment {
 
     private EditText editProducto, editValor, editDetalles, editCantidad;
     private BdHelper bdHelper;
-
-    @NonNull
-    @Override
-    public Dialog onCreateDialog(@Nullable Bundle savedInstanceState) {
-        return super.onCreateDialog(savedInstanceState);
-    }
 
     @Nullable
     @Override
