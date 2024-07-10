@@ -73,12 +73,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         dropboxHelper = new DropboxHelper(this);
 
-
-        // Llamar al método para exportar la base de datos
-        String nombreBaseDatos = "MI_contabilidad.db";
-        dropboxHelper.exportarBaseDatos(nombreBaseDatos);
-
-
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");

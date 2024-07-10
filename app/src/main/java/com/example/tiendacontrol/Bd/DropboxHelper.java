@@ -10,6 +10,8 @@ import com.dropbox.core.DbxException;
 import com.dropbox.core.DbxRequestConfig;
 import com.dropbox.core.v2.DbxClientV2;
 import com.dropbox.core.v2.files.FileMetadata;
+import com.dropbox.core.v2.files.ListFolderErrorException;
+import com.dropbox.core.v2.files.Metadata;
 import com.dropbox.core.v2.files.UploadErrorException;
 
 import java.io.File;
@@ -28,7 +30,7 @@ public class DropboxHelper {
     private static final String TAG = "DropboxHelper";
     private Context mContext;
     private BdHelper bdHelper;
-
+    private DbxClientV2 dropboxClient;
     public DropboxHelper(Context context) {
         mContext = context;
         bdHelper = new BdHelper(context); // Inicializa BdHelper aquí
