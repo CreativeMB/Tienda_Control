@@ -1,13 +1,11 @@
 package com.example.tiendacontrol;
 
-import static android.content.ContentValues.TAG;
-
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,33 +17,23 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
+import com.example.tiendacontrol.Bd.DropboxHelper;
 
-import com.example.tiendacontrol.Bd.GoogleDriveHelper;
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.entidades.Ventas;
-import com.google.android.gms.auth.api.signin.GoogleSignIn;
-import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
-import com.google.android.gms.auth.api.signin.GoogleSignInClient;
-import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.api.ApiException;
-import com.google.android.gms.drive.Drive;
-import com.google.android.gms.drive.DriveClient;
-import com.google.android.gms.tasks.Task;
-import com.google.android.gms.tasks.Tasks;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+
+    private DropboxHelper dropboxHelper;
 
     SearchView txtBuscar;
     RecyclerView listaVentas;
@@ -57,9 +45,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     Toolbar toolbar;
 
-    private GoogleSignInClient googleSignInClient;
-    private GoogleDriveHelper googleDriveHelper;
-    private static final int REQUEST_CODE_GOOGLE_SIGN_IN = 1001;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -86,21 +71,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
-        GoogleSignInOptions gso = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
-                .requestScopes(Drive.SCOPE_FILE)
-                .requestEmail()
-                .build();
-        googleSignInClient = GoogleSignIn.getClient(this, gso);
+        dropboxHelper = new DropboxHelper(this);
 
-        googleSignInClient.silentSignIn()
-                .addOnSuccessListener(this, googleSignInAccount -> {
-                    // Crear el GoogleDriveHelper con el cliente de recursos de Drive y el contexto
-                    googleDriveHelper = new GoogleDriveHelper(Drive.getDriveResourceClient(getApplicationContext(), googleSignInAccount), MainActivity.this);
-                })
-                .addOnFailureListener(this, e -> {
-                    Log.e(TAG, "Error al iniciar sesión en Google de forma silenciosa", e);
-                    // Manejar el error, por ejemplo, mostrar un mensaje de error al usuario
-                });
+
+        // Llamar al método para exportar la base de datos
+        String nombreBaseDatos = "MI_contabilidad.db";
+        dropboxHelper.exportarBaseDatos(nombreBaseDatos);
+
 
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
@@ -203,44 +180,40 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     private void exportarBaseDatos() {
-        File dbFile = this.getDatabasePath(BdVentas.DATABASE_NAME);
-        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        if (account == null) {
-            iniciarSesionGoogle();
+        // Nombre de tu base de datos SQLite
+        String nombreBaseDatos = "MI_contabilidad.db";
+
+        File dbFile = this.getDatabasePath(nombreBaseDatos);
+        if (dbFile.exists()) {
+            // Ejecutar AsyncTask para exportar la base de datos a Dropbox
+            new ExportarBaseDatosTask().execute(nombreBaseDatos);
         } else {
-            subirArchivoAGoogleDrive(dbFile);
+            Toast.makeText(MainActivity.this, "Base de datos no encontrada", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void iniciarSesionGoogle() {
-        Intent signInIntent = googleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, REQUEST_CODE_GOOGLE_SIGN_IN);
-    }
+    // AsyncTask para exportar la base de datos a Dropbox
+    private class ExportarBaseDatosTask extends AsyncTask<String, Void, Boolean> {
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == REQUEST_CODE_GOOGLE_SIGN_IN) {
-            Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
-            handleGoogleSignInResult(task);
-        }
-    }
-
-    private void handleGoogleSignInResult(Task<GoogleSignInAccount> completedTask) {
-        try {
-            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-            if (account != null) {
-                File dbFile = this.getDatabasePath(BdVentas.DATABASE_NAME);
-                subirArchivoAGoogleDrive(dbFile);
-            } else {
-                Toast.makeText(this, "Inicio de sesión en Google fallido", Toast.LENGTH_SHORT).show();
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            try {
+                // Llamar al método exportarBaseDatos de DropboxHelper
+                dropboxHelper.exportarBaseDatos(strings[0]);
+                return true; // Éxito
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false; // Error
             }
-        } catch (ApiException e) {
-            Log.e(TAG, "Error al iniciar sesión en Google", e);
         }
-    }
 
-    private void subirArchivoAGoogleDrive(File file) {
-        googleDriveHelper.subirBaseDeDatos(file);
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                Toast.makeText(MainActivity.this, "Base de datos exportada correctamente", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Error al exportar base de datos", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
