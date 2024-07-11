@@ -42,14 +42,17 @@ public class DropboxHelper {
             String accessToken = prefs.getString("dropbox_access_token", null);
 
             if (accessToken == null) {
+                // Si no hay token de acceso, iniciar la actividad de autenticación de Dropbox
                 mContext.startActivity(new Intent(mContext, DropboxAuthActivity.class));
                 Toast.makeText(mContext, "Autenticación requerida. Intente nuevamente después de autenticarse.", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            // Construir el path en Dropbox para el archivo CSV
             String dropboxPath = "/" + nombreBaseDatos.replace(".db", "") + ".csv";
             DbxRequestConfig config = DbxRequestConfig.newBuilder("Tienda Control").build();
 
+            // Ejecutar la tarea de exportación en segundo plano
             new ExportTask(dbFile, dropboxPath, config, accessToken).execute();
         } else {
             Log.e(TAG, "Base de datos no encontrada en la ruta especificada.");
@@ -73,12 +76,18 @@ public class DropboxHelper {
         @Override
         protected Boolean doInBackground(Void... voids) {
             try {
+                // Crear cliente Dropbox con la configuración y el token de acceso
                 DbxClientV2 client = new DbxClientV2(config, accessToken);
+
+                // Convertir la base de datos SQLite a formato CSV
                 List<String> csvData = convertirBaseDatosACSV(dbFile);
+
+                // Escribir los datos CSV en un archivo local
                 File csvFile = escribirDatosEnCSV(csvData);
 
                 if (csvFile != null) {
                     try (InputStream in = new FileInputStream(csvFile)) {
+                        // Subir el archivo CSV a Dropbox
                         FileMetadata metadata = client.files().uploadBuilder(dropboxPath)
                                 .uploadAndFinish(in);
                         Log.d(TAG, "Archivo subido a Dropbox: " + metadata.getPathLower());
@@ -138,6 +147,7 @@ public class DropboxHelper {
     private File escribirDatosEnCSV(List<String> csvData) {
         File csvFile = null;
         try {
+            // Crear el archivo CSV en el directorio de archivos externos de la aplicación
             csvFile = new File(mContext.getExternalFilesDir(null), "exportacion.csv");
             OutputStream os = new FileOutputStream(csvFile);
             for (String line : csvData) {
