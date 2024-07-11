@@ -73,6 +73,4 @@ dependencies {
     implementation ("com.dropbox.core:dropbox-core-sdk:7.0.0")
     implementation ("com.dropbox.core:dropbox-android-sdk:7.0.0")
 
-    implementation ("com.dropbox.core:dropbox-core-sdk:4.0.5")
-
 }

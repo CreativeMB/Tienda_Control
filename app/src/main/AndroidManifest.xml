@@ -2,10 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
 
     <application
         android:allowBackup="true"
@@ -15,34 +15,51 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TiendaControl"
         tools:targetApi="31">
+
         <activity
             android:name=".dialogFragment.GastoDialogFragment"
             android:exported="false" />
-        <activity
-            android:name=".dialogFragment.IngresoDialogFragment"
-            android:exported="false" />
-        <activity
-            android:name=".Gasto"
-            android:exported="false" /> <!-- Actividades -->
 
+        <activity android:name=".VerActivity" android:exported="false" />
+        <activity android:name=".login.Home" android:exported="false" />
+        <activity android:name=".login.Register" android:exported="false" />
+        <activity android:name=".login.Login" android:exported="false"/>
+        <activity android:name=".MainActivity" android:exported="false"/>
 
+        <activity android:name=".Bd.DropboxAuthActivity" android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data
+                    android:scheme="db-piwj5vwzk0c6cp8"
+                    android:host="1" />
+            </intent-filter>
+        </activity>
 
-
-
-        <activity android:name=".MainActivity"
+        <!-- Declarar AuthActivity de Dropbox -->
+        <activity android:name="com.dropbox.core.android.AuthActivity"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|keyboardHidden"
             android:exported="true">
+            <intent-filter>
+                <data android:scheme="piwj5vwzk0c6cp8" />
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+            </intent-filter>
+        </activity>
 
-        <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
+        <activity
+            android:name=".entidades.SplashActivity"
+            android:theme="@style/Theme.TiendaControl"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-            <category android:name="android.intent.category.LAUNCHER" />
-        </intent-filter></activity>
-        <activity android:name=".VerActivity" />
-        <activity android:name=".Editar" />
-        <activity android:name=".Nuevo" />
-        <activity android:name=".login.Home" />
-        <activity android:name=".login.Register" />
-        <activity android:name=".login.Login"/>
     </application>
 
 </manifest>
