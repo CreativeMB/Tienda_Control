@@ -105,10 +105,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             exportarBaseDatos();
             return true;
         } else if (id == R.id.nueva_venta) {
-            nuevoRegistro();
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+            ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
             return true;
         } else if (id == R.id.nuevo_gasto) {
-            nuevoGasto();
+            GastoDialogFragment dialogFragment = new GastoDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             return true;
         }
 
