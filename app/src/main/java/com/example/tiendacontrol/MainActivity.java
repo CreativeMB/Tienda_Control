@@ -1,60 +1,60 @@
 package com.example.tiendacontrol;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
+import com.example.tiendacontrol.Bd.DropboxHelper;
+
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.entidades.Ventas;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.text.NumberFormat;
+import java.io.File;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+
+    private DropboxHelper dropboxHelper;
 
     SearchView txtBuscar;
     RecyclerView listaVentas;
     ArrayList<Ventas> listaArrayVentas;
-    FloatingActionButton fabNuevo;
-    FloatingActionButton fabGAsto;
     ListaVentasAdapter adapter;
+    FloatingActionButton fabNuevo;
+    FloatingActionButton fabGasto;
     TextView textVenta, textTotal, textGasto;
 
     Toolbar toolbar;
-    private static final int NUEVA_VENTA = 1;
-    private static final int NUEVA_GASTO = 2;
-    private static final int MES = 3;
-    private static final int ANO = 4;
-    
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
         txtBuscar = findViewById(R.id.txtBuscar);
         listaVentas = findViewById(R.id.listaVentas);
         fabNuevo = findViewById(R.id.favNuevo);
-        fabGAsto = findViewById(R.id.favGasto);
-
+        fabGasto = findViewById(R.id.favGasto);
         textVenta = findViewById(R.id.textVenta);
         textTotal = findViewById(R.id.textTotal);
         textGasto = findViewById(R.id.textGasto);
@@ -64,40 +64,34 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         getSupportActionBar().setTitle("Tienda Control");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
 
         BdVentas bdVentas = new BdVentas(MainActivity.this);
-
         listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
-
         adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
+        dropboxHelper = new DropboxHelper(this);
 
-        fabGAsto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                GastoDialogFragment dialogFragment = new GastoDialogFragment();
-                dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
-            }
-        });;
+        fabGasto.setOnClickListener(view -> {
+            GastoDialogFragment dialogFragment = new GastoDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
+        });
 
-        fabNuevo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                FragmentManager fragmentManager = getSupportFragmentManager();
-                com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
-                ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
-            }
+        fabNuevo.setOnClickListener(view -> {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+            ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
 
         txtBuscar.setOnQueryTextListener(this);
-        calcularSumaGancias();
+
+        calcularSumaGanancias();
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
     }
 
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_principal, menu);
         return true;
@@ -105,56 +99,54 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case NUEVA_VENTA:
-                nuevoRegistro();
-                return true;
-            case NUEVA_GASTO:
-                nuevoGasto();
-                return true;
-            case MES:
-                // Código para la opción "Mes"
-                return true;
-            case ANO:
-                // Código para la opción "Año"
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
+        int id = item.getItemId();
 
+        if (id == R.id.exportar_db) {
+            exportarBaseDatos();
+            return true;
+        } else if (id == R.id.nueva_venta) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+            ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
+            return true;
+        } else if (id == R.id.nuevo_gasto) {
+            GastoDialogFragment dialogFragment = new GastoDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
 
     private void nuevoRegistro() {
-        Intent intent = new Intent(this, Nuevo.class);
+        Intent intent = new Intent(this, com.example.tiendacontrol.IngresoDialogFragment.class);
         startActivity(intent);
     }
+
     private void nuevoGasto() {
-        Intent intent = new Intent(this, Gasto.class);
+        Intent intent = new Intent(this, GastoDialogFragment.class);
         startActivity(intent);
     }
 
     @Override
-    public boolean onQueryTextSubmit(String s) {
+    public boolean onQueryTextSubmit(String query) {
         return false;
     }
 
     @Override
-    public boolean onQueryTextChange(String s) {
-        adapter.filtrado(s);
+    public boolean onQueryTextChange(String newText) {
+        adapter.filtrado(newText);
         return false;
     }
 
-    private void calcularSumaGancias() {
+    private void calcularSumaGanancias() {
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
             suma += valorVenta;
-            Log.d("SUMA_DEBUG", "Valor de venta: " + valorVenta + ", Suma parcial: " + suma);
         }
         int sumaFormateada = (int) suma;
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String sumaFormateadaStr = "$" + numberFormat.format(sumaFormateada);
-
+        String sumaFormateadaStr = "$" + sumaFormateada;
         textTotal.setText(sumaFormateadaStr);
     }
 
@@ -162,33 +154,63 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
-            if (valorVenta > 0) {  // Solo sumar si el valor es positivo
+            if (valorVenta > 0) {
                 suma += valorVenta;
-                Log.d("SUMA_DEBUG", "Valor de venta positivo: " + valorVenta + ", Suma parcial: " + suma);
             }
         }
         int sumaFormateada = (int) suma;
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String sumaFormateadaStr = "$" + numberFormat.format(sumaFormateada);
-
+        String sumaFormateadaStr = "$" + sumaFormateada;
         textVenta.setText(sumaFormateadaStr);
     }
+
     private void calcularSumaTotalGasto() {
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
-            if (valorVenta < 0) {  // Solo sumar si el valor es negativo
+            if (valorVenta < 0) {
                 suma += valorVenta;
-                Log.d("SUMA_DEBUG", "Valor de venta negativo: " + valorVenta + ", Suma parcial: " + suma);
             }
         }
         int sumaFormateada = (int) suma;
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String sumaFormateadaStr = "$" + numberFormat.format(sumaFormateada);
-
+        String sumaFormateadaStr = "$" + sumaFormateada;
         textGasto.setText(sumaFormateadaStr);
     }
 
+    private void exportarBaseDatos() {
+        // Nombre de tu base de datos SQLite
+        String nombreBaseDatos = "MI_contabilidad.db";
 
+        File dbFile = this.getDatabasePath(nombreBaseDatos);
+        if (dbFile.exists()) {
+            // Ejecutar AsyncTask para exportar la base de datos a Dropbox
+            new ExportarBaseDatosTask().execute(nombreBaseDatos);
+        } else {
+            Toast.makeText(MainActivity.this, "Base de datos no encontrada", Toast.LENGTH_SHORT).show();
+        }
+    }
 
+    // AsyncTask para exportar la base de datos a Dropbox
+    private class ExportarBaseDatosTask extends AsyncTask<String, Void, Boolean> {
+
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            try {
+                // Llamar al método exportarBaseDatos de DropboxHelper
+                dropboxHelper.exportarBaseDatos(strings[0]);
+                return true; // Éxito
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false; // Error
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                Toast.makeText(MainActivity.this, "Base de datos exportada correctamente", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Error al exportar base de datos", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }

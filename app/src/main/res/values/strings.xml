@@ -21,18 +21,19 @@
     <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
     <string name="realtime_database_button">Realtime</string>
-    <string name="sensor_app_name">Firebase Realtime Database</string>
+    <string name="Edicion">Administra</string>
 
 
     <string name="hint_Producto">Producto:</string>
     <string name="hint_Valor">Valor:</string>
     <string name="hint_Detalles">Dtalles:</string>
     <string name="hint_Cantidad">Cantidad:</string>
-
-
     <string name="btn_guarda">Guardar</string>
-    <string name="menu_nuevo">Nueva Venta</string>
-    <string name="menu_Gasto">Nuevo Gasto</string>
-    <string name="mes">Mes</string>
-    <string name="ano">Año</string>
+    //menu
+    <string name="uno">Exportar Datos</string>
+    <string name="dos">Nuevo ingreso</string>
+    <string name="tres">Nuevo Gasto</string>
+    <string name="cuatro">por Asinganar</string>
+
+    <string name="dropbox_app_key">piwj5vwzk0c6cp8</string>
 </resources>

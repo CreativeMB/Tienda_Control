@@ -126,7 +126,7 @@
         android:layout_marginBottom="180dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@android:drawable/ic_input_add"
+        android:src="@android:drawable/ic_menu_set_as"
         app:backgroundTint="@color/Buton" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -138,7 +138,6 @@
         android:layout_marginBottom="100dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@android:drawable/ic_delete"
+        android:src="@android:drawable/ic_menu_save"
         app:backgroundTint="@color/Buton" />
-
 </FrameLayout>
