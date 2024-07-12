@@ -1,119 +1,96 @@
 package com.example.tiendacontrol;
 
-
-
-import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.Manifest;
-
-import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
+import com.example.tiendacontrol.Bd.DropboxHelper;
+
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
+import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.entidades.Ventas;
-import com.example.tiendacontrol.exportar.DatabaseExporter;
+
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.text.NumberFormat;
 import java.util.ArrayList;
-import java.util.Locale;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+
+    private DropboxHelper dropboxHelper;
 
     SearchView txtBuscar;
     RecyclerView listaVentas;
     ArrayList<Ventas> listaArrayVentas;
-    FloatingActionButton fabNuevo;
-    FloatingActionButton fabGAsto;
     ListaVentasAdapter adapter;
+    FloatingActionButton fabNuevo;
+    FloatingActionButton fabGasto;
     TextView textVenta, textTotal, textGasto;
 
     Toolbar toolbar;
-    private static final int NUEVA_VENTA = 1;
-    private static final int NUEVA_GASTO = 2;
-    private static final int MES = 3;
-//    private static final int EXPORTAR = 4;
-//    private static final int EXPORTAR = R.id.EXPORTAR;
 
-    private static final int PERMISSION_REQUEST_CODE = 1;
-    private DatabaseExporter dbExporter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
         txtBuscar = findViewById(R.id.txtBuscar);
         listaVentas = findViewById(R.id.listaVentas);
         fabNuevo = findViewById(R.id.favNuevo);
-        fabGAsto = findViewById(R.id.favGasto);
-
+        fabGasto = findViewById(R.id.favGasto);
         textVenta = findViewById(R.id.textVenta);
         textTotal = findViewById(R.id.textTotal);
         textGasto = findViewById(R.id.textGasto);
         toolbar = findViewById(R.id.toolbar);
 
-        dbExporter = new DatabaseExporter(this);
-
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Tienda Control");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
 
         BdVentas bdVentas = new BdVentas(MainActivity.this);
-
         listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
-
         adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
+        dropboxHelper = new DropboxHelper(this);
 
-        fabGAsto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                nuevoGasto();
-            }
+        fabGasto.setOnClickListener(view -> {
+            GastoDialogFragment dialogFragment = new GastoDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
         });
-        ;
 
-        fabNuevo.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                nuevoRegistro();
-            }
+        fabNuevo.setOnClickListener(view -> {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+            ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
 
         txtBuscar.setOnQueryTextListener(this);
-        calcularSumaGancias();
+
+        calcularSumaGanancias();
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
     }
 
-
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.menu_principal, menu);
         return true;
@@ -121,61 +98,54 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case NUEVA_VENTA:
-                nuevoRegistro();
-                return true;
-            case NUEVA_GASTO:
-                nuevoGasto();
-                return true;
-            case MES:
-                // Código para la opción "Mes"
-                return true;
-            default:
-                if (item.getItemId() == R.id.EXPORTAR) { // Usa if para comprobar la ID
-                    if (checkPermission()) {
-                        exportDatabase();
-                    } else {
-                        requestPermission();
-                    }
-                    return true;
-                }
-                return super.onOptionsItemSelected(item);
+        int id = item.getItemId();
+
+        if (id == R.id.exportar_db) {
+            exportarBaseDatos();
+            return true;
+        } else if (id == R.id.nueva_venta) {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+            ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
+            return true;
+        } else if (id == R.id.nuevo_gasto) {
+            GastoDialogFragment dialogFragment = new GastoDialogFragment();
+            dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
+            return true;
         }
+
+        return super.onOptionsItemSelected(item);
     }
 
     private void nuevoRegistro() {
-        Intent intent = new Intent(this, Nuevo.class);
+        Intent intent = new Intent(this, com.example.tiendacontrol.IngresoDialogFragment.class);
         startActivity(intent);
     }
 
     private void nuevoGasto() {
-        Intent intent = new Intent(this, Gasto.class);
+        Intent intent = new Intent(this, GastoDialogFragment.class);
         startActivity(intent);
     }
 
     @Override
-    public boolean onQueryTextSubmit(String s) {
+    public boolean onQueryTextSubmit(String query) {
         return false;
     }
 
     @Override
-    public boolean onQueryTextChange(String s) {
-        adapter.filtrado(s);
+    public boolean onQueryTextChange(String newText) {
+        adapter.filtrado(newText);
         return false;
     }
 
-    private void calcularSumaGancias() {
+    private void calcularSumaGanancias() {
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
             suma += valorVenta;
-            Log.d("SUMA_DEBUG", "Valor de venta: " + valorVenta + ", Suma parcial: " + suma);
         }
         int sumaFormateada = (int) suma;
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String sumaFormateadaStr = "$" + numberFormat.format(sumaFormateada);
-
+        String sumaFormateadaStr = "$" + sumaFormateada;
         textTotal.setText(sumaFormateadaStr);
     }
 
@@ -183,15 +153,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
-            if (valorVenta > 0) {  // Solo sumar si el valor es positivo
+            if (valorVenta > 0) {
                 suma += valorVenta;
-                Log.d("SUMA_DEBUG", "Valor de venta positivo: " + valorVenta + ", Suma parcial: " + suma);
             }
         }
         int sumaFormateada = (int) suma;
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String sumaFormateadaStr = "$" + numberFormat.format(sumaFormateada);
-
+        String sumaFormateadaStr = "$" + sumaFormateada;
         textVenta.setText(sumaFormateadaStr);
     }
 
@@ -199,112 +166,49 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
-            if (valorVenta < 0) {  // Solo sumar si el valor es negativo
+            if (valorVenta < 0) {
                 suma += valorVenta;
-                Log.d("SUMA_DEBUG", "Valor de venta negativo: " + valorVenta + ", Suma parcial: " + suma);
             }
         }
         int sumaFormateada = (int) suma;
-        NumberFormat numberFormat = NumberFormat.getNumberInstance(Locale.US);
-        String sumaFormateadaStr = "$" + numberFormat.format(sumaFormateada);
-
+        String sumaFormateadaStr = "$" + sumaFormateada;
         textGasto.setText(sumaFormateadaStr);
     }
 
-    private boolean checkPermission() {
-        int result = ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        return result == PackageManager.PERMISSION_GRANTED;
-    }
+    private void exportarBaseDatos() {
+        // Nombre de tu base de datos SQLite
+        String nombreBaseDatos = "MI_contabilidad.db";
 
-    private void requestPermission() {
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, PERMISSION_REQUEST_CODE);
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == PERMISSION_REQUEST_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                exportDatabase();
-            } else {
-                Toast.makeText(this, "Permiso denegado para escribir en almacenamiento externo", Toast.LENGTH_SHORT).show();
-            }
-
-        }
-    }
-
-    public void exportDatabase() {
-        Log.d("EXPORT_DEBUG", "Comenzando la exportación...");
-        if (dbExporter.exportDatabase()) {
-            Log.d("EXPORT_DEBUG", "Base de datos exportada exitosamente");
-            Toast.makeText(this, "Base de datos exportada exitosamente", Toast.LENGTH_SHORT).show();
+        File dbFile = this.getDatabasePath(nombreBaseDatos);
+        if (dbFile.exists()) {
+            // Ejecutar AsyncTask para exportar la base de datos a Dropbox
+            new ExportarBaseDatosTask().execute(nombreBaseDatos);
         } else {
-            Log.d("EXPORT_DEBUG", "Error al exportar la base de datos");
-            Toast.makeText(this, "Error al exportar la base de datos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Base de datos no encontrada", Toast.LENGTH_SHORT).show();
         }
     }
 
-// ... (resto de tu código)
+    // AsyncTask para exportar la base de datos a Dropbox
+    private class ExportarBaseDatosTask extends AsyncTask<String, Void, Boolean> {
 
-    // Clase DatabaseExporter (ejemplo)
-    public class DatabaseExporter {
-
-        private Context context;
-
-        public DatabaseExporter(Context context) {
-            this.context = context;
+        @Override
+        protected Boolean doInBackground(String... strings) {
+            try {
+                // Llamar al método exportarBaseDatos de DropboxHelper
+                dropboxHelper.exportarBaseDatos(strings[0]);
+                return true; // Éxito
+            } catch (Exception e) {
+                e.printStackTrace();
+                return false; // Error
+            }
         }
 
-        public boolean exportDatabase() {
-            try {
-                // Obtener la base de datos
-                BdVentas dbHelper = new BdVentas(context);
-                SQLiteDatabase db = dbHelper.getReadableDatabase();
-
-                // Obtener la ruta de la carpeta de archivos externos de la app
-                File exportDir = context.getExternalFilesDir(null);
-                if (exportDir == null) {
-                    Log.e("EXPORT_ERROR", "No se pudo obtener la ruta de la carpeta de archivos externos");
-                    return false;
-                }
-
-                // Nombre del archivo de exportación
-                String fileName = "tienda_control_backup.db";
-                File exportFile = new File(exportDir, fileName);
-
-                // Crear el archivo
-                if (!exportFile.exists()) {
-                    if (!exportFile.createNewFile()) {
-                        Log.e("EXPORT_ERROR", "No se pudo crear el archivo de exportación");
-                        return false;
-                    }
-                }
-
-                // Exportar la base de datos
-                FileOutputStream outputStream = new FileOutputStream(exportFile);
-                Cursor cursor = db.rawQuery("SELECT * FROM " + BdVentas.TABLE_NAME, null);
-                if (cursor.moveToFirst()) {
-                    // Escribir la estructura de la tabla
-                    for (int i = 0; i < cursor.getColumnCount(); i++) {
-                        outputStream.write((cursor.getColumnName(i) + ",").getBytes());
-                    }
-                    outputStream.write("\n".getBytes());
-                    // Escribir los datos de la tabla
-                    do {
-                        for (int i = 0; i < cursor.getColumnCount(); i++) {
-                            outputStream.write((cursor.getString(i) + ",").getBytes());
-                        }
-                        outputStream.write("\n".getBytes());
-                    } while (cursor.moveToNext());
-                }
-                outputStream.close();
-                cursor.close();
-
-                Log.d("EXPORT_DEBUG", "Base de datos exportada a: " + exportFile.getAbsolutePath());
-                return true;
-            } catch (IOException e) {
-                Log.e("EXPORT_ERROR", "Error al exportar la base de datos: " + e.getMessage());
-                return false;
+        @Override
+        protected void onPostExecute(Boolean success) {
+            if (success) {
+                Toast.makeText(MainActivity.this, "Base de datos exportada correctamente", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(MainActivity.this, "Error al exportar base de datos", Toast.LENGTH_SHORT).show();
             }
         }
     }

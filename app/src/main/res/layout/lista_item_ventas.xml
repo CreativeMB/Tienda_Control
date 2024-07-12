@@ -25,8 +25,8 @@
                 android:layout_height="match_parent"
                 android:layout_weight="0.1"
                 android:padding="2dp"
-                app:srcCompat="@drawable/iconopng"
-                tools:srcCompat="@drawable/iconopng" />
+                app:srcCompat="@drawable/gastos"
+                tools:srcCompat="@drawable/gastos" />
 
             <LinearLayout
                 android:layout_width="0dp"
