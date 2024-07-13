@@ -33,7 +33,7 @@
     <string name="uno">Exportar Datos</string>
     <string name="dos">Nuevo ingreso</string>
     <string name="tres">Nuevo Gasto</string>
-    <string name="cuatro">por Asinganar</string>
+    <string name="cuatro">Salir</string>
 
-    <string name="dropbox_app_key">piwj5vwzk0c6cp8</string>
+
 </resources>

@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.VerActivity;
 import com.example.tiendacontrol.entidades.Ventas;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -40,30 +43,32 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ContactoViewHolder holder, int position) {
-        holder.viewProducto.setText(listaVentas.get(position).getProducto());
-        holder.viewValor.setText(listaVentas.get(position).getValor());
-        holder.viewDetalles.setText(listaVentas.get(position).getDetalles());
-        holder.viewCantidad.setText(listaVentas.get(position).getCantidad());
-        holder.viewFecha.setText(listaVentas.get(position).getFechaRegistro());
+        Ventas venta = listaVentas.get(position);
+
+        holder.viewProducto.setText(venta.getProducto());
+        double valor = venta.getValorAsDouble();
+
+        holder.viewValor.setText(formatoNumerico(Math.abs(valor))); // Mostrar el valor positivo formateado
+        holder.viewValor.setTextColor(ContextCompat.getColor(holder.itemView.getContext(),
+                valor < 0 ? R.color.colorNegativo : R.color.colorPositivo));
+
+        holder.viewDetalles.setText(venta.getDetalles());
+        holder.viewCantidad.setText(venta.getCantidad());
+        holder.viewFecha.setText(venta.getFechaRegistro());
+
+        holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(),
+                valor < 0 ? R.color.colorFondoNegativo : R.color.colorFondoPositivo));
     }
 
     public void filtrado(final String txtBuscar) {
-        int longitud = txtBuscar.length();
-        if (longitud == 0) {
+        if (txtBuscar.isEmpty()) {
             listaVentas.clear();
             listaVentas.addAll(listaOriginal);
         } else {
-            if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
-                List<Ventas> collecion = listaVentas.stream()
-                        .filter(i -> i.getProducto().toLowerCase().contains(txtBuscar.toLowerCase()))
-                        .collect(Collectors.toList());
-                listaVentas.clear();
-                listaVentas.addAll(collecion);
-            } else {
-                for (Ventas c : listaOriginal) {
-                    if (c.getProducto().toLowerCase().contains(txtBuscar.toLowerCase())) {
-                        listaVentas.add(c);
-                    }
+            listaVentas.clear();
+            for (Ventas venta : listaOriginal) {
+                if (venta.getProducto().toLowerCase().contains(txtBuscar.toLowerCase())) {
+                    listaVentas.add(venta);
                 }
             }
         }
@@ -73,6 +78,13 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
     @Override
     public int getItemCount() {
         return listaVentas.size();
+    }
+
+    private String formatoNumerico(double valor) {
+        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+        symbols.setGroupingSeparator('.'); // Punto como separador de miles
+        DecimalFormat df = new DecimalFormat("#,###", symbols);
+        return "$" + df.format(valor);
     }
 
     public class ContactoViewHolder extends RecyclerView.ViewHolder {

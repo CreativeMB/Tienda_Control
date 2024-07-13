@@ -20,39 +20,49 @@
             android:name=".dialogFragment.GastoDialogFragment"
             android:exported="false" />
 
-        <activity android:name=".VerActivity" android:exported="false" />
-        <activity android:name=".login.Home" android:exported="false" />
-        <activity android:name=".login.Register" android:exported="false" />
-        <activity android:name=".login.Login" android:exported="false"/>
-        <activity android:name=".MainActivity" android:exported="false"/>
-
-        <activity android:name=".Bd.DropboxAuthActivity" android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-                              <data
-                    android:scheme="db-piwj5vwzk0c6cp8"
-                    android:host="1" />
-            </intent-filter>
-        </activity>
-
-
-        <activity android:name="com.dropbox.core.android.AuthActivity"
-            android:launchMode="singleTask"
-            android:configChanges="orientation|keyboardHidden"
-            android:exported="true">
-        </activity>
-
+        <activity
+            android:name=".VerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".login.Home"
+            android:exported="false" />
+        <activity
+            android:name=".login.Register"
+            android:exported="false" />
+        <activity
+            android:name=".login.Login"
+            android:exported="false" />
+        <activity
+            android:name=".MainActivity"
+            android:exported="false" />
+        <activity
+            android:name=".dropbox.DropboxManager"
+            android:exported="false" />
         <activity
             android:name=".entidades.SplashActivity"
-            android:theme="@style/Theme.TiendaControl"
-            android:exported="true">
+            android:exported="true"
+            android:theme="@style/Theme.TiendaControl">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:exported="true"
+            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert"
+            android:launchMode="singleTask">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data  android:scheme="tiendacontrol"
+                    android:host="tiendacontrol.com"
+                    android:path="/oauth2/callback"
+                    />
+            </intent-filter>
+        </activity>
+
 
     </application>
 
