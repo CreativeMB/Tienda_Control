@@ -3,6 +3,7 @@ package com.example.tiendacontrol;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -18,10 +19,11 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
-import com.example.tiendacontrol.Bd.DropboxHelper;
+
 
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
+import com.example.tiendacontrol.dropbox.DropboxManager;
 import com.example.tiendacontrol.entidades.Ventas;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -29,10 +31,11 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-    private DropboxHelper dropboxHelper;
+//    private DropboxHelper dropboxHelper;
 
     SearchView txtBuscar;
     RecyclerView listaVentas;
@@ -70,7 +73,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
-        dropboxHelper = new DropboxHelper(this);
+//        dropboxHelper = new DropboxHelper(this);
 
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
@@ -101,7 +104,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         int id = item.getItemId();
 
         if (id == R.id.exportar_db) {
-            exportarBaseDatos();
+            // Iniciar el flujo de autenticación y subida a Dropbox
+            DropboxManager dropboxManager = DropboxManager.getInstance(this);
+            dropboxManager.authenticate();//Inicia la autenticación
             return true;
         } else if (id == R.id.nueva_venta) {
             FragmentManager fragmentManager = getSupportFragmentManager();
@@ -112,19 +117,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             return true;
+        } else if (id == R.id.salir) {
+            salirApp();
+            return true;
+
         }
 
+
         return super.onOptionsItemSelected(item);
-    }
-
-    private void nuevoRegistro() {
-        Intent intent = new Intent(this, com.example.tiendacontrol.IngresoDialogFragment.class);
-        startActivity(intent);
-    }
-
-    private void nuevoGasto() {
-        Intent intent = new Intent(this, GastoDialogFragment.class);
-        startActivity(intent);
     }
 
     @Override
@@ -170,46 +170,67 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 suma += valorVenta;
             }
         }
+        suma = Math.abs(suma); // Asegurarse de que suma sea positiva
+
         int sumaFormateada = (int) suma;
-        String sumaFormateadaStr = "$" + sumaFormateada;
+        String sumaFormateadaStr;
+
+        if (suma < 0) {
+            sumaFormateadaStr = "$" + (-sumaFormateada); // Mostrar el valor positivo sin signo negativo
+        } else {
+            sumaFormateadaStr = "$" + sumaFormateada;
+        }
+
+        Log.d("CalcularSumaTotalGasto", "sumaFormateadaStr: " + sumaFormateadaStr); // Agrega esta línea
         textGasto.setText(sumaFormateadaStr);
     }
 
-    private void exportarBaseDatos() {
-        // Nombre de tu base de datos SQLite
-        String nombreBaseDatos = "MI_contabilidad.db";
-
-        File dbFile = this.getDatabasePath(nombreBaseDatos);
-        if (dbFile.exists()) {
-            // Ejecutar AsyncTask para exportar la base de datos a Dropbox
-            new ExportarBaseDatosTask().execute(nombreBaseDatos);
-        } else {
-            Toast.makeText(MainActivity.this, "Base de datos no encontrada", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    // AsyncTask para exportar la base de datos a Dropbox
-    private class ExportarBaseDatosTask extends AsyncTask<String, Void, Boolean> {
-
-        @Override
-        protected Boolean doInBackground(String... strings) {
-            try {
-                // Llamar al método exportarBaseDatos de DropboxHelper
-                dropboxHelper.exportarBaseDatos(strings[0]);
-                return true; // Éxito
-            } catch (Exception e) {
-                e.printStackTrace();
-                return false; // Error
-            }
-        }
-
-        @Override
-        protected void onPostExecute(Boolean success) {
-            if (success) {
-                Toast.makeText(MainActivity.this, "Base de datos exportada correctamente", Toast.LENGTH_SHORT).show();
-            } else {
-                Toast.makeText(MainActivity.this, "Error al exportar base de datos", Toast.LENGTH_SHORT).show();
-            }
-        }
+    private void salirApp() {
+        // Cierra todas las actividades y finaliza la aplicación
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finishAffinity(); // Cierra todas las actividades en la pila de tareas
+        System.exit(0); // Cierra el proceso de la aplicación
     }
 }
+
+
+//    private void exportarBaseDatos() {
+//        // Nombre de tu base de datos SQLite
+//        String nombreBaseDatos = "MI_contabilidad.db";
+//
+//        File dbFile = this.getDatabasePath(nombreBaseDatos);
+//        if (dbFile.exists()) {
+//            // Ejecutar AsyncTask para exportar la base de datos a Dropbox
+//            new ExportarBaseDatosTask().execute(nombreBaseDatos);
+//        } else {
+//            Toast.makeText(MainActivity.this, "Base de datos no encontrada", Toast.LENGTH_SHORT).show();
+//        }
+//    }
+//
+//    // AsyncTask para exportar la base de datos a Dropbox
+//    private class ExportarBaseDatosTask extends AsyncTask<String, Void, Boolean> {
+//
+//        @Override
+//        protected Boolean doInBackground(String... strings) {
+//            try {
+//                // Llamar al método exportarBaseDatos de DropboxHelper
+//                dropboxHelper.exportarBaseDatos(strings[0]);
+//                return true; // Éxito
+//            } catch (Exception e) {
+//                e.printStackTrace();
+//                return false; // Error
+//            }
+//        }
+//
+//        @Override
+//        protected void onPostExecute(Boolean success) {
+//            if (success) {
+//                Toast.makeText(MainActivity.this, "Base de datos exportada correctamente", Toast.LENGTH_SHORT).show();
+//            } else {
+//                Toast.makeText(MainActivity.this, "Error al exportar base de datos", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }

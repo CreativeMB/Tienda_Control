@@ -24,7 +24,7 @@ public class SplashActivity extends AppCompatActivity {
             public void run() {
                 // Este método se ejecutará cuando se complete el temporizador
                 // Puedes iniciar la siguiente actividad aquí
-                Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+                Intent intent = new Intent(SplashActivity.this, Login.class);
                 startActivity(intent);
                 finish(); // Cierra la actividad del splash screen para prevenir que el usuario regrese a ella presionando "Atrás"
             }

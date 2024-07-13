@@ -18,7 +18,7 @@
         android:title="@string/tres"
         app:showAsAction="never" />
     <item
-        android:id="@+id/placeholder"
+        android:id="@+id/salir"
         android:orderInCategory="100"
         android:title="@string/cuatro"
         app:showAsAction="never" />

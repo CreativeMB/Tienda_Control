@@ -37,7 +37,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Venta"
-                android:textColor="#327A35"
+                android:textColor="@color/colorPositivo"
                 android:textSize="25sp" />
 
             <TextView
@@ -57,7 +57,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Gasto"
-                android:textColor="#BA1735"
+                android:textColor="@color/colorNegativo"
                 android:textSize="25sp" />
         </LinearLayout>
 
