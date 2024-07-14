@@ -131,8 +131,8 @@
                     android:layout_below="@id/textViewTermsLink"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="16dp"
-                    android:backgroundTint="@color/Buton"
-                    android:text="Seleccionar imagen"
+                    android:backgroundTint="#2F2196F3"
+                    android:text="Logo Empresarial"
                     android:onClick="openFileChooser" />
 
                 <!-- Register Button -->

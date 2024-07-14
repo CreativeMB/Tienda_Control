@@ -35,7 +35,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_launcher_background" />
+                android:src="@drawable/gastos" />
 
             <TextView
                 android:id="@+id/textViewEmail"

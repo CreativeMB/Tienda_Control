@@ -6,7 +6,7 @@
     <string name="accelerometer_values_text">Valores del acelerómetro:</string>
     <string name="return_button_text">Volver al home</string>
     <string name="registration_title">Registro de usuarios</string>
-    <string name="name_hint">Nombre</string>
+    <string name="name_hint">Nombre Empresa</string>
     <string name="email_hint">Correo electrónico</string>
     <string name="password_hint">Contraseña</string>
     <string name="register_button_text">Registro</string>
