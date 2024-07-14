@@ -217,18 +217,23 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         });
     }
 
-    // Métodos para calcular y mostrar las sumas de ganancias, ventas y gastos
+    // Método para calcular y mostrar la suma de ganancias sin decimales
     private void calcularSumaGanancias() {
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
             suma += valorVenta;
         }
-        // Formatear la suma con puntos de mil y moneda colombiana
-        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
+
+        // Redondear suma a valor entero
+        long sumaEntera = Math.round(suma);
+
+        // Formatear la suma como moneda colombiana sin decimales
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(sumaEntera);
         textTotal.setText(sumaFormateadaStr);
     }
 
+    // Método para calcular y mostrar la suma total de ventas sin decimales
     private void calcularSumaTotalVenta() {
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
@@ -237,11 +242,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 suma += valorVenta;
             }
         }
-        // Formatear la suma con puntos de mil y moneda colombiana
-        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
+
+        // Redondear suma a valor entero
+        long sumaEntera = Math.round(suma);
+
+        // Formatear la suma como moneda colombiana sin decimales
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(sumaEntera);
         textVenta.setText(sumaFormateadaStr);
     }
 
+    // Método para calcular y mostrar la suma total de gastos sin decimales
     private void calcularSumaTotalGasto() {
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
@@ -250,10 +260,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 suma += valorVenta;
             }
         }
-        suma = Math.abs(suma); // Asegurarse de que suma sea positiva
 
-        // Formatear la suma con puntos de mil y moneda colombiana
-        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
+        // Asegurarse de que suma sea positiva
+        suma = Math.abs(suma);
+
+        // Redondear suma a valor entero
+        long sumaEntera = Math.round(suma);
+
+        // Formatear la suma como moneda colombiana sin decimales
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(sumaEntera);
         textGasto.setText(sumaFormateadaStr);
     }
 }
