@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -122,6 +123,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         } else {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
         }
+        imageViewProfile.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, PerfilUsuario.class);
+                startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -280,6 +288,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         textGasto.setText(sumaFormateadaStr);
     }
+
 }
 
 
