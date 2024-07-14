@@ -17,12 +17,10 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
 import java.text.NumberFormat;
 import java.util.Locale;
-
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.dropbox.DropboxManager;
