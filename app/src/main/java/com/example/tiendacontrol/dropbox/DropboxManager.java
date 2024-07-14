@@ -26,9 +26,9 @@ import java.io.IOException;
 public class DropboxManager {
 
     private static final String TAG = "DropboxManager";
-    private static final String APP_KEY = "piwj5vwzk0c6cp8"; // Reemplaza con tu App Key
+    private static final String APP_KEY = "7vazzg1njz2v1co"; // Reemplaza con tu App Key
     private static final String ACCESS_TOKEN_KEY = "dropbox_access_token";
-    private static final String REDIRECT_URI = "https://tiendacontrol.com/oauth2/callback";
+    private static final String REDIRECT_URI = "https://com.example.tiendacontrol/callback";
     public static final int AUTH_REQUEST_CODE = 1001;
 
     private static DropboxManager instance; // Instancia única

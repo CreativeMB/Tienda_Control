@@ -58,8 +58,8 @@
                 <category android:name="android.intent.category.BROWSABLE" />
 
                 <data
-                    android:host="tiendacontrol.com"
-                    android:path="/oauth2/callback"
+                    android:host="com.example.tiendacontrol"
+                    android:path="/callback"
                     android:scheme="tiendacontrol" />
             </intent-filter>
         </activity>
