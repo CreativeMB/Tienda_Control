@@ -230,6 +230,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Formatear la suma como moneda colombiana sin decimales
         String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(sumaEntera);
+        // Eliminar decimales si hay .00
+        sumaFormateadaStr = sumaFormateadaStr.replaceAll("[,.]00$", "");
+
         textTotal.setText(sumaFormateadaStr);
     }
 
@@ -248,6 +251,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Formatear la suma como moneda colombiana sin decimales
         String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(sumaEntera);
+        // Eliminar decimales si hay .00
+        sumaFormateadaStr = sumaFormateadaStr.replaceAll("[,.]00$", "");
+
         textVenta.setText(sumaFormateadaStr);
     }
 
@@ -269,6 +275,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Formatear la suma como moneda colombiana sin decimales
         String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(sumaEntera);
+        // Eliminar decimales si hay .00
+        sumaFormateadaStr = sumaFormateadaStr.replaceAll("[,.]00$", "");
+
         textGasto.setText(sumaFormateadaStr);
     }
 }
