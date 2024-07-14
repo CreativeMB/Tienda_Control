@@ -25,7 +25,6 @@ import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.dropbox.DropboxManager;
 import com.example.tiendacontrol.entidades.Ventas;
-
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.login.PerfilUsuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
