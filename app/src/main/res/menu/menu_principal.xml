@@ -23,8 +23,15 @@
         android:title="@string/quinto"
         app:showAsAction="never" />
     <item
+        android:id="@+id/BaseDatos"
+        android:orderInCategory="100"
+        android:title="@string/sexto"
+        app:showAsAction="never" />
+
+    <item
         android:id="@+id/salir"
         android:orderInCategory="100"
         android:title="@string/cuatro"
         app:showAsAction="never" />
+
 </menu>
