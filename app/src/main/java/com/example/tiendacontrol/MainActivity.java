@@ -21,7 +21,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
-
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
@@ -44,16 +45,15 @@ import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-//    private DropboxHelper dropboxHelper;
-private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
-    SearchView txtBuscar;
-    RecyclerView listaVentas;
-    ArrayList<Ventas> listaArrayVentas;
-    ListaVentasAdapter adapter;
-    FloatingActionButton fabNuevo;
-    FloatingActionButton fabGasto;
-    TextView textVenta, textTotal, textGasto;
-    Toolbar toolbar;
+// Declaración de variables
+    private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
+    private SearchView txtBuscar;
+    private RecyclerView listaVentas;
+    private ArrayList<Ventas> listaArrayVentas;
+    private ListaVentasAdapter adapter;
+    private FloatingActionButton fabNuevo, fabGasto;
+    private TextView textVenta, textTotal, textGasto;
+    private Toolbar toolbar;
     private ImageView imageViewProfile;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -64,12 +64,12 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Inicializar Firebase
+        // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        // Inicializar ImageView
-        imageViewProfile = findViewById(R.id.imageViewProfile);
 
+        // Referencias a vistas
+        imageViewProfile = findViewById(R.id.imageViewProfile);
         txtBuscar = findViewById(R.id.txtBuscar);
         listaVentas = findViewById(R.id.listaVentas);
         fabNuevo = findViewById(R.id.favNuevo);
@@ -79,19 +79,21 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
         textGasto = findViewById(R.id.textGasto);
         toolbar = findViewById(R.id.toolbar);
 
+        // Configuración de la Toolbar
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Tienda Control");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Configuración del RecyclerView
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
 
+        // Inicialización de la base de datos y el adaptador
         BdVentas bdVentas = new BdVentas(MainActivity.this);
         listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
         adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
-//        dropboxHelper = new DropboxHelper(this);
-
+        // Configuración de los botones flotantes
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
@@ -103,8 +105,10 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
 
+        // Configuración del SearchView
         txtBuscar.setOnQueryTextListener(this);
 
+        // Calcular y mostrar las sumas iniciales
         calcularSumaGanancias();
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
@@ -118,8 +122,6 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
         } else {
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
         }
-
-
     }
 
     @Override
@@ -132,17 +134,20 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        // Manejo de opciones del menú
         if (id == R.id.exportar_db) {
             // Iniciar el flujo de autenticación y subida a Dropbox
             DropboxManager dropboxManager = DropboxManager.getInstance(this);
-            dropboxManager.authenticate();//Inicia la autenticación
+            dropboxManager.authenticate();
             return true;
         } else if (id == R.id.nueva_venta) {
+            // Mostrar el diálogo de nueva venta
             FragmentManager fragmentManager = getSupportFragmentManager();
             com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
             return true;
         } else if (id == R.id.nuevo_gasto) {
+            // Mostrar el diálogo de nuevo gasto
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             return true;
@@ -152,11 +157,10 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
             startActivityForResult(intent, REQUEST_CODE_PERFIL_USUARIO);
             return true;
         } else if (id == R.id.salir) {
+            // Dirigir al usuario a la pantalla de inicio de sesión
             dirigirAInicioSesion();
             return true;
-
         }
-
 
         return super.onOptionsItemSelected(item);
     }
@@ -165,6 +169,7 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
+        // Manejo del resultado de la actividad de perfil de usuario
         if (requestCode == REQUEST_CODE_PERFIL_USUARIO && resultCode == RESULT_OK) {
             // Aquí puedes actualizar la vista de MainActivity si es necesario
         }
@@ -177,63 +182,19 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        // Filtrar el RecyclerView según el texto de búsqueda
         adapter.filtrado(newText);
         return false;
     }
 
-    private void calcularSumaGanancias() {
-        double suma = 0.0;
-        for (Ventas venta : listaArrayVentas) {
-            double valorVenta = venta.getValorAsDouble();
-            suma += valorVenta;
-        }
-        int sumaFormateada = (int) suma;
-        String sumaFormateadaStr = "$" + sumaFormateada;
-        textTotal.setText(sumaFormateadaStr);
-    }
-
-    private void calcularSumaTotalVenta() {
-        double suma = 0.0;
-        for (Ventas venta : listaArrayVentas) {
-            double valorVenta = venta.getValorAsDouble();
-            if (valorVenta > 0) {
-                suma += valorVenta;
-            }
-        }
-        int sumaFormateada = (int) suma;
-        String sumaFormateadaStr = "$" + sumaFormateada;
-        textVenta.setText(sumaFormateadaStr);
-    }
-
-    private void calcularSumaTotalGasto() {
-        double suma = 0.0;
-        for (Ventas venta : listaArrayVentas) {
-            double valorVenta = venta.getValorAsDouble();
-            if (valorVenta < 0) {
-                suma += valorVenta;
-            }
-        }
-        suma = Math.abs(suma); // Asegurarse de que suma sea positiva
-
-        int sumaFormateada = (int) suma;
-        String sumaFormateadaStr;
-
-        if (suma < 0) {
-            sumaFormateadaStr = "$" + (-sumaFormateada); // Mostrar el valor positivo sin signo negativo
-        } else {
-            sumaFormateadaStr = "$" + sumaFormateada;
-        }
-
-        Log.d("CalcularSumaTotalGasto", "sumaFormateadaStr: " + sumaFormateadaStr); // Agrega esta línea
-        textGasto.setText(sumaFormateadaStr);
-    }
-
+    // Método para dirigir al usuario a la pantalla de inicio de sesión
     private void dirigirAInicioSesion() {
-        Intent intent = new Intent(this, Login.class); // Reemplaza LoginActivity con el nombre de tu actividad de inicio de sesión
+        Intent intent = new Intent(this, Login.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finishAffinity(); // Cierra todas las actividades en la pila de tareas
     }
+
     // Método para cargar la imagen de perfil del usuario desde Firestore
     private void loadProfileImage(String userId) {
         DocumentReference userRef = db.collection("usuarios").document(userId);
@@ -256,7 +217,47 @@ private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
         });
     }
 
+    // Métodos para calcular y mostrar las sumas de ganancias, ventas y gastos
+    private void calcularSumaGanancias() {
+        double suma = 0.0;
+        for (Ventas venta : listaArrayVentas) {
+            double valorVenta = venta.getValorAsDouble();
+            suma += valorVenta;
+        }
+        // Formatear la suma con puntos de mil y moneda colombiana
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
+        textTotal.setText(sumaFormateadaStr);
+    }
+
+    private void calcularSumaTotalVenta() {
+        double suma = 0.0;
+        for (Ventas venta : listaArrayVentas) {
+            double valorVenta = venta.getValorAsDouble();
+            if (valorVenta > 0) {
+                suma += valorVenta;
+            }
+        }
+        // Formatear la suma con puntos de mil y moneda colombiana
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
+        textVenta.setText(sumaFormateadaStr);
+    }
+
+    private void calcularSumaTotalGasto() {
+        double suma = 0.0;
+        for (Ventas venta : listaArrayVentas) {
+            double valorVenta = venta.getValorAsDouble();
+            if (valorVenta < 0) {
+                suma += valorVenta;
+            }
+        }
+        suma = Math.abs(suma); // Asegurarse de que suma sea positiva
+
+        // Formatear la suma con puntos de mil y moneda colombiana
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
+        textGasto.setText(sumaFormateadaStr);
+    }
 }
+
 
 
 

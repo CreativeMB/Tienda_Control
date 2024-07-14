@@ -1,166 +1,171 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16dp"
     android:background="@drawable/fondo"
+    android:padding="16dp"
     tools:context=".login.Register">
 
-    <!-- Title -->
-    <TextView
-        android:id="@+id/textViewTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:padding="2dp"
-        android:text="@string/login_title"
-        android:textColor="@color/texcolor"
-        android:textSize="20sp"
-        android:textStyle="bold"
-        android:gravity="center"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="20dp" />
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
 
-    <!-- ImageView for displaying selected image -->
-    <ImageView
-        android:id="@+id/imageViewProfile"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:scaleType="centerCrop"
-        android:src="@drawable/gastos"
-    app:layout_constraintStart_toStartOf="parent"
-    app:layout_constraintTop_toBottomOf="@id/textViewTitle"
-    app:layout_constraintBottom_toTopOf="@id/cardView"
-    app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- CardView for registration form -->
-    <com.google.android.material.card.MaterialCardView
-        android:id="@+id/cardView"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        app:cardElevation="4dp"
-        app:cardCornerRadius="20dp"
-        app:layout_constraintTop_toBottomOf="@id/imageViewProfile"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.5"
-        android:theme="@style/Theme.MaterialComponents"
-        app:layout_constraintWidth_percent="0.9"
-        app:cardBackgroundColor="#FDF2E2">
-
-        <!-- Layout inside CardView -->
-        <RelativeLayout
-            android:layout_width="match_parent"
+        <!-- Title -->
+        <TextView
+            android:id="@+id/textViewTitle"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="2dp"
+            android:text="@string/login_title"
+            android:textColor="@color/texcolor"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp" />
 
-            <!-- Name EditText -->
-            <EditText
-                android:id="@+id/editTextName"
+        <!-- ImageView for displaying selected image -->
+        <ImageView
+            android:id="@+id/imageViewProfile"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/gastos"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/textViewTitle"
+            app:layout_constraintBottom_toTopOf="@id/cardView"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <!-- CardView for registration form -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/cardView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            app:cardElevation="4dp"
+            app:cardCornerRadius="20dp"
+            app:layout_constraintTop_toBottomOf="@id/imageViewProfile"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.5"
+            android:theme="@style/Theme.MaterialComponents"
+            app:layout_constraintWidth_percent="0.9"
+            app:cardBackgroundColor="#FDF2E2">
+
+            <!-- Layout inside CardView -->
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textColorHint="@color/black"
-                android:textColor="@color/black"
-                android:hint="@string/name_hint" />
+                android:padding="16dp">
 
-            <!-- Email EditText -->
-            <EditText
-                android:id="@+id/editTextEmail"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTextName"
-                android:textColorHint="@color/black"
-                android:textColor="@color/black"
-                android:layout_marginTop="16dp"
-                android:hint="@string/email_hint" />
+                <!-- Name EditText -->
+                <EditText
+                    android:id="@+id/editTextName"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/black"
+                    android:hint="@string/name_hint" />
 
-            <!-- Password EditText -->
-            <EditText
-                android:id="@+id/editTextPassword"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTextEmail"
-                android:textColorHint="@color/black"
-                android:textColor="@color/black"
-                android:layout_marginTop="16dp"
-                android:hint="@string/password_hint"
-                android:inputType="textPassword" />
+                <!-- Email EditText -->
+                <EditText
+                    android:id="@+id/editTextEmail"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/editTextName"
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/email_hint" />
 
-            <!-- Checkbox for Terms and Conditions -->
-            <CheckBox
-                android:id="@+id/checkBoxTerms"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/editTextPassword"
-                android:layout_marginTop="16dp"
-                android:text="He leído y acepto los términos y condiciones"
-                android:textColor="@color/black" />
+                <!-- Password EditText -->
+                <EditText
+                    android:id="@+id/editTextPassword"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/editTextEmail"
+                    android:textColorHint="@color/black"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/password_hint"
+                    android:inputType="textPassword" />
 
-            <!-- Terms and Conditions Link -->
-            <TextView
-                android:id="@+id/textViewTermsLink"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ver términos y condiciones"
-                android:textColor="@color/black"
-                android:layout_below="@id/checkBoxTerms"
-                android:layout_marginTop="8dp"
-                android:clickable="true"
-                android:textStyle="italic"
-                android:textColorLink="@color/colorPrimaryDark"
-                android:onClick="openTermsPage" />
+                <!-- Checkbox for Terms and Conditions -->
+                <CheckBox
+                    android:id="@+id/checkBoxTerms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/editTextPassword"
+                    android:layout_marginTop="16dp"
+                    android:text="He leído y acepto los términos y condiciones"
+                    android:textColor="@color/black" />
 
-            <!-- Button to select profile image -->
-            <Button
-                android:id="@+id/btnSelectImage"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/textViewTermsLink"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="@color/Buton"
-                android:text="Seleccionar imagen"
-                android:onClick="openFileChooser" />
+                <!-- Terms and Conditions Link -->
+                <TextView
+                    android:id="@+id/textViewTermsLink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Ver términos y condiciones"
+                    android:textColor="@color/black"
+                    android:layout_below="@id/checkBoxTerms"
+                    android:layout_marginTop="8dp"
+                    android:clickable="true"
+                    android:textStyle="italic"
+                    android:textColorLink="@color/colorPrimaryDark"
+                    android:onClick="openTermsPage" />
 
-            <!-- Register Button -->
-            <Button
-                android:id="@+id/btnRegister"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_below="@id/btnSelectImage"
-                android:layout_centerHorizontal="true"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="@color/Buton"
-                android:gravity="center"
-                android:text="@string/register_button" />
+                <!-- Button to select profile image -->
+                <Button
+                    android:id="@+id/btnSelectImage"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/textViewTermsLink"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/Buton"
+                    android:text="Seleccionar imagen"
+                    android:onClick="openFileChooser" />
 
-        </RelativeLayout>
+                <!-- Register Button -->
+                <Button
+                    android:id="@+id/btnRegister"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_below="@id/btnSelectImage"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginTop="16dp"
+                    android:backgroundTint="@color/Buton"
+                    android:gravity="center"
+                    android:text="@string/register_button" />
 
-    </com.google.android.material.card.MaterialCardView>
+            </RelativeLayout>
 
-    <!-- Login Button -->
-    <Button
-        android:id="@+id/btnLogin"
-        android:text="@string/login_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:backgroundTint="#002196F3"
-        android:textColor="@color/texcolor"
-        app:layout_constraintTop_toBottomOf="@id/cardView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:textSize="25sp"
-        app:layout_constraintHorizontal_bias="0.5" />
+        </com.google.android.material.card.MaterialCardView>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <!-- Login Button -->
+        <Button
+            android:id="@+id/btnLogin"
+            android:text="@string/login_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:backgroundTint="#002196F3"
+            android:textColor="@color/texcolor"
+            app:layout_constraintTop_toBottomOf="@id/cardView"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="25sp"
+            app:layout_constraintHorizontal_bias="0.5" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+</ScrollView>
