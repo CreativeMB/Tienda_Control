@@ -9,6 +9,8 @@
     <color name="Buton">#2196F3</color>
     <color name="toolbarBackground">#2196F3</color>
 
+    <color name="texcolor">#96562C</color>
+
 
     <color name="colorNegativo">#FF0000</color> <!-- Rojo para valores negativos -->
     <color name="colorPositivo">#4CAF50</color> <!-- Verde para valores positivos -->

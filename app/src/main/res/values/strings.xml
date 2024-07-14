@@ -16,14 +16,15 @@
     <string name="send_button_text">Enviar mensaje</string>
     <string name="login_title">Bienvenido a Tienda Control</string>
     <string name="login_button">Iniciar sesión</string>
-    <string name="register_button">¿Regitro por Aqui?</string>
+    <string name="register_button">Registrarme</string>
+    <string name="recuperar_button">¿Recuperar Contraseña?</string>
     <string name="home_view_title">Vista del Home</string>
     <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
-    <string name="realtime_database_button">Realtime</string>
+    <string name="imagenperfil">Seleciona una imagen de Perfil</string>
+
+
     <string name="Edicion">Administra</string>
-
-
     <string name="hint_Producto">Producto:</string>
     <string name="hint_Valor">Valor:</string>
     <string name="hint_Detalles">Dtalles:</string>
@@ -31,9 +32,10 @@
     <string name="btn_guarda">Guardar</string>
     //menu
     <string name="uno">Exportar Datos</string>
-    <string name="dos">Nuevo ingreso</string>
-    <string name="tres">Nuevo Gasto</string>
-    <string name="cuatro">Salir</string>
+    <string name="dos">Nuevo Ingreso</string>
+    <string name="tres">Nuevo Egreso</string>
+    <string name="cuatro">Cerrar Sesión</string>
+    <string name="quinto">Perfil Usuario</string>
 
 
 </resources>

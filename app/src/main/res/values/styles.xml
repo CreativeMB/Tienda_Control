@@ -1,8 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-
-
-
+    <color name="color_fondo_menu">#2196F3</color>
+    <color name="color_texto_menu">#FFFFFF</color>
+    <style name="AppTheme.PopupMenu" parent="ThemeOverlay.AppCompat.Light">
+        <!-- Fondo del menú -->
+        <item name="android:background">@color/color_fondo_menu</item>
+        <!-- Color del texto del menú -->
+        <item name="android:textColor">@color/black</item>
+        <!-- Alineación del menú dentro de la AppBarLayout -->
+        <item name="android:layout_gravity">bottom</item>
+    </style>
 
 </resources>

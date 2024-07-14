@@ -18,6 +18,11 @@
         android:title="@string/tres"
         app:showAsAction="never" />
     <item
+        android:id="@+id/perfil_usuario"
+        android:orderInCategory="100"
+        android:title="@string/quinto"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/salir"
         android:orderInCategory="100"
         android:title="@string/cuatro"

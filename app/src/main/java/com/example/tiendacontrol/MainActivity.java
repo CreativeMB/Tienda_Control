@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -27,7 +28,14 @@ import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.dropbox.DropboxManager;
 import com.example.tiendacontrol.entidades.Ventas;
 
+import com.example.tiendacontrol.login.Login;
+import com.example.tiendacontrol.login.PerfilUsuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -37,7 +45,7 @@ import java.util.logging.Handler;
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
 //    private DropboxHelper dropboxHelper;
-
+private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
     SearchView txtBuscar;
     RecyclerView listaVentas;
     ArrayList<Ventas> listaArrayVentas;
@@ -45,14 +53,22 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     FloatingActionButton fabNuevo;
     FloatingActionButton fabGasto;
     TextView textVenta, textTotal, textGasto;
-
     Toolbar toolbar;
-
+    private ImageView imageViewProfile;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        // Inicializar Firebase
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+        // Inicializar ImageView
+        imageViewProfile = findViewById(R.id.imageViewProfile);
 
         txtBuscar = findViewById(R.id.txtBuscar);
         listaVentas = findViewById(R.id.listaVentas);
@@ -92,6 +108,18 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         calcularSumaGanancias();
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
+
+        // Obtener el usuario actual de Firebase Authentication
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            userId = user.getUid();
+            // Cargar la imagen de perfil del usuario
+            loadProfileImage(userId);
+        } else {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
+        }
+
+
     }
 
     @Override
@@ -118,14 +146,28 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             return true;
+        } else if (id == R.id.perfil_usuario) {
+            // Ir a la pantalla de perfil de usuario
+            Intent intent = new Intent(this, PerfilUsuario.class);
+            startActivityForResult(intent, REQUEST_CODE_PERFIL_USUARIO);
+            return true;
         } else if (id == R.id.salir) {
-            salirApp();
+            dirigirAInicioSesion();
             return true;
 
         }
 
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_PERFIL_USUARIO && resultCode == RESULT_OK) {
+            // Aquí puedes actualizar la vista de MainActivity si es necesario
+        }
     }
 
     @Override
@@ -186,16 +228,37 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textGasto.setText(sumaFormateadaStr);
     }
 
-    private void salirApp() {
-        // Cierra todas las actividades y finaliza la aplicación
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    private void dirigirAInicioSesion() {
+        Intent intent = new Intent(this, Login.class); // Reemplaza LoginActivity con el nombre de tu actividad de inicio de sesión
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
         finishAffinity(); // Cierra todas las actividades en la pila de tareas
-        System.exit(0); // Cierra el proceso de la aplicación
     }
+    // Método para cargar la imagen de perfil del usuario desde Firestore
+    private void loadProfileImage(String userId) {
+        DocumentReference userRef = db.collection("usuarios").document(userId);
+
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String imageUrl = documentSnapshot.getString("profileImageUrl");
+
+                // Cargar la imagen usando Picasso si la URL de la imagen está disponible
+                if (imageUrl != null && !imageUrl.isEmpty()) {
+                    Picasso.get().load(imageUrl).into(imageViewProfile);
+                } else {
+                    Toast.makeText(MainActivity.this, "No se encontró la imagen de perfil", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "No se encontraron datos del usuario", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(MainActivity.this, "Error al cargar la imagen de perfil", Toast.LENGTH_SHORT).show();
+        });
+    }
+
 }
+
+
 
 
 //    private void exportarBaseDatos() {
