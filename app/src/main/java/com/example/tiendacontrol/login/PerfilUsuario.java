@@ -261,6 +261,11 @@ public class PerfilUsuario extends AppCompatActivity {
             Intent intent = new Intent(this, PerfilUsuario.class);
             finish();
             return true;
+
+        } else if (id == R.id.BaseDatos) {
+            Intent intent = new Intent(this, MainActivity.class);
+            finish();
+            return true;
         } else if (id == R.id.salir) {
             dirigirAInicioSesion();
             return true;
