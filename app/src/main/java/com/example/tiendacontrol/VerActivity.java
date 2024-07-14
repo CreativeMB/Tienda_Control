@@ -76,7 +76,7 @@ public class VerActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 AlertDialog.Builder builder = new AlertDialog.Builder(VerActivity.this);
-                builder.setMessage("¿Desea eliminar este contacto?")
+                builder.setMessage("¿Desea eliminar Item?")
                         .setPositiveButton("SI", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
