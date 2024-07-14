@@ -12,7 +12,7 @@
     <color name="texcolor">#96562C</color>
 
 
-    <color name="colorNegativo">#FF0000</color> <!-- Rojo para valores negativos -->
+    <color name="colorNegativo">#900000</color> <!-- Rojo para valores negativos -->
     <color name="colorPositivo">#4CAF50</color> <!-- Verde para valores positivos -->
     <color name="colorFondoNegativo">#93F44336</color> <!-- Color de fondo para valores negativos -->
     <color name="colorFondoPositivo">#4CAF50</color> <!-- Color de fondo para valores positivos -->
