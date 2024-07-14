@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -19,14 +20,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
-
+import java.text.NumberFormat;
+import java.util.Locale;
 
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.dropbox.DropboxManager;
 import com.example.tiendacontrol.entidades.Ventas;
 
+import com.example.tiendacontrol.login.Login;
+import com.example.tiendacontrol.login.PerfilUsuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,24 +44,31 @@ import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
 
-//    private DropboxHelper dropboxHelper;
-
-    SearchView txtBuscar;
-    RecyclerView listaVentas;
-    ArrayList<Ventas> listaArrayVentas;
-    ListaVentasAdapter adapter;
-    FloatingActionButton fabNuevo;
-    FloatingActionButton fabGasto;
-    TextView textVenta, textTotal, textGasto;
-
-    Toolbar toolbar;
-
+// Declaración de variables
+    private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
+    private SearchView txtBuscar;
+    private RecyclerView listaVentas;
+    private ArrayList<Ventas> listaArrayVentas;
+    private ListaVentasAdapter adapter;
+    private FloatingActionButton fabNuevo, fabGasto;
+    private TextView textVenta, textTotal, textGasto;
+    private Toolbar toolbar;
+    private ImageView imageViewProfile;
+    private FirebaseAuth mAuth;
+    private FirebaseFirestore db;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        // Inicialización de Firebase
+        mAuth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
+
+        // Referencias a vistas
+        imageViewProfile = findViewById(R.id.imageViewProfile);
         txtBuscar = findViewById(R.id.txtBuscar);
         listaVentas = findViewById(R.id.listaVentas);
         fabNuevo = findViewById(R.id.favNuevo);
@@ -62,19 +78,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textGasto = findViewById(R.id.textGasto);
         toolbar = findViewById(R.id.toolbar);
 
+        // Configuración de la Toolbar
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("Tienda Control");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
+        // Configuración del RecyclerView
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
 
+        // Inicialización de la base de datos y el adaptador
         BdVentas bdVentas = new BdVentas(MainActivity.this);
         listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
         adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
-//        dropboxHelper = new DropboxHelper(this);
-
+        // Configuración de los botones flotantes
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
@@ -86,11 +104,23 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
 
+        // Configuración del SearchView
         txtBuscar.setOnQueryTextListener(this);
 
+        // Calcular y mostrar las sumas iniciales
         calcularSumaGanancias();
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
+
+        // Obtener el usuario actual de Firebase Authentication
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            userId = user.getUid();
+            // Cargar la imagen de perfil del usuario
+            loadProfileImage(userId);
+        } else {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override
@@ -103,28 +133,45 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
 
+        // Manejo de opciones del menú
         if (id == R.id.exportar_db) {
             // Iniciar el flujo de autenticación y subida a Dropbox
             DropboxManager dropboxManager = DropboxManager.getInstance(this);
-            dropboxManager.authenticate();//Inicia la autenticación
+            dropboxManager.authenticate();
             return true;
         } else if (id == R.id.nueva_venta) {
+            // Mostrar el diálogo de nueva venta
             FragmentManager fragmentManager = getSupportFragmentManager();
             com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
             return true;
         } else if (id == R.id.nuevo_gasto) {
+            // Mostrar el diálogo de nuevo gasto
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             return true;
-        } else if (id == R.id.salir) {
-            salirApp();
+        } else if (id == R.id.perfil_usuario) {
+            // Ir a la pantalla de perfil de usuario
+            Intent intent = new Intent(this, PerfilUsuario.class);
+            startActivityForResult(intent, REQUEST_CODE_PERFIL_USUARIO);
             return true;
-
+        } else if (id == R.id.salir) {
+            // Dirigir al usuario a la pantalla de inicio de sesión
+            dirigirAInicioSesion();
+            return true;
         }
 
-
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Manejo del resultado de la actividad de perfil de usuario
+        if (requestCode == REQUEST_CODE_PERFIL_USUARIO && resultCode == RESULT_OK) {
+            // Aquí puedes actualizar la vista de MainActivity si es necesario
+        }
     }
 
     @Override
@@ -134,18 +181,50 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     public boolean onQueryTextChange(String newText) {
+        // Filtrar el RecyclerView según el texto de búsqueda
         adapter.filtrado(newText);
         return false;
     }
 
+    // Método para dirigir al usuario a la pantalla de inicio de sesión
+    private void dirigirAInicioSesion() {
+        Intent intent = new Intent(this, Login.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+        finishAffinity(); // Cierra todas las actividades en la pila de tareas
+    }
+
+    // Método para cargar la imagen de perfil del usuario desde Firestore
+    private void loadProfileImage(String userId) {
+        DocumentReference userRef = db.collection("usuarios").document(userId);
+
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                String imageUrl = documentSnapshot.getString("profileImageUrl");
+
+                // Cargar la imagen usando Picasso si la URL de la imagen está disponible
+                if (imageUrl != null && !imageUrl.isEmpty()) {
+                    Picasso.get().load(imageUrl).into(imageViewProfile);
+                } else {
+                    Toast.makeText(MainActivity.this, "No se encontró la imagen de perfil", Toast.LENGTH_SHORT).show();
+                }
+            } else {
+                Toast.makeText(MainActivity.this, "No se encontraron datos del usuario", Toast.LENGTH_SHORT).show();
+            }
+        }).addOnFailureListener(e -> {
+            Toast.makeText(MainActivity.this, "Error al cargar la imagen de perfil", Toast.LENGTH_SHORT).show();
+        });
+    }
+
+    // Métodos para calcular y mostrar las sumas de ganancias, ventas y gastos
     private void calcularSumaGanancias() {
         double suma = 0.0;
         for (Ventas venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
             suma += valorVenta;
         }
-        int sumaFormateada = (int) suma;
-        String sumaFormateadaStr = "$" + sumaFormateada;
+        // Formatear la suma con puntos de mil y moneda colombiana
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
         textTotal.setText(sumaFormateadaStr);
     }
 
@@ -157,8 +236,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 suma += valorVenta;
             }
         }
-        int sumaFormateada = (int) suma;
-        String sumaFormateadaStr = "$" + sumaFormateada;
+        // Formatear la suma con puntos de mil y moneda colombiana
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
         textVenta.setText(sumaFormateadaStr);
     }
 
@@ -172,29 +251,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
         suma = Math.abs(suma); // Asegurarse de que suma sea positiva
 
-        int sumaFormateada = (int) suma;
-        String sumaFormateadaStr;
-
-        if (suma < 0) {
-            sumaFormateadaStr = "$" + (-sumaFormateada); // Mostrar el valor positivo sin signo negativo
-        } else {
-            sumaFormateadaStr = "$" + sumaFormateada;
-        }
-
-        Log.d("CalcularSumaTotalGasto", "sumaFormateadaStr: " + sumaFormateadaStr); // Agrega esta línea
+        // Formatear la suma con puntos de mil y moneda colombiana
+        String sumaFormateadaStr = NumberFormat.getCurrencyInstance(new Locale("es", "CO")).format(suma);
         textGasto.setText(sumaFormateadaStr);
     }
-
-    private void salirApp() {
-        // Cierra todas las actividades y finaliza la aplicación
-        Intent intent = new Intent(Intent.ACTION_MAIN);
-        intent.addCategory(Intent.CATEGORY_HOME);
-        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        finishAffinity(); // Cierra todas las actividades en la pila de tareas
-        System.exit(0); // Cierra el proceso de la aplicación
-    }
 }
+
+
+
 
 
 //    private void exportarBaseDatos() {

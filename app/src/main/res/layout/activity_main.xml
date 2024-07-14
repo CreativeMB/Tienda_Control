@@ -10,13 +10,13 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/toolbarBackground"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme" />
+            <androidx.appcompat.widget.Toolbar
+                android:id="@+id/toolbar"
+                android:layout_width="match_parent"
+                android:layout_height="70dp"
+                android:background="@color/Buton"
+                android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+                app:popupTheme="@style/AppTheme.PopupMenu" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaVentas"
@@ -36,9 +36,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Venta"
+                android:text="Ingreso"
                 android:textColor="@color/colorPositivo"
-                android:textSize="25sp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/textTotal"
@@ -46,9 +46,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Total"
+                android:text="Ganacia"
                 android:textColor="#2196F3"
-                android:textSize="25sp" />
+                android:textSize="20sp" />
 
             <TextView
                 android:id="@+id/textGasto"
@@ -56,9 +56,9 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Gasto"
+                android:text="Egreso"
                 android:textColor="@color/colorNegativo"
-                android:textSize="25sp" />
+                android:textSize="20sp" />
         </LinearLayout>
 
         <!-- Contenedor para los TextView adicionales -->
@@ -74,7 +74,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Total venta"
+                android:text="Total Ingreso"
                 android:textColor="#327A35"
                 android:textSize="18sp" />
 
@@ -94,7 +94,7 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
-                android:text="Total gasto"
+                android:text="Total Egreso"
                 android:textColor="#BA1735"
                 android:textSize="18sp" />
         </LinearLayout>
@@ -111,9 +111,20 @@
         <SearchView
             android:id="@+id/txtBuscar"
             android:layout_width="300dp"
-            android:layout_height="50dp"
+            android:layout_height="55dp"
+            android:layout_marginStart="20dp"
             android:background="@color/Buton"
             android:gravity="left" />
+
+        <ImageView
+            android:id="@+id/imageViewProfile"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="140dp"
+            android:src="@drawable/gastos" />
+
+
     </FrameLayout>
 
     <!-- FloatingActionButton superpuesto -->
@@ -126,8 +137,10 @@
         android:layout_marginBottom="180dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@android:drawable/ic_menu_set_as"
-        app:backgroundTint="@color/Buton" />
+        android:src="@drawable/baseline_person_add_alt_1_24"
+        app:backgroundTint="@color/Buton"
+        app:maxImageSize="50dp"
+        app:tint="@color/colorPositivo" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/favGasto"
@@ -138,6 +151,8 @@
         android:layout_marginBottom="100dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@android:drawable/ic_menu_save"
-        app:backgroundTint="@color/Buton" />
+        android:src="@drawable/baseline_person_remove_24"
+        app:backgroundTint="@color/Buton"
+        app:maxImageSize="50dp"
+        app:tint="@color/colorNegativo" />
 </FrameLayout>
