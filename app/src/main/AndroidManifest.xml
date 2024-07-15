@@ -33,6 +33,7 @@
         <activity
             android:name=".MainActivity"
             android:exported="false" />
+
         <activity
             android:name=".dropbox.DropboxManager"
             android:exported="false" />
@@ -50,17 +51,15 @@
             android:name="com.dropbox.core.android.AuthActivity"
             android:exported="true"
             android:launchMode="singleTask"
-            android:theme="@style/Theme.AppCompat.Light.Dialog.Alert">
+            android:configChanges="orientation|keyboardHidden">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data
-                    android:scheme="https"
-                    android:host="com.example.tiendacontrol"
-                    android:path="/callback" />
+                <data android:scheme="db-j3bayptxiiokqde" android:host="com.example.tiendacontrol" android:path="/callback" />
             </intent-filter>
         </activity>
+
     </application>
 
 </manifest>

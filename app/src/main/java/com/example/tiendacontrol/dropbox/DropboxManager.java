@@ -22,14 +22,13 @@ import com.dropbox.core.v2.users.FullAccount;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Locale;
 
 public class DropboxManager {
 
     private static final String TAG = "DropboxManager";
-    private static final String APP_KEY = "7vazzg1njz2v1co"; // Reemplaza con tu App Key
+    private static final String APP_KEY = "j3bayptxiiokqde"; // Reemplaza con tu App Key
     private static final String ACCESS_TOKEN_KEY = "dropbox_access_token";
-    private static final String REDIRECT_URI = "https://com.example.tiendacontrol/callback";
+    private static final String REDIRECT_URI = "db-j3bayptxiiokqde://com.example.tiendacontrol/callback";
     public static final int AUTH_REQUEST_CODE = 1001;
 
     private static DropboxManager instance; // Instancia única
@@ -59,15 +58,22 @@ public class DropboxManager {
         }
     }
 
-    public void startAuth() {
+    private void startAuth() {
         try {
+            // Crea una instancia de DbxRequestConfig
+            DbxRequestConfig requestConfig = DbxRequestConfig.newBuilder("Tienda_Control")
+                    .withUserLocale("es") // Ajusta el idioma si necesario
+                    .build();
+
             // Crea una Intent para AuthActivity
+            // Define los scopes que necesitas (por ejemplo, 'files.content.read' y 'files.content.write')
             String[] scopes = {"files.content.read", "files.content.write"};
             Intent intent = AuthActivity.makeIntent(
-                    mActivity, APP_KEY, REDIRECT_URI, scopes, null, null, null);
+                    mActivity, APP_KEY, REDIRECT_URI, scopes, null, null, null); // Valores por defecto para los nuevos parámetros
 
             // Ejecuta startActivityForResult() en el hilo principal a través de un Handler
-            mActivity.startActivityForResult(intent, AUTH_REQUEST_CODE);
+            Handler handler = new Handler(Looper.getMainLooper());
+            handler.post(() -> mActivity.startActivityForResult(intent, AUTH_REQUEST_CODE));
 
         } catch (Exception e) {
             Log.e(TAG, "Error al iniciar la autenticación: " + e.getMessage());
@@ -76,13 +82,12 @@ public class DropboxManager {
     }
 
     public void handleAuthResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) {
+        if (requestCode == AUTH_REQUEST_CODE && resultCode == Activity.RESULT_OK) { // Verifica con la constante personalizada
             // Manejar el resultado de la autenticación
-            String accessToken = Auth.getOAuth2Token();
-            if (accessToken != null) {
+            String accessToken = Auth.getOAuth2Token(); // Obtén el token de acceso
+            if (accessToken != null) { // Verifica si el token es válido
                 Log.d(TAG, "Autenticación exitosa. Token de acceso: " + accessToken);
                 saveAccessToken(accessToken);
-                initializeClient(accessToken);
                 loadAccount();
             } else {
                 Log.e(TAG, "Error en la autenticación.");
@@ -93,7 +98,7 @@ public class DropboxManager {
 
     private void initializeClient(String accessToken) {
         DbxRequestConfig config = DbxRequestConfig.newBuilder("Tienda_Control")
-                .withUserLocale("es_ES") // Ajusta el idioma si necesario en formato String
+                .withUserLocale("es")
                 .build();
         mDbxClient = new DbxClientV2(config, accessToken);
     }
@@ -116,7 +121,7 @@ public class DropboxManager {
                 FullAccount account = mDbxClient.users().getCurrentAccount();
                 Log.d(TAG, "Usuario autenticado: " + account.getName().getDisplayName());
                 new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(mActivity, "Autenticación exitosa", Toast.LENGTH_SHORT).show());
-            } catch (DbxException e) {
+            } catch (Exception e) {
                 Log.e(TAG, "Error al cargar la cuenta: " + e.getMessage());
                 new Handler(Looper.getMainLooper()).post(() -> Toast.makeText(mActivity, "Error al cargar la cuenta", Toast.LENGTH_SHORT).show());
             }

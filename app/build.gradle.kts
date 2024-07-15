@@ -73,7 +73,8 @@ dependencies {
 
     // Dropbox Core API v2 para Android
     implementation ("com.dropbox.core:dropbox-core-sdk:7.0.0")
-    implementation ("com.dropbox.core:dropbox-android-sdk:7.0.0")
+    implementation("com.dropbox.core:dropbox-android-sdk:7.0.0")
+
 }
 
 

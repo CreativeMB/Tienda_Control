@@ -1,8 +1,16 @@
 package com.example.tiendacontrol;
 
+import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+import static com.example.tiendacontrol.Bd.BdHelper.DATABASE_NAME;
+import android.Manifest;
+import android.content.Context;
+import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
@@ -13,15 +21,25 @@ import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.Bd.BdHelper;
 import com.example.tiendacontrol.Bd.BdVentas;
+
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.nio.channels.FileChannel;
 import java.text.NumberFormat;
 import java.util.Locale;
 
@@ -45,9 +63,11 @@ import java.util.List;
 import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
-
-// Declaración de variables
+    // Declaración de variables
+    private static final String DATABASE_NAME = "MI_contabilidad.db";
     private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
+    // Constante para el código de solicitud de permiso de almacenamiento
+    private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
     private SearchView txtBuscar;
     private RecyclerView listaVentas;
     private ArrayList<Ventas> listaArrayVentas;
@@ -59,7 +79,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userId;
-
+    private BdHelper bdHelper;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,7 +88,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
         txtBuscar = findViewById(R.id.txtBuscar);
@@ -109,11 +128,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Configuración del SearchView
         txtBuscar.setOnQueryTextListener(this);
 
+
+
         // Calcular y mostrar las sumas iniciales
         calcularSumaGanancias();
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
 
+        // Inicializar el BdHelper
+        bdHelper = new BdHelper(this);
         // Obtener el usuario actual de Firebase Authentication
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
@@ -144,9 +167,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Manejo de opciones del menú
         if (id == R.id.exportar_db) {
-            // Iniciar el flujo de autenticación y subida a Dropbox
-            DropboxManager dropboxManager = DropboxManager.getInstance(this);
-            dropboxManager.authenticate();
+            // Verificar y solicitar permisos de escritura en almacenamiento externo si es necesario
+            if (isStoragePermissionGranted()) {
+                exportDatabase();
+            }
+//            DropboxManager dropboxManager = DropboxManager.getInstance(this);
+//            dropboxManager.authenticate();
+            return true;
+        } else if (id == R.id.inportar_db) {
+            if (isStoragePermissionGranted()) {
+                importDatabase();
+            }
             return true;
         } else if (id == R.id.nueva_venta) {
             // Mostrar el diálogo de nueva venta
@@ -174,12 +205,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        // Manejo del resultado de la actividad de perfil de usuario
-        if (requestCode == REQUEST_CODE_PERFIL_USUARIO && resultCode == RESULT_OK) {
-            // Aquí puedes actualizar la vista de MainActivity si es necesario
+        if (requestCode == DropboxManager.AUTH_REQUEST_CODE) {
+            DropboxManager.getInstance(this).handleAuthResult(requestCode, resultCode, data);
         }
     }
 
@@ -288,11 +318,134 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         textGasto.setText(sumaFormateadaStr);
     }
+    // Método para exportar la base de datos SQLite
+    private void exportDatabase() {
+        Log.d(TAG, "Iniciando exportación de la base de datos.");
 
+        // Obtener la ruta de la base de datos original
+        File dbFile = getDatabasePath(BdHelper.DATABASE_NAME);
+        Log.d(TAG, "Ruta de la base de datos original: " + dbFile.getAbsolutePath());
+
+        // Define la ruta de destino para la exportación en la carpeta de descargas
+        File exportDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        File exportFile = new File(exportDir, BdHelper.DATABASE_NAME);
+        Log.d(TAG, "Ruta de destino para la exportación: " + exportFile.getAbsolutePath());
+
+        try {
+            // Copia el archivo de la base de datos a la nueva ubicación
+            copyFile(dbFile, exportFile);
+            Log.d(TAG, "Base de datos exportada exitosamente a: " + exportFile.getAbsolutePath());
+
+            // Mostrar mensaje al usuario con la ruta de descarga
+            Toast.makeText(this, "Base de datos exportada correctamente a " + exportFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+
+            // Puedes realizar otras acciones después de la exportación exitosa si es necesario
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error al exportar la base de datos: " + e.getMessage());
+            // Manejar cualquier excepción que pueda ocurrir durante la copia del archivo
+
+            // Mostrar mensaje de error al usuario si es necesario
+            Toast.makeText(this, "Error al exportar la base de datos", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    // Método para copiar archivos
+    private void copyFile(File sourceFile, File destFile) throws IOException {
+        FileChannel sourceChannel = null;
+        FileChannel destChannel = null;
+
+        try {
+            sourceChannel = new FileInputStream(sourceFile).getChannel();
+            destChannel = new FileOutputStream(destFile).getChannel();
+            destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+        } finally {
+            if (sourceChannel != null) {
+                sourceChannel.close();
+            }
+            if (destChannel != null) {
+                destChannel.close();
+            }
+        }
+        if (!sourceFile.exists()) {
+            throw new IOException("Archivo de origen no existe: " + sourceFile.getAbsolutePath());
+        }
+
+        try (InputStream inputStream = new FileInputStream(sourceFile);
+             OutputStream outputStream = new FileOutputStream(destFile)) {
+
+            byte[] buffer = new byte[1024];
+            int length;
+            while ((length = inputStream.read(buffer)) > 0) {
+                outputStream.write(buffer, 0, length);
+            }
+
+        } catch (IOException e) {
+            throw new IOException("Error al copiar archivo: " + e.getMessage());
+        }
+    }
+        // Método para verificar y solicitar permisos de escritura en almacenamiento externo
+    private boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true;
+            } else {
+                ActivityCompat.requestPermissions(this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_CODE_STORAGE_PERMISSION);
+                return false;
+            }
+        } else {
+            // No se necesita verificar permisos en versiones anteriores a M
+            return true;
+        }
+    }
+
+    // Manejar resultado de la solicitud de permisos
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
+                                           @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                exportDatabase();
+            } else {
+                Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+    private void importDatabase() {
+        Log.d(TAG, "Iniciando importación de la base de datos.");
+
+        // Ruta del archivo exportado en la carpeta de descargas
+        File importFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), BdHelper.DATABASE_NAME);
+        Log.d(TAG, "Ruta del archivo a importar: " + importFile.getAbsolutePath());
+
+        // Obtener la ruta de la base de datos actual
+        File dbFile = getDatabasePath(BdHelper.DATABASE_NAME);
+
+        try {
+            // Copiar el archivo exportado a la ubicación de la base de datos actual
+            copyFile(importFile, dbFile);
+            Log.d(TAG, "Base de datos importada exitosamente desde: " + importFile.getAbsolutePath());
+
+            // Mostrar mensaje al usuario
+            Toast.makeText(this, "Base de datos importada correctamente", Toast.LENGTH_SHORT).show();
+
+            // Puedes realizar otras acciones después de la importación exitosa si es necesario
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error al importar la base de datos: " + e.getMessage());
+            // Manejar cualquier excepción que pueda ocurrir durante la copia del archivo
+
+            // Mostrar mensaje de error al usuario si es necesario
+            Toast.makeText(this, "Error al importar la base de datos", Toast.LENGTH_SHORT).show();
+        }
+    }
 }
-
-
-
 
 
 //    private void exportarBaseDatos() {
