@@ -1,17 +1,13 @@
 package com.example.tiendacontrol;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
-import static com.example.tiendacontrol.Bd.BdHelper.DATABASE_NAME;
+
 import android.Manifest;
-import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Looper;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -22,7 +18,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.core.app.ActivityCompat;
@@ -43,9 +38,9 @@ import java.nio.channels.FileChannel;
 import java.text.NumberFormat;
 import java.util.Locale;
 
+import com.example.tiendacontrol.Bd.ExcelExporter;
 import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
-import com.example.tiendacontrol.dropbox.DropboxManager;
 import com.example.tiendacontrol.entidades.Ventas;
 
 import com.example.tiendacontrol.login.Login;
@@ -59,8 +54,6 @@ import com.squareup.picasso.Picasso;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.logging.Handler;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     // Declaración de variables
@@ -169,14 +162,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         if (id == R.id.exportar_db) {
             // Verificar y solicitar permisos de escritura en almacenamiento externo si es necesario
             if (isStoragePermissionGranted()) {
-                exportDatabase();
+               exportDatabase();
             }
-//            DropboxManager dropboxManager = DropboxManager.getInstance(this);
-//            dropboxManager.authenticate();
             return true;
         } else if (id == R.id.inportar_db) {
             if (isStoragePermissionGranted()) {
                 importDatabase();
+            }
+            return true;
+        } else if (id == R.id.exportar_exel) {
+            if (isStoragePermissionGranted()) {
+                ExcelExporter.exportToExcel(MainActivity.this, "datos_excel");
             }
             return true;
         } else if (id == R.id.nueva_venta) {
@@ -208,9 +204,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == DropboxManager.AUTH_REQUEST_CODE) {
-            DropboxManager.getInstance(this).handleAuthResult(requestCode, resultCode, data);
-        }
     }
 
     @Override
@@ -446,42 +439,3 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 }
-
-
-//    private void exportarBaseDatos() {
-//        // Nombre de tu base de datos SQLite
-//        String nombreBaseDatos = "MI_contabilidad.db";
-//
-//        File dbFile = this.getDatabasePath(nombreBaseDatos);
-//        if (dbFile.exists()) {
-//            // Ejecutar AsyncTask para exportar la base de datos a Dropbox
-//            new ExportarBaseDatosTask().execute(nombreBaseDatos);
-//        } else {
-//            Toast.makeText(MainActivity.this, "Base de datos no encontrada", Toast.LENGTH_SHORT).show();
-//        }
-//    }
-//
-//    // AsyncTask para exportar la base de datos a Dropbox
-//    private class ExportarBaseDatosTask extends AsyncTask<String, Void, Boolean> {
-//
-//        @Override
-//        protected Boolean doInBackground(String... strings) {
-//            try {
-//                // Llamar al método exportarBaseDatos de DropboxHelper
-//                dropboxHelper.exportarBaseDatos(strings[0]);
-//                return true; // Éxito
-//            } catch (Exception e) {
-//                e.printStackTrace();
-//                return false; // Error
-//            }
-//        }
-//
-//        @Override
-//        protected void onPostExecute(Boolean success) {
-//            if (success) {
-//                Toast.makeText(MainActivity.this, "Base de datos exportada correctamente", Toast.LENGTH_SHORT).show();
-//            } else {
-//                Toast.makeText(MainActivity.this, "Error al exportar base de datos", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }

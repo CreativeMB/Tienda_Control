@@ -38,5 +38,6 @@
     <string name="quinto">Perfil Usuario</string>
     <string name="sexto">Tienda Control</string>
     <string name="Septimo">Inportar Datos</string>
+    <string name="octavo">Exportar Exel</string>
 
 </resources>
