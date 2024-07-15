@@ -44,7 +44,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class PerfilUsuario extends AppCompatActivity {
-
     private TextView textViewName;
     private EditText editTextName;
     private TextView textViewEmail;
