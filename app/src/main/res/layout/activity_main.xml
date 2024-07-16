@@ -108,7 +108,7 @@
 
         <SearchView
             android:id="@+id/txtBuscar"
-            android:layout_width="300dp"
+            android:layout_width="260dp"
             android:layout_height="55dp"
             android:layout_marginStart="20dp"
             android:background="@color/Buton"
@@ -116,10 +116,10 @@
 
         <ImageView
             android:id="@+id/imageViewProfile"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:layout_gravity="center_horizontal"
-            android:layout_marginStart="140dp"
+            android:layout_marginStart="120dp"
             android:src="@drawable/gastos" />
 
 
