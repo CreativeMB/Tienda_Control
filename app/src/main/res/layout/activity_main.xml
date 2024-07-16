@@ -9,7 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical">
-
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
@@ -17,7 +16,6 @@
                 android:background="@color/Buton"
                 android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
                 app:popupTheme="@style/AppTheme.PopupMenu" />
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaVentas"
             android:layout_width="match_parent"
