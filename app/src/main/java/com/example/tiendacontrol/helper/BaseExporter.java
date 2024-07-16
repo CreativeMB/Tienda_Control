@@ -1,4 +1,6 @@
 package com.example.tiendacontrol.helper;
+import static com.example.tiendacontrol.helper.BdHelper.DATABASE_NAME;
+
 import android.content.Context;
 import android.os.Environment;
 import android.util.Log;
@@ -21,6 +23,7 @@ public class BaseExporter {
 
     public BaseExporter(Context context) {
         this.context = context;
+
     }
 
     public void exportDatabase(String dbFilePath) {
@@ -64,30 +67,58 @@ public class BaseExporter {
         }
     }
 
-    public void importDatabase(String dbFilePath) {
+    public void importDatabase(String dbFileName) {
         if (!((MainActivity) context).isStoragePermissionGranted()) {
             Toast.makeText(context, "Permisos de almacenamiento no concedidos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Log.d(TAG, "Iniciando importación de la base de datos.");
+        Log.d(TAG, "Iniciando importación de la base de datos desde la carpeta de descargas.");
 
-        File importDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File importFile = new File(importDir, new File(dbFilePath).getName());
-        Log.d(TAG, "Ruta de destino para la importación: " + importFile.getAbsolutePath());
+        // Obtener la carpeta de descargas del dispositivo
+        File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+        if (!downloadDir.exists()) {
+            Log.e(TAG, "La carpeta de descargas no existe: " + downloadDir.getAbsolutePath());
+            Toast.makeText(context, "La carpeta de descargas no existe", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        // Construir la ruta completa del archivo de la base de datos en la carpeta de descargas
+        File sourceFile = new File(downloadDir, dbFileName);
+        if (!sourceFile.exists()) {
+            Log.e(TAG, "El archivo de la base de datos no existe en la carpeta de descargas: " + sourceFile.getAbsolutePath());
+            Toast.makeText(context, "El archivo de la base de datos no existe en la carpeta de descargas", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        Log.d(TAG, "Ruta del archivo a importar desde descargas: " + sourceFile.getAbsolutePath());
+
+        // Ruta de destino para la importación (la base de datos actual de la app)
+        File destFile = context.getDatabasePath(BdHelper.DATABASE_NAME);
+        Log.d(TAG, "Ruta de destino para la importación: " + destFile.getAbsolutePath());
 
         try {
-            copyFile(new File(dbFilePath), importFile);
-            Log.d(TAG, "Base de datos importada exitosamente desde: " + importFile.getAbsolutePath());
-            Toast.makeText(context, "Base de datos importada correctamente desde " + importFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+            // Eliminar el archivo de base de datos existente si existe
+            if (destFile.exists()) {
+                boolean deleted = destFile.delete();
+                if (deleted) {
+                    Log.d(TAG, "Archivo existente eliminado: " + destFile.getAbsolutePath());
+                } else {
+                    Log.e(TAG, "Error al eliminar el archivo existente: " + destFile.getAbsolutePath());
+                }
+            }
+
+            // Copiar el archivo desde la carpeta de descargas a la ubicación de la base de datos de la app
+            copyFile(sourceFile, destFile);
+            Log.d(TAG, "Base de datos importada exitosamente desde descargas a: " + destFile.getAbsolutePath());
+            Toast.makeText(context, "Base de datos importada correctamente desde descargas", Toast.LENGTH_LONG).show();
 
         } catch (IOException e) {
             e.printStackTrace();
-            Log.e(TAG, "Error al importar la base de datos: " + e.getMessage());
-            Toast.makeText(context, "Error al importar la base de datos", Toast.LENGTH_SHORT).show();
+            Log.e(TAG, "Error al importar la base de datos desde descargas: " + e.getMessage());
+            Toast.makeText(context, "Error al importar la base de datos desde descargas", Toast.LENGTH_SHORT).show();
         }
     }
-
         // Método para copiar archivos
     private void copyFile(File sourceFile, File destFile) throws IOException {
         FileChannel sourceChannel = null;

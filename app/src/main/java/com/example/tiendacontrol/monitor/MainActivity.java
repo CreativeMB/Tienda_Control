@@ -70,6 +70,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private String userId;
     private BdHelper bdHelper;
     private BaseExporter baseExporter;
+    private BaseExporter baseInporter;
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -183,16 +184,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
             return true;
         } else if (id == R.id.inportar_db) {
+            // Verificar y solicitar permisos de escritura en almacenamiento externo si es necesario
             if (isStoragePermissionGranted()) {
-                baseExporter.importDatabase(getDatabasePath(BdHelper.DATABASE_NAME).getAbsolutePath());
-                // Actualizar la lista de ventas (o cualquier otro dato que estés mostrando)
-                BdVentas bdVentas = new BdVentas(MainActivity.this);
-                listaArrayVentas.clear(); // Limpiar la lista actual
-                listaArrayVentas.addAll(bdVentas.mostrarVentas()); // Recargar los datos desde la base de datos
-                adapter.notifyDataSetChanged(); // Notificar al adaptador sobre el cambio en los datos
-                bdHelper.reopenDatabase();
+                // Obtener la instancia de BaseExporter y llamar al método de importación desde descargas
+                BaseExporter baseImporter = new BaseExporter(MainActivity.this);
+                baseImporter.importDatabase(BdHelper.DATABASE_NAME);
             } else {
-                requestStoragePermissionLauncher.launch(new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE});
+                requestStoragePermissionLauncher.launch(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE});
             }
             return true;
         } else if (id == R.id.exportar_exel) {
@@ -332,11 +330,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         textGasto.setText(sumaFormateadaStr);
     }
-
+    // Método para verificar si los permisos de almacenamiento están concedidos
     public boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()) {
-                return true; // Permiso concedido
+                return Environment.isExternalStorageManager();
+               // Permiso concedido
             } else {
                 // Solicitar permiso MANAGE_EXTERNAL_STORAGE
                 try {
@@ -362,7 +361,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 return false; // Permiso no concedido aún
             }
         } else {
-            return true; // Versiones anteriores a M, el permiso está concedido automáticamente
+            // Verifica si el permiso ya ha sido concedido
+            if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED) {
+                return true; // Permiso concedido
+            } else {
+                // Si el permiso no ha sido concedido, solicítalo al usuario
+                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
+                        REQUEST_CODE_STORAGE_PERMISSION);
+                // El resultado de la solicitud se manejará en onRequestPermissionsResult()
+                return false; // Permiso no concedido aún
+            }
         }
     }
 
