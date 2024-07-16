@@ -28,15 +28,11 @@
             android:exported="false" />
         <activity
             android:name=".login.Login"
-
-            android:exported="false" />
+                        android:exported="false" />
         <activity
             android:name=".monitor.MainActivity"
             android:exported="false" />
 
-        <activity
-            android:name=".dropbox.DropboxManager"
-            android:exported="false" />
         <activity
             android:name=".model.SplashActivity"
             android:exported="true"
