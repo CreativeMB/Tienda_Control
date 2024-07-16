@@ -1,5 +1,8 @@
 package com.example.tiendacontrol.helper;
+import static com.example.tiendacontrol.helper.BdHelper.DATABASE_NAME;
+
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -16,6 +19,7 @@ import java.nio.channels.FileChannel;
 
 public class BaseExporter {
 
+
     private static final String TAG = "BaseExporter";
     private Context context;
 
@@ -29,66 +33,109 @@ public class BaseExporter {
             return;
         }
 
-        Log.d(TAG, "Iniciando exportación de la base de datos.");
+        // Mostrar ProgressDialog
+        ProgressDialogHelper.showProgressDialog(context, "Exportando base de datos...");
 
-        File dbFile = new File(dbFilePath);
-        if (!dbFile.exists()) {
-            Log.e(TAG, "El archivo de la base de datos no existe: " + dbFilePath);
-            Toast.makeText(context, "El archivo de la base de datos no existe", Toast.LENGTH_SHORT).show();
-            return;
-        }
-        Log.d(TAG, "Ruta de la base de datos original: " + dbFile.getAbsolutePath());
-
-        File exportDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File exportFile = new File(exportDir, dbFile.getName());
-        Log.d(TAG, "Ruta de destino para la exportación: " + exportFile.getAbsolutePath());
-
-        try {
-            if (exportFile.exists()) {
-                boolean deleted = exportFile.delete();
-                if (deleted) {
-                    Log.d(TAG, "Archivo existente eliminado: " + exportFile.getAbsolutePath());
-                } else {
-                    Log.e(TAG, "Error al eliminar el archivo existente: " + exportFile.getAbsolutePath());
-                }
-            }
-
-            copyFile(dbFile, exportFile);
-            Log.d(TAG, "Base de datos exportada exitosamente a: " + exportFile.getAbsolutePath());
-            Toast.makeText(context, "Base de datos exportada correctamente a " + exportFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
-
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Error al exportar la base de datos: " + e.getMessage());
-            Toast.makeText(context, "Error al exportar la base de datos", Toast.LENGTH_SHORT).show();
-        }
+        new ExportTask().execute(dbFilePath);
     }
 
-    public void importDatabase(String dbFilePath) {
+    public void importDatabase(String dbFileName) {
         if (!((MainActivity) context).isStoragePermissionGranted()) {
             Toast.makeText(context, "Permisos de almacenamiento no concedidos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        Log.d(TAG, "Iniciando importación de la base de datos.");
+        // Mostrar ProgressDialog
+        ProgressDialogHelper.showProgressDialog(context, "Importando base de datos...");
 
-        File importDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-        File importFile = new File(importDir, new File(dbFilePath).getName());
-        Log.d(TAG, "Ruta de destino para la importación: " + importFile.getAbsolutePath());
+        new ImportTask().execute(dbFileName);
+    }
 
-        try {
-            copyFile(new File(dbFilePath), importFile);
-            Log.d(TAG, "Base de datos importada exitosamente desde: " + importFile.getAbsolutePath());
-            Toast.makeText(context, "Base de datos importada correctamente desde " + importFile.getAbsolutePath(), Toast.LENGTH_LONG).show();
+    private class ExportTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String dbFilePath = params[0];
+            File dbFile = new File(dbFilePath);
 
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.e(TAG, "Error al importar la base de datos: " + e.getMessage());
-            Toast.makeText(context, "Error al importar la base de datos", Toast.LENGTH_SHORT).show();
+            if (!dbFile.exists()) {
+                Log.e(TAG, "El archivo de la base de datos no existe: " + dbFilePath);
+                return false;
+            }
+
+            File exportDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File exportFile = new File(exportDir, dbFile.getName());
+
+            try {
+                if (exportFile.exists() && !exportFile.delete()) {
+                    Log.e(TAG, "Error al eliminar el archivo existente: " + exportFile.getAbsolutePath());
+                    return false;
+                }
+
+                copyFile(dbFile, exportFile);
+                return true;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Error al exportar la base de datos: " + e.getMessage());
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            ProgressDialogHelper.dismissProgressDialog();
+
+            if (success) {
+                Toast.makeText(context, "Base de datos exportada correctamente", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Error al exportar la base de datos", Toast.LENGTH_SHORT).show();
+            }
         }
     }
 
-        // Método para copiar archivos
+    private class ImportTask extends AsyncTask<String, Void, Boolean> {
+        @Override
+        protected Boolean doInBackground(String... params) {
+            String dbFileName = params[0];
+
+            File downloadDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+            File sourceFile = new File(downloadDir, dbFileName);
+
+            if (!sourceFile.exists()) {
+                Log.e(TAG, "El archivo de la base de datos no existe en la carpeta de descargas: " + sourceFile.getAbsolutePath());
+                return false;
+            }
+
+            File destFile = context.getDatabasePath(BdHelper.DATABASE_NAME);
+
+            try {
+                if (destFile.exists() && !destFile.delete()) {
+                    Log.e(TAG, "Error al eliminar el archivo existente: " + destFile.getAbsolutePath());
+                    return false;
+                }
+
+                copyFile(sourceFile, destFile);
+                return true;
+
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.e(TAG, "Error al importar la base de datos: " + e.getMessage());
+                return false;
+            }
+        }
+
+        @Override
+        protected void onPostExecute(Boolean success) {
+            ProgressDialogHelper.dismissProgressDialog();
+
+            if (success) {
+                Toast.makeText(context, "Base de datos importada correctamente", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(context, "Error al importar la base de datos", Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
     private void copyFile(File sourceFile, File destFile) throws IOException {
         FileChannel sourceChannel = null;
         FileChannel destChannel = null;
@@ -97,6 +144,7 @@ public class BaseExporter {
             sourceChannel = new FileInputStream(sourceFile).getChannel();
             destChannel = new FileOutputStream(destFile).getChannel();
             destChannel.transferFrom(sourceChannel, 0, sourceChannel.size());
+
         } finally {
             if (sourceChannel != null) {
                 sourceChannel.close();
@@ -104,22 +152,6 @@ public class BaseExporter {
             if (destChannel != null) {
                 destChannel.close();
             }
-        }
-        if (!sourceFile.exists()) {
-            throw new IOException("Archivo de origen no existe: " + sourceFile.getAbsolutePath());
-        }
-
-        try (InputStream inputStream = new FileInputStream(sourceFile);
-             OutputStream outputStream = new FileOutputStream(destFile)) {
-
-            byte[] buffer = new byte[1024];
-            int length;
-            while ((length = inputStream.read(buffer)) > 0) {
-                outputStream.write(buffer, 0, length);
-            }
-
-        } catch (IOException e) {
-            throw new IOException("Error al copiar archivo: " + e.getMessage());
         }
     }
 }

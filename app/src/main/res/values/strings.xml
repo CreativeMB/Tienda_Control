@@ -18,7 +18,7 @@
     <string name="firestore_button">Firestore</string>
     <string name="imagenperfil">Seleciona una imagen de Perfil</string>
     <string name="Edicion">Administra</string>
-    <string name="hint_Producto">Producto:</string>
+    <string name="hint_Producto">Items:</string>
     <string name="hint_Valor">Valor:</string>
     <string name="hint_Detalles">Dtalles:</string>
     <string name="hint_Cantidad">Cantidad:</string>
