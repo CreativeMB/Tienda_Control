@@ -1,4 +1,4 @@
-package com.example.tiendacontrol.Bd;
+package com.example.tiendacontrol.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -14,11 +14,11 @@ import java.util.Locale;
 public class BdHelper extends SQLiteOpenHelper {
 
     private static final int DATABASE_VERSION = 2;
-    private static final String DATABASE_NOMBRE = "ventas.db";
-    public static final String TABLE_VENTAS = "t_ventas";
+    public static final String DATABASE_NAME = "MI_contabilidad.db";
+    public static final String TABLE_VENTAS = "Mi_Contabilidad";
 
     public BdHelper(@Nullable Context context) {
-        super(context, DATABASE_NOMBRE, null, DATABASE_VERSION);
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
@@ -40,7 +40,7 @@ public class BdHelper extends SQLiteOpenHelper {
         onCreate(sqLiteDatabase);
 
     }
-    // Método para insertar un nuevo registro con valor negativo
+    // Método para insertar un ingreso registro con valor negativo
     public void insertarGasto(String producto, double valor, String detalles, int cantidad) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -57,4 +57,12 @@ public class BdHelper extends SQLiteOpenHelper {
         Date date = new Date();
         return dateFormat.format(date);
     }
+    // Método para cerrar y abrir la base de datos
+    public void reopenDatabase() {
+        if (getWritableDatabase() != null) {
+            getWritableDatabase().close();
+            SQLiteDatabase db = getWritableDatabase();
+        }
+    }
 }
+

@@ -3,6 +3,8 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
 
     <application
         android:allowBackup="true"
@@ -13,25 +15,46 @@
         android:theme="@style/Theme.TiendaControl"
         tools:targetApi="31">
         <activity
-            android:name=".Gasto"
+            android:name=".login.PerfilUsuario"
             android:exported="false" />
-        <!-- Actividades -->
+        <activity
+            android:name=".dialogFragment.GastoDialogFragment"
+            android:exported="false" />
+        <activity
+            android:name=".monitor.VerActivity"
+            android:exported="false" />
+        <activity
+            android:name=".login.Register"
+            android:exported="false" />
         <activity
             android:name=".login.Login"
+                        android:exported="false" />
+        <activity
+            android:name=".monitor.MainActivity"
+            android:exported="false" />
+
+        <activity
+            android:name=".model.SplashActivity"
             android:exported="true"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/Theme.TiendaControl">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".MainActivity" />
-        <activity android:name=".VerActivity" />
-        <activity android:name=".Editar" />
-        <activity android:name=".Nuevo" />
-        <activity android:name=".login.Home" />
-        <activity android:name=".login.Register" />
+        <activity
+            android:name="com.dropbox.core.android.AuthActivity"
+            android:exported="true"
+            android:launchMode="singleTask"
+            android:configChanges="orientation|keyboardHidden">
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="db-j3bayptxiiokqde" android:host="com.example.tiendacontrol" android:path="/callback" />
+            </intent-filter>
+        </activity>
 
     </application>
 
