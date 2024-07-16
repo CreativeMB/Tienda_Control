@@ -1,4 +1,4 @@
-package com.example.tiendacontrol.Bd;
+package com.example.tiendacontrol.helper;
 
 import android.content.Context;
 import android.database.Cursor;
@@ -13,9 +13,6 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 public class ExcelExporter {
 

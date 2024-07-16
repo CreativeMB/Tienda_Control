@@ -1,4 +1,4 @@
-package com.example.tiendacontrol;
+package com.example.tiendacontrol.monitor;
 
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -11,9 +11,10 @@ import android.widget.EditText;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.tiendacontrol.Bd.BdVentas;
+import com.example.tiendacontrol.helper.BdVentas;
+import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.EditarDialogFragment;
-import com.example.tiendacontrol.entidades.Ventas;
+import com.example.tiendacontrol.model.Ventas;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class VerActivity extends AppCompatActivity {

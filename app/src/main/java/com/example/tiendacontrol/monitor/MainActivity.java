@@ -1,4 +1,4 @@
-package com.example.tiendacontrol;
+package com.example.tiendacontrol.monitor;
 
 import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
 
@@ -26,8 +26,8 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tiendacontrol.Bd.BdHelper;
-import com.example.tiendacontrol.Bd.BdVentas;
+import com.example.tiendacontrol.helper.BdHelper;
+import com.example.tiendacontrol.helper.BdVentas;
 
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -38,10 +38,11 @@ import java.nio.channels.FileChannel;
 import java.text.NumberFormat;
 import java.util.Locale;
 
-import com.example.tiendacontrol.Bd.ExcelExporter;
-import com.example.tiendacontrol.adaptadores.ListaVentasAdapter;
+import com.example.tiendacontrol.helper.ExcelExporter;
+import com.example.tiendacontrol.R;
+import com.example.tiendacontrol.adapter.ListaVentasAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
-import com.example.tiendacontrol.entidades.Ventas;
+import com.example.tiendacontrol.model.Ventas;
 
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.login.PerfilUsuario;
@@ -167,7 +168,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             return true;
         } else if (id == R.id.inportar_db) {
             if (isStoragePermissionGranted()) {
-                importDatabase();
+                importarBaseDeDatos();
+                // Actualizar la lista de ventas (o cualquier otro dato que estés mostrando)
+                BdVentas bdVentas = new BdVentas(MainActivity.this);
+                listaArrayVentas.clear(); // Limpiar la lista actual
+                listaArrayVentas.addAll(bdVentas.mostrarVentas()); // Recargar los datos desde la base de datos
+                adapter.notifyDataSetChanged(); // Notificar al adaptador sobre el cambio en los datos
+                bdHelper.reopenDatabase();
             }
             return true;
         } else if (id == R.id.exportar_exel) {
@@ -182,7 +189,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
             return true;
         } else if (id == R.id.nuevo_gasto) {
-            // Mostrar el diálogo de nuevo gasto
+            // Mostrar el diálogo de ingreso gasto
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             return true;
@@ -422,10 +429,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         try {
             // Copiar el archivo exportado a la ubicación de la base de datos actual
             copyFile(importFile, dbFile);
-            Log.d(TAG, "Base de datos importada exitosamente desde: " + importFile.getAbsolutePath());
+            Log.d(TAG, "Guardado en descargas:" + importFile.getAbsolutePath());
 
             // Mostrar mensaje al usuario
-            Toast.makeText(this, "Base de datos importada correctamente", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Guardado en descargas", Toast.LENGTH_SHORT).show();
 
             // Puedes realizar otras acciones después de la importación exitosa si es necesario
 
@@ -436,6 +443,35 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
             // Mostrar mensaje de error al usuario si es necesario
             Toast.makeText(this, "Error al importar la base de datos", Toast.LENGTH_SHORT).show();
+        }
+    }
+    private void importarBaseDeDatos() {
+        Log.d(TAG, "Iniciando importación de la base de datos.");
+
+        // Ruta del archivo exportado en la carpeta de descargas
+        File archivoImportado = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), BdHelper.DATABASE_NAME);
+        Log.d(TAG, "Ruta del archivo a importar: " + archivoImportado.getAbsolutePath());
+
+        // Obtener la ruta de la base de datos actual
+        File dbFile = getDatabasePath(BdHelper.DATABASE_NAME);
+
+        try {
+            // Copiar el archivo exportado a la ubicación de la base de datos actual
+            copyFile(archivoImportado, dbFile);
+            Log.d(TAG, "Base de datos importada exitosamente desde: " + archivoImportado.getAbsolutePath());
+
+            // Mostrar mensaje al usuario
+            Toast.makeText(this, "Base de datos importada correctamente", Toast.LENGTH_SHORT).show();
+
+            // Actualizar la lista de ventas u otra operación necesaria después de la importación
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.e(TAG, "Error al importar la base de datos: " + e.getMessage());
+            // Manejar cualquier excepción que pueda ocurrir durante la copia del archivo
+
+            // Mostrar mensaje de error al usuario si es necesario
+            Toast.makeText(this, "Error al importar (MI_contabilidad.db no esta descargas)", Toast.LENGTH_LONG).show();
         }
     }
 }

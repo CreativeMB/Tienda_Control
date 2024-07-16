@@ -1,6 +1,4 @@
-package com.example.tiendacontrol.Bd;
-
-import static com.example.tiendacontrol.Bd.BdHelper.TABLE_VENTAS;
+package com.example.tiendacontrol.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
@@ -9,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.Nullable;
 
-import com.example.tiendacontrol.entidades.Ventas;
+import com.example.tiendacontrol.model.Ventas;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -144,5 +142,5 @@ public class BdVentas extends BdHelper{
         Date date = new Date();
         return dateFormat.format(date);
     }
-
 }
+

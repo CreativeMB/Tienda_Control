@@ -1,4 +1,4 @@
-package com.example.tiendacontrol.entidades;
+package com.example.tiendacontrol.model;
 
 public class Ventas {
 

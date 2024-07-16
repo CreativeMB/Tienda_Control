@@ -21,7 +21,7 @@
             android:name=".dialogFragment.GastoDialogFragment"
             android:exported="false" />
         <activity
-            android:name=".VerActivity"
+            android:name=".monitor.VerActivity"
             android:exported="false" />
         <activity
             android:name=".login.Register"
@@ -31,14 +31,14 @@
 
             android:exported="false" />
         <activity
-            android:name=".MainActivity"
+            android:name=".monitor.MainActivity"
             android:exported="false" />
 
         <activity
             android:name=".dropbox.DropboxManager"
             android:exported="false" />
         <activity
-            android:name=".entidades.SplashActivity"
+            android:name=".model.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.TiendaControl">
             <intent-filter>

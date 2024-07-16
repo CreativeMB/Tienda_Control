@@ -1,4 +1,4 @@
-package com.example.tiendacontrol.adaptadores;
+package com.example.tiendacontrol.adapter;
 
 import android.content.Context;
 import android.content.Intent;
@@ -12,14 +12,12 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.VerActivity;
-import com.example.tiendacontrol.entidades.Ventas;
+import com.example.tiendacontrol.monitor.VerActivity;
+import com.example.tiendacontrol.model.Ventas;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.stream.Collectors;
 
 public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.ContactoViewHolder>{
 

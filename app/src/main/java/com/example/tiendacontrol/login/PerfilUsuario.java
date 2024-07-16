@@ -17,7 +17,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.tiendacontrol.MainActivity;
+import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.google.android.gms.tasks.OnFailureListener;
