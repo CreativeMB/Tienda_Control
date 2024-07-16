@@ -1,5 +1,4 @@
 package com.example.tiendacontrol.login;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -8,11 +7,9 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
-import androidx.activity.EdgeToEdge;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -31,8 +28,7 @@ public class Login extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
-        setContentView(R.layout.login);
+        setContentView(R.layout.login); // Eliminado EdgeToEdge.enable(this);
 
         // Inicialización de Firebase Authentication
         mAuth = FirebaseAuth.getInstance();
@@ -91,6 +87,7 @@ public class Login extends AppCompatActivity {
                     }
                 });
     }
+
     // Método llamado cuando se hace clic en "Forgot your password?"
     public void forgotPasswordClicked(View view) {
         EditText editTextEmail = new EditText(this);
