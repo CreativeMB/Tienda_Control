@@ -209,7 +209,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
             return true;
         } else if (id == R.id.nuevo_gasto) {
-            // Mostrar el diálogo de ingreso gasto
+            // Mostrar el diálogo de ingreso egreso
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
             return true;

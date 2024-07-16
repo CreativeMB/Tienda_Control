@@ -24,7 +24,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.gasto, container, false);
+        View view = inflater.inflate(R.layout.egreso, container, false);
 
         editProducto = view.findViewById(R.id.editProducto);
         editValor = view.findViewById(R.id.editValor);
@@ -72,7 +72,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
             return;
         }
 
-        // Insertar el gasto en la base de datos
+        // Insertar el egreso en la base de datos
         bdHelper.insertarGasto(producto, valor, detalles, cantidad);
 
         Toast.makeText(requireContext(), "Gasto guardado correctamente", Toast.LENGTH_SHORT).show();
