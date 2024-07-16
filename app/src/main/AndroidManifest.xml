@@ -35,9 +35,6 @@
             android:exported="false" />
 
         <activity
-            android:name=".dropbox.DropboxManager"
-            android:exported="false" />
-        <activity
             android:name=".model.SplashActivity"
             android:exported="true"
             android:theme="@style/Theme.TiendaControl">
