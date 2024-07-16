@@ -63,17 +63,17 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation ("com.google.firebase:firebase-storage:20.0.0")
     implementation ("com.squareup.picasso:picasso:2.8")
-//exel
     implementation ("com.google.android.gms:play-services-drive:17.0.0")
     implementation ("com.google.android.gms:play-services-auth:21.2.0")
-
-
     implementation ("androidx.recyclerview:recyclerview:1.2.1")
     implementation ("androidx.recyclerview:recyclerview-selection:1.1.0")
 
     // Dropbox Core API v2 para Android
     implementation ("com.dropbox.core:dropbox-core-sdk:7.0.0")
-    implementation ("com.dropbox.core:dropbox-android-sdk:7.0.0")
+    implementation("com.dropbox.core:dropbox-android-sdk:7.0.0")
+    //exel
+    implementation ("org.apache.poi:poi:5.2.4")
+    implementation ("org.apache.poi:poi-ooxml:5.2.4")
 }
 
 

@@ -5,15 +5,11 @@
     <color name="colorAccent">#000000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="texinicio">#FFAA00FF</color>
     <color name="Buton">#2196F3</color>
     <color name="toolbarBackground">#2196F3</color>
-
     <color name="texcolor">#96562C</color>
-
-
-    <color name="colorNegativo">#900000</color> <!-- Rojo para valores negativos -->
-    <color name="colorPositivo">#4CAF50</color> <!-- Verde para valores positivos -->
-    <color name="colorFondoNegativo">#93F44336</color> <!-- Color de fondo para valores negativos -->
-    <color name="colorFondoPositivo">#4CAF50</color> <!-- Color de fondo para valores positivos -->
+    <color name="colorNegativo">#900000</color>
+    <color name="colorPositivo">#4CAF50</color>
+    <color name="colorFondoNegativo">#93F44336</color>
+    <color name="colorFondoPositivo">#4CAF50</color>
 </resources>

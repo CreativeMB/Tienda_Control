@@ -14,7 +14,8 @@
             android:layout_height="wrap_content"
             android:background="@color/toolbarBackground"
             android:minHeight="?attr/actionBarSize"
-            android:theme="?attr/actionBarTheme" />
+            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
+            app:popupTheme="@style/AppTheme.PopupMenu"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,7 +36,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/ic_launcher_background" />
+                android:src="@drawable/gastos" />
 
             <TextView
                 android:id="@+id/textViewEmail"

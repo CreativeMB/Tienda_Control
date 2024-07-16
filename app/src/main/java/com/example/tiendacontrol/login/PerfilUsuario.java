@@ -3,7 +3,6 @@ package com.example.tiendacontrol.login;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -18,16 +17,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
-import com.example.tiendacontrol.IngresoDialogFragment;
-import com.example.tiendacontrol.MainActivity;
+import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
-import com.example.tiendacontrol.dropbox.DropboxManager;
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -35,16 +29,12 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Picasso;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
 
 public class PerfilUsuario extends AppCompatActivity {
-
     private TextView textViewName;
     private EditText editTextName;
     private TextView textViewEmail;
@@ -243,10 +233,7 @@ public class PerfilUsuario extends AppCompatActivity {
         int id = item.getItemId();
 
         if (id == R.id.exportar_db) {
-            // Iniciar el flujo de autenticación y subida a Dropbox
-            DropboxManager dropboxManager = DropboxManager.getInstance(this);
-            dropboxManager.authenticate();//Inicia la autenticación
-            return true;
+                       return true;
         } else if (id == R.id.nueva_venta) {
             FragmentManager fragmentManager = getSupportFragmentManager();
             com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();

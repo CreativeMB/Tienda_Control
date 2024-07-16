@@ -13,10 +13,10 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.DialogFragment;
 
-import com.example.tiendacontrol.Bd.BdVentas;
-import com.example.tiendacontrol.MainActivity;
+import com.example.tiendacontrol.helper.BdVentas;
+import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.entidades.Ventas;
+import com.example.tiendacontrol.model.Ventas;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class EditarDialogFragment extends DialogFragment {

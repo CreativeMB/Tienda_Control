@@ -11,8 +11,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.example.tiendacontrol.monitor.MainActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.example.tiendacontrol.Bd.BdVentas;
+import com.example.tiendacontrol.helper.BdVentas;
 
 public class IngresoDialogFragment extends BottomSheetDialogFragment {
 
@@ -26,7 +28,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.nuevo, container, false);
+        View view = inflater.inflate(R.layout.ingreso, container, false);
 
         txtProducto = view.findViewById(R.id.txtProducto);
         txtValor = view.findViewById(R.id.txtValor);

@@ -12,8 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.example.tiendacontrol.Bd.BdHelper;
-import com.example.tiendacontrol.MainActivity;
+import com.example.tiendacontrol.helper.BdHelper;
+import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 
 public class GastoDialogFragment extends BottomSheetDialogFragment {

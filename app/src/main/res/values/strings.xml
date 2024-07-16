@@ -1,12 +1,7 @@
 <resources>
     <string name="app_name">Tienda Control</string>
-    <string name="app_footer">"@UnalTodosAlaU2024"</string>
-    <string name="start_button_text">Comenzar</string>
-    <string name="upload_button_text">Subir</string>
-    <string name="accelerometer_values_text">Valores del acelerómetro:</string>
-    <string name="return_button_text">Volver al home</string>
     <string name="registration_title">Registro de usuarios</string>
-    <string name="name_hint">Nombre</string>
+    <string name="name_hint">Nombre Empresa</string>
     <string name="email_hint">Correo electrónico</string>
     <string name="password_hint">Contraseña</string>
     <string name="register_button_text">Registro</string>
@@ -22,8 +17,6 @@
     <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
     <string name="imagenperfil">Seleciona una imagen de Perfil</string>
-
-
     <string name="Edicion">Administra</string>
     <string name="hint_Producto">Producto:</string>
     <string name="hint_Valor">Valor:</string>
@@ -36,6 +29,8 @@
     <string name="tres">Nuevo Egreso</string>
     <string name="cuatro">Cerrar Sesión</string>
     <string name="quinto">Perfil Usuario</string>
-    <string name="sexto">Base Datos</string>
+    <string name="sexto">Tienda Control</string>
+    <string name="Septimo">Inportar Datos</string>
+    <string name="octavo">Exportar Exel</string>
 
 </resources>
