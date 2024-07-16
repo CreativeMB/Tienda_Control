@@ -13,12 +13,14 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class ExcelExporter {
-
     private static final String TAG = "ExcelExporter";
 
-    public static void exportToExcel(Context context, String fileName) {
+    public static void exportToExcel(Context context) {
         BdHelper dbHelper = new BdHelper(context);
         SQLiteDatabase db = dbHelper.getReadableDatabase();
 
@@ -55,6 +57,9 @@ public class ExcelExporter {
         cursor.close();
         db.close();
 
+        // Generar un nombre de archivo único
+        String fileName = generateFileName();
+
         // Guardar el libro de Excel en la carpeta de descargas del dispositivo
         try {
             File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
@@ -72,7 +77,7 @@ public class ExcelExporter {
             outputStream.close();
 
             Log.d(TAG, "Archivo Excel exportado correctamente a: " + file.getAbsolutePath());
-            Toast.makeText(context, "Guardado en Descargas", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Guardado en Descargas como " + fileName + ".xlsx", Toast.LENGTH_SHORT).show();
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -85,5 +90,10 @@ public class ExcelExporter {
                 e.printStackTrace();
             }
         }
+    }
+
+    private static String generateFileName() {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        return "Mi_contabilidad" + timeStamp;
     }
 }

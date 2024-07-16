@@ -179,7 +179,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             return true;
         } else if (id == R.id.exportar_exel) {
             if (isStoragePermissionGranted()) {
-                ExcelExporter.exportToExcel(MainActivity.this, "datos_excel");
+                ExcelExporter.exportToExcel(MainActivity.this);
             }
             return true;
         } else if (id == R.id.nueva_venta) {
