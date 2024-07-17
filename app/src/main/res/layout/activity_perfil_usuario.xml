@@ -8,14 +8,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
-        <androidx.appcompat.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:background="@color/toolbarBackground"
-            android:minHeight="?attr/actionBarSize"
-            android:theme="@style/ThemeOverlay.AppCompat.ActionBar"
-            app:popupTheme="@style/AppTheme.PopupMenu"/>
 
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -100,6 +92,14 @@
                 android:layout_gravity="center"
                 android:backgroundTint="@color/Buton"
                 android:text="Editar Perfil Empresa" />
+
+            <Button
+                android:id="@+id/btnPrincipal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:backgroundTint="@color/Buton"
+                android:text="Base De DAtos" />
 
         </LinearLayout>
 

@@ -23,7 +23,7 @@ android:padding="16dp">
             android:gravity="center"
             android:textColor="@color/Buton"
             android:textSize="25dp"
-            android:text="Nuevo Gasto" />
+            android:text="Nuevo Egreso" />
 
         <TextView
             android:id="@+id/viewProducto"

@@ -49,7 +49,7 @@ public class PerfilUsuario extends AppCompatActivity {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imageUri;
-    Toolbar toolbar;
+    Button btnPrincipal;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,8 +64,7 @@ public class PerfilUsuario extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         editTextSlogan = findViewById(R.id.editTextSlogan);
         editTextDescription = findViewById(R.id.editTextDescription);
-        toolbar = findViewById(R.id.toolbar);
-
+        btnPrincipal = findViewById(R.id.btnPrincipal);
         // Inicializar Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -75,11 +74,6 @@ public class PerfilUsuario extends AppCompatActivity {
         FirebaseUser user = mAuth.getCurrentUser();
         userId = user.getUid();
 
-        // Obtener la Toolbar y configurarla
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Tienda Control");
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true); // Habilitar el botón de retroceso
-
         if (user != null) {
             // Mostrar los datos del usuario
             textViewEmail.setText(user.getEmail());
@@ -87,10 +81,16 @@ public class PerfilUsuario extends AppCompatActivity {
             // Cargar datos del usuario desde Firestore
             loadUserData(userId);
         }
-
         // Configurar el click del ImageView para seleccionar una imagen
         imageViewProfile.setOnClickListener(v -> openFileChooser());
 
+        btnPrincipal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                startActivity(new Intent(PerfilUsuario.this, MainActivity.class));
+                finish(); // Cierra la actividad actual
+            }
+        });
         // Configurar el botón "Guardar"
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -220,51 +220,8 @@ public class PerfilUsuario extends AppCompatActivity {
                 });
     }
 
-    // Metodo para crear el menu
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_principal, menu);
-        return true;
-    }
-
-    // Metodo para manejar los clicks en el menu
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-
-        if (id == R.id.exportar_db) {
-                       return true;
-        } else if (id == R.id.nueva_venta) {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
-            ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
-            return true;
-        } else if (id == R.id.nuevo_gasto) {
-            GastoDialogFragment dialogFragment = new GastoDialogFragment();
-            dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
-            return true;
-        } else if (id == R.id.perfil_usuario) {
-            // Ir a la pantalla de perfil de usuario
-            Intent intent = new Intent(this, PerfilUsuario.class);
-            finish();
-            return true;
-
-        } else if (id == R.id.BaseDatos) {
-            Intent intent = new Intent(this, MainActivity.class);
-            finish();
-            return true;
-        } else if (id == R.id.salir) {
-            dirigirAInicioSesion();
-            return true;
-
-        }
-
-
-        return super.onOptionsItemSelected(item);
-    }
-
     // Método para redirigir al usuario a la pantalla de inicio de sesión
-    private void  dirigirAInicioSesion() {
+    private void dirigirAInicioSesion() {
         mAuth.signOut();
         startActivity(new Intent(PerfilUsuario.this, Login.class));
         finish(); // Cierra la actividad actual
