@@ -121,7 +121,6 @@
             android:layout_marginStart="-155dp"
             android:src="@drawable/gastos" />
 
-
     </FrameLayout>
 
     <!-- FloatingActionButton superpuesto -->
