@@ -28,6 +28,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 import com.example.tiendacontrol.helper.BaseExporter;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.BdVentas;
@@ -115,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         fabNuevo.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+            IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
 
@@ -203,7 +204,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         } else if (id == R.id.nueva_venta) {
             // Mostrar el diálogo de nueva venta
             FragmentManager fragmentManager = getSupportFragmentManager();
-            com.example.tiendacontrol.IngresoDialogFragment ingresoDialogFragment = com.example.tiendacontrol.IngresoDialogFragment.newInstance();
+            IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
             return true;
         } else if (id == R.id.nuevo_gasto) {
