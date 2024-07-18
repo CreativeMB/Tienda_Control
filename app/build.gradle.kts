@@ -74,6 +74,8 @@ dependencies {
     //exel
     implementation ("org.apache.poi:poi:5.2.4")
     implementation ("org.apache.poi:poi-ooxml:5.2.4")
+
+    implementation ("androidx.appcompat:appcompat:1.4.0")
 }
 
 

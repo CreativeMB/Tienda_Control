@@ -28,7 +28,9 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tiendacontrol.adapter.MenuDialogFragment;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
+
 import com.example.tiendacontrol.helper.BaseExporter;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.BdVentas;
@@ -55,14 +57,15 @@ import java.util.ArrayList;
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     // Declaración de variables
     private static final String DATABASE_NAME = "MI_contabilidad.db";
-    private static final int REQUEST_CODE_PERFIL_USUARIO = 1;
+    private static final int REQUEST_CODE_WRITE_STORAGE_PERMISSION = 100;
+    public static final int REQUEST_CODE_PERFIL_USUARIO = 1;
     // Constante para el código de solicitud de permiso de almacenamiento
-    private static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
+    public static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
     private SearchView txtBuscar;
     private RecyclerView listaVentas;
     private ArrayList<Ventas> listaArrayVentas;
     private ListaVentasAdapter adapter;
-    private FloatingActionButton fabNuevo, fabGasto;
+    private FloatingActionButton fabNuevo, fabGasto, fabMenu;
     private TextView textVenta, textTotal, textGasto;
     private Toolbar toolbar;
     private ImageView imageViewProfile;
@@ -86,6 +89,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         txtBuscar = findViewById(R.id.txtBuscar);
         listaVentas = findViewById(R.id.listaVentas);
         fabNuevo = findViewById(R.id.favNuevo);
+        fabMenu = findViewById(R.id.fabMenu);
         fabGasto = findViewById(R.id.favGasto);
         textVenta = findViewById(R.id.textVenta);
         textTotal = findViewById(R.id.textTotal);
@@ -119,6 +123,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
+        fabMenu.setOnClickListener(view -> {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
+            menuDialogFragment.show(getSupportFragmentManager(), "MenuDialogFragment");
+        });
 
         // Configuración del SearchView
         txtBuscar.setOnQueryTextListener(this);
@@ -138,7 +147,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     }
                 }
         );
-
+// finaliza el lanzador para la solicitud de permisos
 
         // Calcular y mostrar las sumas iniciales
         calcularSumaGanancias();
@@ -387,7 +396,29 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 Toast.makeText(this, "Permisos de almacenamiento denegados", Toast.LENGTH_SHORT).show();
             }
         }
+
     }
+//    public void requestWriteStoragePermission() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                // No se ha concedido el permiso, se solicita al usuario
+//                ActivityCompat.requestPermissions(this,
+//                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                        REQUEST_CODE_WRITE_STORAGE_PERMISSION);
+//            } else {
+//                // Permiso ya concedido, realiza la operación que requiere el permiso
+//                Toast.makeText(this, "Permiso de escritura en almacenamiento externo concedido",
+//                        Toast.LENGTH_SHORT).show();
+//                // Aquí puedes realizar la operación que necesitabas el permiso
+//            }
+//        } else {
+//            // Versiones anteriores a Marshmallow, el permiso se considera concedido
+//            Toast.makeText(this, "Permiso de escritura en almacenamiento externo concedido",
+//                    Toast.LENGTH_SHORT).show();
+//            // Aquí puedes realizar la operación que necesitabas el permiso
+//        }
+//    }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -401,6 +432,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     Toast.makeText(this, "Permisos de almacenamiento denegados", Toast.LENGTH_SHORT).show();
                 }
             }
+
         }
     }
 

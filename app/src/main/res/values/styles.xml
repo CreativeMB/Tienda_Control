@@ -11,4 +11,14 @@
         <item name="android:layout_gravity">bottom</item>
     </style>
 
+
+        <style name="BottomSheetDialogTheme_Top" parent="Theme.Design.Light.BottomSheetDialog">
+            <item name="bottomSheetStyle">@style/TopSheetStyle</item>
+        </style>
+
+        <style name="TopSheetStyle" parent="Widget.Design.BottomSheet.Modal">
+            <item name="android:layout_gravity">top</item>
+        </style>
+
+
 </resources>
