@@ -24,7 +24,6 @@ public class VerActivity extends AppCompatActivity {
     Button btnGuarda;
     Ventas venta;
     int id = 0;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
