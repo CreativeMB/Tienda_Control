@@ -10,19 +10,21 @@ import android.widget.EditText;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.fragment.app.FragmentManager;
 
+import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.EditarDialogFragment;
-import com.example.tiendacontrol.model.Ventas;
+import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class VerActivity extends AppCompatActivity {
 
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
-    FloatingActionButton fabEditar, fabEliminar;
+    FloatingActionButton fabEditar, fabEliminar, fabMenu;
     Button btnGuarda;
-    Ventas venta;
+    Items venta;
     int id = 0;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,6 +39,13 @@ public class VerActivity extends AppCompatActivity {
         fabEliminar = findViewById(R.id.fabEliminar);
         btnGuarda = findViewById(R.id.btnGuarda);
         btnGuarda.setVisibility(View.INVISIBLE);
+        fabMenu = findViewById(R.id.fabMenu);
+
+        fabMenu.setOnClickListener(view -> {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
+            menuDialogFragment.show(fragmentManager, "servicios_dialog");
+        });
 
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();

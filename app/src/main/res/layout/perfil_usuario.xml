@@ -93,16 +93,22 @@
                 android:backgroundTint="@color/Buton"
                 android:text="Editar Perfil Empresa" />
 
-            <Button
-                android:id="@+id/btnPrincipal"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:backgroundTint="@color/Buton"
-                android:text="Base De DAtos" />
-
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/baseline_density_medium_24"
+        app:backgroundTint="@color/Buton"
+        app:maxImageSize="35dp"
+        app:tint="@color/black" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

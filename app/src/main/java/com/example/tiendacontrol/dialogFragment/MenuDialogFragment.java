@@ -19,11 +19,10 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.fragment.app.DialogFragment;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuItemImpl;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.tiendacontrol.R;
@@ -33,24 +32,27 @@ import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.ExcelExporter;
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.login.PerfilUsuario;
+import com.example.tiendacontrol.monitor.MainActivity;
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class MenuDialogFragment extends DialogFragment {
+public class MenuDialogFragment extends BottomSheetDialogFragment {
 
     private ListView menuListView;
     private MenuCustomAdapter menuAdapter;
     private List<MenuItemImpl> menuItems = new ArrayList<>();
     private BaseExporter baseExporter;
-    public MenuDialogFragment() {
-        // Constructor vacío requerido por ser un Fragment
+
+    public static MenuDialogFragment newInstance() {
+        return new MenuDialogFragment();
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_menu, container, false);
+        View view = inflater.inflate(R.layout.menu_dialog, container, false);
 
         menuListView = view.findViewById(R.id.menu_list);
 
@@ -101,6 +103,10 @@ public class MenuDialogFragment extends DialogFragment {
             FragmentManager fragmentManager = getParentFragmentManager();
             IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
+        } else if (id == R.id.inicio) {
+            // Ir a la pantalla de perfil de usuario
+            Intent intent = new Intent(requireContext(), MainActivity.class);
+            startActivity(intent);
         } else if (id == R.id.nuevo_gasto) {
             // Mostrar el diálogo de ingreso egreso
             FragmentManager fragmentManager = getParentFragmentManager();
@@ -190,23 +196,20 @@ public class MenuDialogFragment extends DialogFragment {
         }
     }
 
-
     // Método estático para crear una nueva instancia de MenuDialogFragment
-    public static MenuDialogFragment newInstance() {
-        MenuDialogFragment fragment = new MenuDialogFragment();
-        Bundle args = new Bundle();
-        // Puedes agregar argumentos adicionales aquí si es necesario
-        fragment.setArguments(args);
-        return fragment;
-    }
+//    public static MenuDialogFragment newInstance() {
+//        MenuDialogFragment fragment = new MenuDialogFragment();
+//        Bundle args = new Bundle();
+//        // Puedes agregar argumentos adicionales aquí si es necesario
+//        fragment.setArguments(args);
+//        return fragment;
+//    }
+
     // Método para dirigir al usuario a la pantalla de inicio de sesión
     private void dirigirAInicioSesion() {
         Intent intent = new Intent(requireContext(), Login.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(intent);
-        requireActivity().finishAffinity();// Cierra todas las actividades en la pila de tareas
+        requireActivity().finishAffinity(); // Cierra todas las actividades en la pila de tareas
     }
 }
-
-
-

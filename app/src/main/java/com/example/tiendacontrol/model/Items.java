@@ -1,6 +1,6 @@
 package com.example.tiendacontrol.model;
 
-public class Ventas {
+public class Items {
 
     private int id;
     private String producto;

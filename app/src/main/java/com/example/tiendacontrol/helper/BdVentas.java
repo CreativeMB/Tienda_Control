@@ -7,7 +7,7 @@ import android.database.sqlite.SQLiteDatabase;
 
 import androidx.annotation.Nullable;
 
-import com.example.tiendacontrol.model.Ventas;
+import com.example.tiendacontrol.model.Items;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,20 +45,20 @@ public class BdVentas extends BdHelper{
         return id;
     }
 
-    public ArrayList<Ventas> mostrarVentas() {
+    public ArrayList<Items> mostrarVentas() {
 
         BdHelper dbHelper = new BdHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        ArrayList<Ventas> listaVentas = new ArrayList<>();
-        Ventas venta;
+        ArrayList<Items> listaVentas = new ArrayList<>();
+        Items venta;
         Cursor cursorVentas;
 
         cursorVentas = db.rawQuery("SELECT * FROM " + TABLE_VENTAS + " ORDER BY producto ASC", null);
 
         if (cursorVentas.moveToFirst()) {
             do {
-                venta= new Ventas();
+                venta= new Items();
                 venta.setId(cursorVentas.getInt(0));
                 venta.setProducto(cursorVentas.getString(1));
                 venta.setValor(cursorVentas.getString(2));
@@ -74,18 +74,18 @@ public class BdVentas extends BdHelper{
         return listaVentas;
     }
 
-    public Ventas verVenta(int id) {
+    public Items verVenta(int id) {
 
         BdHelper dbHelper = new BdHelper(context);
         SQLiteDatabase db = dbHelper.getWritableDatabase();
 
-        Ventas venta = null;
+        Items venta = null;
         Cursor cursorVentas;
 
         cursorVentas = db.rawQuery("SELECT * FROM " + TABLE_VENTAS + " WHERE id = " + id + " LIMIT 1", null);
 
         if (cursorVentas.moveToFirst()) {
-            venta= new Ventas();
+            venta= new Items();
             venta.setId(cursorVentas.getInt(0));
             venta.setProducto(cursorVentas.getString(1));
             venta.setValor(cursorVentas.getString(2));

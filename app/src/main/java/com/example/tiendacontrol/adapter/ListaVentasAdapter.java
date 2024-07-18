@@ -11,7 +11,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.monitor.VerActivity;
-import com.example.tiendacontrol.model.Ventas;
+import com.example.tiendacontrol.model.Items;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
@@ -19,11 +19,11 @@ import java.util.ArrayList;
 public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.ContactoViewHolder>{
 
 
-    ArrayList<Ventas> listaVentas;
-    ArrayList<Ventas> listaOriginal;
+    ArrayList<Items> listaVentas;
+    ArrayList<Items> listaOriginal;
 
 
-    public ListaVentasAdapter(ArrayList<Ventas> listaVentas) {
+    public ListaVentasAdapter(ArrayList<Items> listaVentas) {
         this.listaVentas = listaVentas;
         listaOriginal = new ArrayList<>();
         listaOriginal.addAll(listaVentas);
@@ -38,7 +38,7 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ContactoViewHolder holder, int position) {
-        Ventas venta = listaVentas.get(position);
+        Items venta = listaVentas.get(position);
 
         holder.viewProducto.setText(venta.getProducto());
         double valor = venta.getValorAsDouble();
@@ -61,7 +61,7 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
             listaVentas.addAll(listaOriginal);
         } else {
             listaVentas.clear();
-            for (Ventas venta : listaOriginal) {
+            for (Items venta : listaOriginal) {
                 if (venta.getProducto().toLowerCase().contains(txtBuscar.toLowerCase())) {
                     listaVentas.add(venta);
                 }

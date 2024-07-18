@@ -96,6 +96,7 @@
                 android:backgroundTint="@color/Buton"
                 android:text="@string/btn_guarda" />
 
+
             <com.google.android.material.floatingactionbutton.FloatingActionButton
                 android:id="@+id/fabEditar"
                 android:layout_width="match_parent"
@@ -122,5 +123,21 @@
                 android:src="@android:drawable/ic_delete" />
 
         </LinearLayout>
+
     </ScrollView>
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/baseline_density_medium_24"
+        app:backgroundTint="@color/Buton"
+        app:maxImageSize="35dp"
+        app:tint="@color/black" />
+
 </RelativeLayout>

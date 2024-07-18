@@ -3,8 +3,6 @@ package com.example.tiendacontrol.login;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -14,14 +12,14 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentManager;
 
+import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
@@ -46,15 +44,15 @@ public class PerfilUsuario extends AppCompatActivity {
     private FirebaseFirestore db;
     private StorageReference storageRef;
     private String userId;
-
+    private FloatingActionButton fabMenu;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Uri imageUri;
-    Button btnPrincipal;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_perfil_usuario);
+        setContentView(R.layout.perfil_usuario);
 
         // Inicializar componentes de la interfaz de usuario
         textViewName = findViewById(R.id.textViewName);
@@ -64,7 +62,9 @@ public class PerfilUsuario extends AppCompatActivity {
         btnSave = findViewById(R.id.btnSave);
         editTextSlogan = findViewById(R.id.editTextSlogan);
         editTextDescription = findViewById(R.id.editTextDescription);
-        btnPrincipal = findViewById(R.id.btnPrincipal);
+
+        fabMenu = findViewById(R.id.fabMenu);
+
         // Inicializar Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
@@ -73,6 +73,12 @@ public class PerfilUsuario extends AppCompatActivity {
         // Obtener el usuario actual de Firebase Authentication
         FirebaseUser user = mAuth.getCurrentUser();
         userId = user.getUid();
+
+        fabMenu.setOnClickListener(view -> {
+            FragmentManager fragmentManager = getSupportFragmentManager();
+            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
+            menuDialogFragment.show(fragmentManager, "servicios_dialog");
+        });
 
         if (user != null) {
             // Mostrar los datos del usuario
@@ -84,13 +90,6 @@ public class PerfilUsuario extends AppCompatActivity {
         // Configurar el click del ImageView para seleccionar una imagen
         imageViewProfile.setOnClickListener(v -> openFileChooser());
 
-        btnPrincipal.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                startActivity(new Intent(PerfilUsuario.this, MainActivity.class));
-                finish(); // Cierra la actividad actual
-            }
-        });
         // Configurar el botón "Guardar"
         btnSave.setOnClickListener(new View.OnClickListener() {
             @Override

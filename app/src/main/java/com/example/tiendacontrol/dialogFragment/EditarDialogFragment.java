@@ -14,7 +14,7 @@ import androidx.fragment.app.DialogFragment;
 import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.model.Ventas;
+import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class EditarDialogFragment extends DialogFragment {
@@ -23,7 +23,7 @@ public class EditarDialogFragment extends DialogFragment {
     Button btnGuarda;
     FloatingActionButton fabEditar, fabEliminar;
     boolean correcto = false;
-    Ventas venta;
+    Items venta;
     int id = 0;
 
     public static EditarDialogFragment newInstance(int id) {
