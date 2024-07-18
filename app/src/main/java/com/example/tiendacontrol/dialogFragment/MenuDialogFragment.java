@@ -1,6 +1,5 @@
-package com.example.tiendacontrol.adapter;
+package com.example.tiendacontrol.dialogFragment;
 
-import static androidx.core.app.ActivityCompat.finishAffinity;
 import static com.example.tiendacontrol.monitor.MainActivity.REQUEST_CODE_STORAGE_PERMISSION;
 
 import android.Manifest;
@@ -13,7 +12,6 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
@@ -29,8 +27,7 @@ import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
-import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
+import com.example.tiendacontrol.adapter.MenuCustomAdapter;
 import com.example.tiendacontrol.helper.BaseExporter;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.ExcelExporter;
@@ -73,6 +70,10 @@ public class MenuDialogFragment extends DialogFragment {
         menuListView.setOnItemClickListener((parent, view1, position, id) -> {
             MenuItemImpl menuItem = menuItems.get(position);
             handleMenuItemClick(menuItem);
+
+            // Cerrar el diálogo al seleccionar un elemento del menú
+            dismiss();
+
         });
 
         return view;

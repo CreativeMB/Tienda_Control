@@ -28,7 +28,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tiendacontrol.adapter.MenuDialogFragment;
+import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 
 import com.example.tiendacontrol.helper.BaseExporter;
