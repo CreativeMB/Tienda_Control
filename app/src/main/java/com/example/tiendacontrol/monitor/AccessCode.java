@@ -65,7 +65,6 @@ public class AccessCode extends AppCompatActivity {
             }
         });
     }
-
     private boolean validateCode(String inputCode) {
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
         String savedCode = sharedPreferences.getString(CODE_KEY, "");
