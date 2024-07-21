@@ -94,6 +94,10 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textVenta = findViewById(R.id.textVenta);
         textTotal = findViewById(R.id.textTotal);
         textGasto = findViewById(R.id.textGasto);
+
+        TextView textGasto = findViewById(R.id.textGasto);
+        TextView textVenta = findViewById(R.id.textVenta);
+        TextView textGanacia = findViewById(R.id.textTotal);
         // Configuración del RecyclerView
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
         baseExporter = new BaseExporter(this);
@@ -164,7 +168,33 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 startActivity(intent);
             }
         });
-    }
+        // Configurar OnClickListener para abrir NegativoActivity
+        textGasto.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, EgresoTotal.class);
+            startActivity(intent);
+        }
+    });
+
+// Configurar OnClickListener para abrir PositivoActivity
+        textVenta.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, IngresoTotal.class);
+            startActivity(intent);
+        }
+    });
+
+// Configurar OnClickListener para abrir PositivoActivity
+        textTotal.setOnClickListener(new View.OnClickListener() {
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(MainActivity.this, IngresoEgreso.class);
+            startActivity(intent);
+        }
+    });
+}
 
     @Override
     public boolean onQueryTextSubmit(String query) {

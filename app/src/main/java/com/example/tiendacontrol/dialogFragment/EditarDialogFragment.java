@@ -18,7 +18,6 @@ import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class EditarDialogFragment extends DialogFragment {
-
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
     FloatingActionButton fabEditar, fabEliminar;
@@ -60,16 +59,16 @@ public class EditarDialogFragment extends DialogFragment {
 
         if (venta != null) {
             txtProducto.setText(venta.getProducto());
-            txtValor.setText(venta.getValor());
+            txtValor.setText(String.valueOf(venta.getValor())); // Convertir double a String
             txtDetalles.setText(venta.getDetalles());
-            txtCantidad.setText(venta.getCantidad());
+            txtCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
         }
 
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (!txtProducto.getText().toString().isEmpty() && !txtValor.getText().toString().isEmpty()) {
-                    correcto = bdVentas.editarVenta(id, txtProducto.getText().toString(), txtValor.getText().toString(), txtDetalles.getText().toString(), txtCantidad.getText().toString());
+                    correcto = bdVentas.editarVenta(id, txtProducto.getText().toString(), Double.parseDouble(txtValor.getText().toString()), txtDetalles.getText().toString(), Integer.parseInt(txtCantidad.getText().toString()));
 
                     if (correcto) {
                         Toast.makeText(requireContext(), "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();

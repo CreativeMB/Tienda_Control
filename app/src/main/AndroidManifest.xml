@@ -3,9 +3,15 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28"/>
-    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"/>
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28" />
+    <uses-permission
+        android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
+        tools:ignore="ScopedStorage" />
 
     <application
         android:allowBackup="true"
@@ -15,6 +21,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.TiendaControl"
         tools:targetApi="31">
+        <activity
+            android:name=".monitor.Items"
+            android:exported="false" />
+        <activity
+            android:name=".monitor.IngresoEgreso"
+            android:exported="false" />
         <activity
             android:name=".login.PerfilUsuario"
             android:exported="false" />
@@ -27,9 +39,15 @@
         <activity
             android:name=".login.Register"
             android:exported="false" />
+
+        <activity android:name=".monitor.EgresoTotal" />
+        <activity android:name=".monitor.IngresoTotal" />
+        <activity android:name=".monitor.SetCodeActivity"/>
+        <activity android:name=".monitor.AccessCodeActivity"/>
+
         <activity
             android:name=".login.Login"
-                        android:exported="false" />
+            android:exported="false" />
         <activity
             android:name=".monitor.MainActivity"
             android:exported="false" />
@@ -46,17 +64,21 @@
         </activity>
         <activity
             android:name="com.dropbox.core.android.AuthActivity"
+            android:configChanges="orientation|keyboardHidden"
             android:exported="true"
-            android:launchMode="singleTask"
-            android:configChanges="orientation|keyboardHidden">
+            android:launchMode="singleTask">
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="db-j3bayptxiiokqde" android:host="com.example.tiendacontrol" android:path="/callback" />
+
+                <data
+                    android:host="com.example.tiendacontrol"
+                    android:path="/callback"
+                    android:scheme="db-j3bayptxiiokqde" />
             </intent-filter>
         </activity>
-
     </application>
 
 </manifest>

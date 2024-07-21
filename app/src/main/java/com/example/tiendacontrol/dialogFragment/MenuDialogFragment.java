@@ -32,7 +32,9 @@ import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.ExcelExporter;
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.login.PerfilUsuario;
+import com.example.tiendacontrol.monitor.AccessCodeActivity;
 import com.example.tiendacontrol.monitor.MainActivity;
+import com.example.tiendacontrol.monitor.SetCodeActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.util.ArrayList;
@@ -106,6 +108,10 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         } else if (id == R.id.inicio) {
             // Ir a la pantalla de perfil de usuario
             Intent intent = new Intent(requireContext(), MainActivity.class);
+            startActivity(intent);
+        } else if (id == R.id.code) {
+            // Ir a la pantalla de perfil de usuario
+            Intent intent = new Intent(requireContext(), SetCodeActivity.class);
             startActivity(intent);
         } else if (id == R.id.nuevo_gasto) {
             // Mostrar el diálogo de ingreso egreso

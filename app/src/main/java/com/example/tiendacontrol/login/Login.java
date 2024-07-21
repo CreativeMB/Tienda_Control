@@ -10,6 +10,8 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.tiendacontrol.monitor.AccessCodeActivity;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -22,7 +24,7 @@ public class Login extends AppCompatActivity {
     private FirebaseAuth mAuth;
     private EditText editTextEmail;
     private EditText editTextPassword;
-    private Button btnLogin;
+    private Button btnLogin,  btnCode;
     private Button btnRegister;
 
     @Override
@@ -38,6 +40,7 @@ public class Login extends AppCompatActivity {
         editTextPassword = findViewById(R.id.editTextPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnRegister = findViewById(R.id.btnRegister);
+        btnCode = findViewById(R.id.btnCodeAcceso);
 
         // Configuración del botón de registro para abrir la actividad de registro
         btnRegister.setOnClickListener(new View.OnClickListener() {
@@ -54,6 +57,16 @@ public class Login extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 loginUser();
+            }
+        });
+
+        // Configuración del botón de registro para abrir la actividad de registro
+        btnCode.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Login.this, AccessCodeActivity.class);
+                startActivity(intent);
+                finish(); // Finaliza esta actividad para que el usuario no pueda volver atrás
             }
         });
     }
