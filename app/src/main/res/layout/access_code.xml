@@ -22,7 +22,6 @@
         android:textColor="@color/texcolor"
         android:gravity="center"
         android:paddingBottom="25dp"/>
-
     <EditText
         android:id="@+id/editTextAccessCode"
         android:layout_width="match_parent"
