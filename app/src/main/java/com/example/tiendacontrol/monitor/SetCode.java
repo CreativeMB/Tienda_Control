@@ -15,13 +15,13 @@ import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-public class SetCodeActivity extends AppCompatActivity {
+public class SetCode extends AppCompatActivity {
     private FloatingActionButton fabMenu;
     private EditText editTextCode;
     private Button buttonSaveCode;
     private static final String PREFS_NAME = "CodePrefs";
     private static final String CODE_KEY = "access_code";
-    private static final String TAG = "SetCodeActivity";
+    private static final String TAG = "SetCode";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -44,11 +44,11 @@ public class SetCodeActivity extends AppCompatActivity {
                 String code = editTextCode.getText().toString().trim();
                 if (!code.isEmpty()) {
                     saveCode(code);
-                    Toast.makeText(SetCodeActivity.this, "Código guardado correctamente", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SetCode.this, "Código guardado correctamente", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "Código guardado correctamente: " + code);
                     finish(); // Cierra la actividad después de guardar el código
                 } else {
-                    Toast.makeText(SetCodeActivity.this, "El campo de código está vacío", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(SetCode.this, "El campo de código está vacío", Toast.LENGTH_SHORT).show();
                     Log.d(TAG, "El campo de código está vacío");
                 }
             }
