@@ -17,44 +17,47 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 
 public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.ContactoViewHolder>{
-
-
+    // Lista de ventas y lista original para realizar filtrados
     ArrayList<Items> listaVentas;
     ArrayList<Items> listaOriginal;
 
-
+    // Constructor del adaptador que inicializa las listas
     public ListaVentasAdapter(ArrayList<Items> listaVentas) {
         this.listaVentas = listaVentas;
         listaOriginal = new ArrayList<>();
         listaOriginal.addAll(listaVentas);
     }
 
+    // Método para inflar la vista del item
     @NonNull
     @Override
     public ContactoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lista_item_ventas, null, false);
+        View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.lista_item, null, false);
         return new ContactoViewHolder(view);
     }
 
+    // Método para enlazar los datos de un item con la vista
     @Override
     public void onBindViewHolder(@NonNull ContactoViewHolder holder, int position) {
         Items venta = listaVentas.get(position);
 
+        // Asignar datos a los TextViews
         holder.viewProducto.setText(venta.getProducto());
         double valor = venta.getValorAsDouble();
-
         holder.viewValor.setText(formatoNumerico(Math.abs(valor))); // Mostrar el valor positivo formateado
         holder.viewValor.setTextColor(ContextCompat.getColor(holder.itemView.getContext(),
                 valor < 0 ? R.color.colorNegativo : R.color.colorPositivo));
 
         holder.viewDetalles.setText(venta.getDetalles());
-        holder.viewCantidad.setText(venta.getCantidad());
+        holder.viewCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
         holder.viewFecha.setText(venta.getFechaRegistro());
 
+        // Cambiar el color de fondo del item según el valor
         holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(),
                 valor < 0 ? R.color.colorFondoNegativo : R.color.colorFondoPositivo));
     }
 
+    // Método para filtrar la lista de ventas según el texto ingresado
     public void filtrado(final String txtBuscar) {
         if (txtBuscar.isEmpty()) {
             listaVentas.clear();
@@ -67,14 +70,16 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
                 }
             }
         }
-        notifyDataSetChanged();
+        notifyDataSetChanged(); // Notificar cambios al adaptador
     }
 
+    // Método que devuelve la cantidad de items en la lista
     @Override
     public int getItemCount() {
         return listaVentas.size();
     }
 
+    // Método para formatear los valores numéricos con separador de miles
     private String formatoNumerico(double valor) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
         symbols.setGroupingSeparator('.'); // Punto como separador de miles
@@ -82,10 +87,12 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
         return "$" + df.format(valor);
     }
 
+    // Clase interna para el ViewHolder de cada item en el RecyclerView
     public class ContactoViewHolder extends RecyclerView.ViewHolder {
 
         TextView viewProducto, viewValor, viewDetalles, viewCantidad, viewFecha;
 
+        // Constructor del ViewHolder que inicializa los TextViews
         public ContactoViewHolder(@NonNull View itemView) {
             super(itemView);
 
@@ -95,6 +102,7 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
             viewCantidad = itemView.findViewById(R.id.viewCantidad);
             viewFecha = itemView.findViewById(R.id.viewFecha);
 
+            // Configuración del click listener para cada item
             itemView.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {

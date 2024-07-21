@@ -18,6 +18,7 @@ import com.example.tiendacontrol.helper.BdVentas;
 
 public class IngresoDialogFragment extends BottomSheetDialogFragment {
 
+
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
 
@@ -39,18 +40,36 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!txtProducto.getText().toString().equals("") && !txtValor.getText().toString().equals("") && !txtDetalles.getText().toString().equals("") && !txtCantidad.getText().toString().equals("")) {
+                if (!txtProducto.getText().toString().equals("") &&
+                        !txtValor.getText().toString().equals("") &&
+                        !txtDetalles.getText().toString().equals("") &&
+                        !txtCantidad.getText().toString().equals("")) {
 
-                    BdVentas bdVentas = new BdVentas(getContext());
-                    long id = bdVentas.insertarVenta(txtProducto.getText().toString(), txtValor.getText().toString(), txtDetalles.getText().toString(), txtCantidad.getText().toString());
+                    try {
+                        // Convertir txtValor a double
+                        double valor = Double.parseDouble(txtValor.getText().toString());
 
-                    if (id > 0) {
-                        Toast.makeText(getContext(), "REGISTRO GUARDADO", Toast.LENGTH_LONG).show();
-                        limpiar();
-                        verRegistro();
-                        dismiss();
-                    } else {
-                        Toast.makeText(getContext(), "ERROR AL GUARDAR REGISTRO", Toast.LENGTH_LONG).show();
+                        // Convertir txtCantidad a int
+                        int cantidad = Integer.parseInt(txtCantidad.getText().toString());
+
+                        BdVentas bdVentas = new BdVentas(getContext());
+                        long id = bdVentas.insertarVenta(
+                                txtProducto.getText().toString(),
+                                valor, // Pasar como double
+                                txtDetalles.getText().toString(),
+                                cantidad // Pasar como int
+                        );
+
+                        if (id > 0) {
+                            Toast.makeText(getContext(), "REGISTRO GUARDADO", Toast.LENGTH_LONG).show();
+                            limpiar();
+                            verRegistro();
+                            dismiss();
+                        } else {
+                            Toast.makeText(getContext(), "ERROR AL GUARDAR REGISTRO", Toast.LENGTH_LONG).show();
+                        }
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(getContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_LONG).show();
                     }
                 } else {
                     Toast.makeText(getContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();

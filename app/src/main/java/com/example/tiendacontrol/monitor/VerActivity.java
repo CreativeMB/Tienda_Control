@@ -20,12 +20,12 @@ import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class VerActivity extends AppCompatActivity {
-
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     FloatingActionButton fabEditar, fabEliminar, fabMenu;
     Button btnGuarda;
     Items venta;
     int id = 0;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -50,7 +50,7 @@ public class VerActivity extends AppCompatActivity {
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
             if (extras == null) {
-                id = Integer.parseInt(null);
+                id = -1; // Cambiar a un valor de ID predeterminado o manejar el caso en que no se proporciona ID
             } else {
                 id = extras.getInt("ID");
             }
@@ -63,44 +63,33 @@ public class VerActivity extends AppCompatActivity {
 
         if (venta != null) {
             txtProducto.setText(venta.getProducto());
-            txtValor.setText(venta.getValor());
+            // Convertir double a String antes de pasar a setText
+            txtValor.setText(String.valueOf(venta.getValor()));
             txtDetalles.setText(venta.getDetalles());
-            txtCantidad.setText(venta.getCantidad());
+            txtCantidad.setText(String.valueOf(venta.getCantidad())); // Asegúrate de que getCantidad devuelve int o String
             txtProducto.setInputType(InputType.TYPE_NULL);
             txtValor.setInputType(InputType.TYPE_NULL);
             txtDetalles.setInputType(InputType.TYPE_NULL);
             txtCantidad.setInputType(InputType.TYPE_NULL);
         }
 
-        fabEditar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // Mostrar EditarDialogFragment al hacer clic en fabEditar
-                EditarDialogFragment dialogFragment = EditarDialogFragment.newInstance(id);
-                dialogFragment.show(getSupportFragmentManager(), "EditarDialogFragment");
-            }
+        fabEditar.setOnClickListener(view -> {
+            // Mostrar EditarDialogFragment al hacer clic en fabEditar
+            EditarDialogFragment dialogFragment = EditarDialogFragment.newInstance(id);
+            dialogFragment.show(getSupportFragmentManager(), "EditarDialogFragment");
         });
 
-        fabEliminar.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                AlertDialog.Builder builder = new AlertDialog.Builder(VerActivity.this);
-                builder.setMessage("¿Desea eliminar Item?")
-                        .setPositiveButton("SI", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                if (bdVentas.eliminarVenta(id)) {
-                                    lista();
-                                }
-                            }
-                        })
-                        .setNegativeButton("NO", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialogInterface, int i) {
-                                // No hacer nada si se selecciona NO
-                            }
-                        }).show();
-            }
+        fabEliminar.setOnClickListener(view -> {
+            AlertDialog.Builder builder = new AlertDialog.Builder(VerActivity.this);
+            builder.setMessage("¿Desea eliminar Item?")
+                    .setPositiveButton("SI", (dialogInterface, i) -> {
+                        if (bdVentas.eliminarVenta(id)) {
+                            lista();
+                        }
+                    })
+                    .setNegativeButton("NO", (dialogInterface, i) -> {
+                        // No hacer nada si se selecciona NO
+                    }).show();
         });
     }
 

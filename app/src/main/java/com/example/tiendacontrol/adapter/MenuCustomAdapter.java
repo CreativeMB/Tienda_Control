@@ -31,7 +31,7 @@ public class MenuCustomAdapter extends ArrayAdapter<MenuItemImpl> {
     public View getView(int position, @Nullable View convertView, @NonNull ViewGroup parent) {
         View listItemView = convertView;
         if (listItemView == null) {
-            listItemView = LayoutInflater.from(mContext).inflate(R.layout.list_item_menu, parent, false);
+            listItemView = LayoutInflater.from(mContext).inflate(R.layout.lista_item_menu, parent, false);
         }
 
         MenuItemImpl menuItem = mMenuItems.get(position);
