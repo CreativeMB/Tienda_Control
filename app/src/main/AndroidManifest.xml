@@ -43,7 +43,7 @@
         <activity android:name=".monitor.EgresoTotal" />
         <activity android:name=".monitor.IngresoTotal" />
         <activity android:name=".monitor.SetCodeActivity"/>
-        <activity android:name=".monitor.AccessCodeActivity"/>
+        <activity android:name=".monitor.AccessCode"/>
 
         <activity
             android:name=".login.Login"

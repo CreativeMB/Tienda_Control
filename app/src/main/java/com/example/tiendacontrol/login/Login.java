@@ -11,7 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.tiendacontrol.monitor.AccessCodeActivity;
+import com.example.tiendacontrol.monitor.AccessCode;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -64,7 +64,7 @@ public class Login extends AppCompatActivity {
         btnCode.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Login.this, AccessCodeActivity.class);
+                Intent intent = new Intent(Login.this, AccessCode.class);
                 startActivity(intent);
                 finish(); // Finaliza esta actividad para que el usuario no pueda volver atrás
             }

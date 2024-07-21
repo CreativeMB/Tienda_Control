@@ -11,32 +11,44 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tiendacontrol.R;
+import com.example.tiendacontrol.login.Login;
 
-public class AccessCodeActivity extends AppCompatActivity {
+public class AccessCode extends AppCompatActivity {
 
     private EditText editTextAccessCode;
     private Button buttonAccess;
     private static final String PREFS_NAME = "CodePrefs";
     private static final String CODE_KEY = "access_code";
-
+Button btnLogin;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_access_code);
+        setContentView(R.layout.access_code);
 
         editTextAccessCode = findViewById(R.id.editTextAccessCode);
         buttonAccess = findViewById(R.id.buttonAccess);
+        btnLogin = findViewById(R.id.btnLogin);
+
+        // Set up "Login" button listener to redirect the user to the login screen
+        btnLogin.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(AccessCode.this, Login.class);
+                startActivity(intent);
+                finish(); // Close this activity so the user cannot navigate back
+            }
+        });
 
         buttonAccess.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String inputCode = editTextAccessCode.getText().toString().trim();
                 if (validateCode(inputCode)) {
-                    Intent intent = new Intent(AccessCodeActivity.this, MainActivity.class);
+                    Intent intent = new Intent(AccessCode.this, MainActivity.class);
                     startActivity(intent);
                     finish(); // Cierra la actividad después de acceder al MainActivity
                 } else {
-                    Toast.makeText(AccessCodeActivity.this, "Código incorrecto", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(AccessCode.this, "Código incorrecto", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -47,5 +59,6 @@ public class AccessCodeActivity extends AppCompatActivity {
         String savedCode = sharedPreferences.getString(CODE_KEY, "");
         return inputCode.equals(savedCode);
     }
+
 }
 
