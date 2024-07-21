@@ -44,7 +44,6 @@ public class AccessCode extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 String inputCode = editTextAccessCode.getText().toString().trim();
-
                 // Verificar si hay un código guardado
                 SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, MODE_PRIVATE);
                 String savedCode = sharedPreferences.getString(CODE_KEY, "");
