@@ -34,7 +34,6 @@
         android:backgroundTint="@color/Buton"
         android:padding="16dp"/>
 
-    <!-- Login Button -->
     <Button
         android:id="@+id/btnLogin"
         android:text="@string/login_button"
