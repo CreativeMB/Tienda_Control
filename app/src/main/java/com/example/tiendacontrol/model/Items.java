@@ -60,4 +60,9 @@ public class Items {
     public double getValorAsDouble() {
         return valor;
     }
+
+    @Override
+    public String toString() {
+        return producto; // Esto hará que el Spinner muestre el nombre del producto
+    }
 }

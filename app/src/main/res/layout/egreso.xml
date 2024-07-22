@@ -95,6 +95,23 @@ android:padding="16dp">
             android:text="@string/btn_guarda"
             android:textSize="18sp"
             android:onClick="guardarGasto"/>
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="30dp" />
+
+        <Button
+            android:id="@+id/btnSavePredefined"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:backgroundTint="@color/Buton"
+            android:textSize="18sp"
+            android:text="Guardar como predefinido"/>
+
+        <Spinner
+            android:id="@+id/spinnerPredefined"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"/>
 
     </LinearLayout>
 </ScrollView>
