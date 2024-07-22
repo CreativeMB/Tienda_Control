@@ -160,9 +160,10 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             try {
                 double valor = Double.parseDouble(valorStr);
                 int cantidad = Integer.parseInt(cantidadStr);
+                double total = valor * cantidad; // Calcula el total
 
                 BdVentas bdVentas = new BdVentas(getContext());
-                long id = bdVentas.insertarVenta(producto, valor, detalles, cantidad);
+                long id = bdVentas.insertarVenta(producto, total, detalles, cantidad); // Pasa el total
 
                 if (id > 0) {
                     Toast.makeText(getContext(), "REGISTRO GUARDADO", Toast.LENGTH_LONG).show();
@@ -179,7 +180,6 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             Toast.makeText(getContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
         }
     }
-
     private void limpiar() {
         txtProducto.setText("");
         txtValor.setText("");

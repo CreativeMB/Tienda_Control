@@ -136,27 +136,28 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
 
         try {
             valor = Double.parseDouble(valorStr); // Convertir valor a double
+            cantidad = Integer.parseInt(cantidadStr);
 
             // Si el valor es positivo, convertirlo a negativo
             if (valor > 0) {
                 valor = -valor;
             }
 
-            cantidad = Integer.parseInt(cantidadStr);
+            // Calcular el total
+            double total = valor * cantidad;
+
+            // Insertar el egreso en la base de datos
+            bdHelper.insertarGasto(producto, total, detalles, cantidad);
+
+            Toast.makeText(requireContext(), "Gasto guardado correctamente", Toast.LENGTH_SHORT).show();
+
+            // Limpiar los campos después de guardar
+            limpiar();
+
+            verRegistro();
         } catch (NumberFormatException e) {
             Toast.makeText(requireContext(), "Valor o cantidad no válidos", Toast.LENGTH_SHORT).show();
-            return;
         }
-
-        // Insertar el egreso en la base de datos
-        bdHelper.insertarGasto(producto, valor, detalles, cantidad);
-
-        Toast.makeText(requireContext(), "Gasto guardado correctamente", Toast.LENGTH_SHORT).show();
-
-        // Limpiar los campos después de guardar
-        limpiar();
-
-        verRegistro();
     }
 
     private void limpiar() {
