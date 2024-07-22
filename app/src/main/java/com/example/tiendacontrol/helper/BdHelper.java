@@ -41,11 +41,11 @@ public class BdHelper extends SQLiteOpenHelper {
 
     }
     // Método para insertar un ingreso registro con valor negativo
-    public void insertarGasto(String producto, double valor, String detalles, int cantidad) {
+    public void insertarGasto(String producto, double total, String detalles, int cantidad) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
         values.put("producto", producto);
-        values.put("valor", valor); // Puede ser positivo o negativo
+        values.put("valor", total);// Puede ser positivo o negativo
         values.put("detalles", detalles);
         values.put("cantidad", cantidad);
         values.put("fecha_registro", obtenerFechaActual());

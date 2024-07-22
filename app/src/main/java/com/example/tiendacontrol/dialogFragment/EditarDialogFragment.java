@@ -20,7 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class EditarDialogFragment extends DialogFragment {
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
-    FloatingActionButton fabEditar, fabEliminar;
+    FloatingActionButton fabEditar, fabEliminar, fabMenu;
     boolean correcto = false;
     Items venta;
     int id = 0;
@@ -45,10 +45,11 @@ public class EditarDialogFragment extends DialogFragment {
         btnGuarda = view.findViewById(R.id.btnGuarda);
         fabEditar = view.findViewById(R.id.fabEditar);
         fabEliminar = view.findViewById(R.id.fabEliminar);
-
+        fabMenu = view.findViewById(R.id.fabMenu);
         // Ocultar FABs en el diálogo
         fabEditar.setVisibility(View.INVISIBLE);
         fabEliminar.setVisibility(View.INVISIBLE);
+        fabMenu.setVisibility(View.INVISIBLE);
 
         if (getArguments() != null) {
             id = getArguments().getInt("ID");
@@ -59,7 +60,12 @@ public class EditarDialogFragment extends DialogFragment {
 
         if (venta != null) {
             txtProducto.setText(venta.getProducto());
-            txtValor.setText(String.valueOf(venta.getValor())); // Convertir double a String
+            // Mostrar valor sin decimales y sin signo negativo
+            double valor = venta.getValor();
+            if (valor < 0) {
+                valor = -valor; // Eliminar signo negativo
+            }
+            txtValor.setText(String.format("%.0f", valor));// Convertir double a String
             txtDetalles.setText(venta.getDetalles());
             txtCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
         }
@@ -67,8 +73,28 @@ public class EditarDialogFragment extends DialogFragment {
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (!txtProducto.getText().toString().isEmpty() && !txtValor.getText().toString().isEmpty()) {
-                    correcto = bdVentas.editarVenta(id, txtProducto.getText().toString(), Double.parseDouble(txtValor.getText().toString()), txtDetalles.getText().toString(), Integer.parseInt(txtCantidad.getText().toString()));
+                String producto = txtProducto.getText().toString().trim();
+                String valorStr = txtValor.getText().toString().trim();
+                String detalles = txtDetalles.getText().toString().trim();
+                String cantidadStr = txtCantidad.getText().toString().trim();
+
+                if (producto.isEmpty() || valorStr.isEmpty() || cantidadStr.isEmpty()) {
+                    Toast.makeText(requireContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
+                    return;
+                }
+
+                double valor;
+                int cantidad;
+
+                try {
+                    valor = Double.parseDouble(valorStr);
+                    cantidad = Integer.parseInt(cantidadStr);
+
+                    // Calcular el total
+                    double total = valor * cantidad;
+
+                    // Actualizar la base de datos
+                    correcto = bdVentas.editarVenta(id, producto, total, detalles, cantidad);
 
                     if (correcto) {
                         Toast.makeText(requireContext(), "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();
@@ -77,8 +103,8 @@ public class EditarDialogFragment extends DialogFragment {
                     } else {
                         Toast.makeText(requireContext(), "ERROR AL MODIFICAR REGISTRO", Toast.LENGTH_LONG).show();
                     }
-                } else {
-                    Toast.makeText(requireContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
+                } catch (NumberFormatException e) {
+                    Toast.makeText(requireContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_LONG).show();
                 }
             }
         });

@@ -41,6 +41,8 @@ public class VerActivity extends AppCompatActivity {
         btnGuarda.setVisibility(View.INVISIBLE);
         fabMenu = findViewById(R.id.fabMenu);
 
+
+
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
@@ -63,8 +65,12 @@ public class VerActivity extends AppCompatActivity {
 
         if (venta != null) {
             txtProducto.setText(venta.getProducto());
-            // Convertir double a String antes de pasar a setText
-            txtValor.setText(String.valueOf(venta.getValor()));
+            // Formatear valor para eliminar decimales y signo negativo
+            double valor = venta.getValor();
+            if (valor < 0) {
+                valor = -valor; // Eliminar signo negativo
+            }
+            txtValor.setText(String.format("%.0f", valor));
             txtDetalles.setText(venta.getDetalles());
             txtCantidad.setText(String.valueOf(venta.getCantidad())); // Asegúrate de que getCantidad devuelve int o String
             txtProducto.setInputType(InputType.TYPE_NULL);

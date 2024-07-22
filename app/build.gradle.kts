@@ -76,6 +76,8 @@ dependencies {
     implementation ("org.apache.poi:poi-ooxml:5.2.4")
 
     implementation ("androidx.appcompat:appcompat:1.4.0")
+
+    implementation ("com.google.code.gson:gson:2.8.9")
 }
 
 

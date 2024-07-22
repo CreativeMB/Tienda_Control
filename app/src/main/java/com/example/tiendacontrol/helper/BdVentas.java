@@ -22,7 +22,7 @@ public class BdVentas extends BdHelper{
         this.context = context;
     }
 
-    public long insertarVenta(String producto, double valor, String detalles, int cantidad) {
+    public long insertarVenta(String producto, double total, String detalles, int cantidad) {
         long id = 0;
 
         try {
@@ -31,10 +31,11 @@ public class BdVentas extends BdHelper{
 
             ContentValues values = new ContentValues();
             values.put("producto", producto);
-            values.put("valor", valor); // Guardar como double
+            values.put("valor", total); // Guarda el total calculado
             values.put("detalles", detalles);
-            values.put("cantidad", cantidad); // Cambiar a int
-            values.put("fecha_registro", obtenerFechaActual());
+            values.put("cantidad", cantidad);
+            values.put("fecha_registro", obtenerFechaActual()); // Asegúrate de que este método esté definido correctamente
+
             id = db.insert(TABLE_VENTAS, null, values);
         } catch (Exception ex) {
             ex.printStackTrace();
@@ -94,7 +95,7 @@ public class BdVentas extends BdHelper{
         return venta;
     }
 
-    public boolean editarVenta(int id, String producto, double valor, String detalles, int cantidad) {
+    public boolean editarVenta(int id, String producto, double total, String detalles, int cantidad) {
         boolean correcto = false;
         BdHelper bdHelper = new BdHelper(context);
         SQLiteDatabase db = bdHelper.getWritableDatabase();
@@ -102,7 +103,7 @@ public class BdVentas extends BdHelper{
         try {
             ContentValues values = new ContentValues();
             values.put("producto", producto);
-            values.put("valor", valor); // Cambiar a double
+            values.put("valor", total); // Cambiar a double
             values.put("detalles", detalles);
             values.put("cantidad", cantidad); // Cambiar a int
 
