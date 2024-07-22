@@ -20,7 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class EditarDialogFragment extends DialogFragment {
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
-    FloatingActionButton fabEditar, fabEliminar;
+    FloatingActionButton fabEditar, fabEliminar, fabMenu;
     boolean correcto = false;
     Items venta;
     int id = 0;
@@ -45,10 +45,11 @@ public class EditarDialogFragment extends DialogFragment {
         btnGuarda = view.findViewById(R.id.btnGuarda);
         fabEditar = view.findViewById(R.id.fabEditar);
         fabEliminar = view.findViewById(R.id.fabEliminar);
-
+        fabMenu = view.findViewById(R.id.fabMenu);
         // Ocultar FABs en el diálogo
         fabEditar.setVisibility(View.INVISIBLE);
         fabEliminar.setVisibility(View.INVISIBLE);
+        fabMenu.setVisibility(View.INVISIBLE);
 
         if (getArguments() != null) {
             id = getArguments().getInt("ID");

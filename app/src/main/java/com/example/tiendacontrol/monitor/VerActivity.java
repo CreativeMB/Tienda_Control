@@ -41,6 +41,8 @@ public class VerActivity extends AppCompatActivity {
         btnGuarda.setVisibility(View.INVISIBLE);
         fabMenu = findViewById(R.id.fabMenu);
 
+
+
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
