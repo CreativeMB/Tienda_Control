@@ -37,4 +37,19 @@ public class ItemManager {
         Type type = new TypeToken<ArrayList<Items>>() {}.getType();
         return json == null ? new ArrayList<>() : gson.fromJson(json, type);
     }
+    public void removeCustomItems() {
+        List<Items> items = getItems();
+        List<Items> updatedItems = new ArrayList<>();
+
+        for (Items item : items) {
+            if (item.isPredefined()) { // Asume que tienes un método para identificar ítems predefinidos
+                updatedItems.add(item);
+            }
+        }
+
+        // Guardar la lista actualizada de ítems
+        String json = gson.toJson(updatedItems);
+        sharedPreferences.edit().putString(ITEMS_KEY, json).apply();
+    }
 }
+

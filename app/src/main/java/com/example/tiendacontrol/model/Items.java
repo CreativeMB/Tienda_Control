@@ -7,7 +7,7 @@ public class Items {
     private String detalles;
     private int cantidad;
     private String fechaRegistro;
-
+    private boolean isPredefined;
     // Getters y Setters
     public int getId() {
         return id;
@@ -64,5 +64,12 @@ public class Items {
     @Override
     public String toString() {
         return producto; // Esto hará que el Spinner muestre el nombre del producto
+    }
+    public boolean isPredefined() {
+        return isPredefined;
+    }
+
+    public void setPredefined(boolean predefined) {
+        isPredefined = predefined;
     }
 }

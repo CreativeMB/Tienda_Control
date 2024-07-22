@@ -13,6 +13,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -29,10 +30,11 @@ import java.util.Set;
 
 public class IngresoDialogFragment extends BottomSheetDialogFragment {
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
-    Button btnGuarda, btnSavePredefined;
+    Button btnGuarda, btnSavePredefined, btnClearCustom;
     Spinner spinnerPredefined;
     ItemManager itemManager;
 
+    private GastoDialogFragment gastoDialogFragment;
     public static IngresoDialogFragment newInstance() {
         return new IngresoDialogFragment();
     }
@@ -49,10 +51,11 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         btnGuarda = view.findViewById(R.id.btnGuarda);
         btnSavePredefined = view.findViewById(R.id.btnSavePredefined);
         spinnerPredefined = view.findViewById(R.id.spinnerPredefined);
+        btnClearCustom = view.findViewById(R.id.btnClearCustom);
 
         itemManager = new ItemManager(getContext());
         loadPredefinedItems();
-
+        gastoDialogFragment = new GastoDialogFragment();
         // Clear fields when the view is created
         limpiar();
 
@@ -67,6 +70,12 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             @Override
             public void onClick(View view) {
                 savePredefinedItem();
+            }
+        });
+        btnClearCustom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clearCustomItems();
             }
         });
 
@@ -181,5 +190,15 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
     private void verRegistro() {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         startActivity(intent);
+    }
+
+    public void clearCustomItems() {
+        // Eliminar ítems personalizados de la base de datos
+        itemManager.removeCustomItems();
+
+        // Recargar los ítems predefinidos en el spinner
+        loadPredefinedItems();
+        // Mostrar un mensaje informativo al usuario
+        Toast.makeText(requireContext(), "Ítems personalizados eliminados", Toast.LENGTH_SHORT).show();
     }
 }

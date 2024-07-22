@@ -11,6 +11,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -25,11 +26,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GastoDialogFragment extends BottomSheetDialogFragment {
+
     private EditText editProducto, editValor, editDetalles, editCantidad;
     private Spinner spinnerPredefined;
     private BdHelper bdHelper;
     private ItemManager itemManager;
-    private Button btnGuarda, btnSavePredefined;
+    private Button btnGuarda, btnSavePredefined, btnClearCustom;
 
     @Nullable
     @Override
@@ -43,9 +45,12 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         btnGuarda = view.findViewById(R.id.btnGuarda);
         spinnerPredefined = view.findViewById(R.id.spinnerPredefined);
         btnSavePredefined = view.findViewById(R.id.btnSavePredefined);
+        btnClearCustom = view.findViewById(R.id.btnClearCustom); // Asegúrate de tener este botón en tu layout
 
         bdHelper = new BdHelper(requireContext());
         itemManager = new ItemManager(requireContext());
+
+
 
         // Cargar los ítems predefinidos en el spinner
         loadPredefinedItems();
@@ -56,10 +61,18 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
                 guardarGasto();
             }
         });
+
         btnSavePredefined.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 savePredefinedItem();
+            }
+        });
+
+        btnClearCustom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                clearCustomItems();
             }
         });
 
@@ -160,10 +173,10 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
     }
 
     public void savePredefinedItem() {
-        String producto = editProducto.getText().toString();
-        String valorStr = editValor.getText().toString();
-        String detalles = editDetalles.getText().toString();
-        String cantidadStr = editCantidad.getText().toString();
+        String producto = editProducto.getText().toString().trim();
+        String valorStr = editValor.getText().toString().trim();
+        String detalles = editDetalles.getText().toString().trim();
+        String cantidadStr = editCantidad.getText().toString().trim();
 
         if (!producto.isEmpty() && !valorStr.isEmpty() && !detalles.isEmpty() && !cantidadStr.isEmpty()) {
             try {
@@ -176,12 +189,22 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
                 item.setCantidad(cantidad);
                 itemManager.saveItem(item);
                 Toast.makeText(getContext(), "Ítem guardado", Toast.LENGTH_SHORT).show();
-                loadPredefinedItems();
+                loadPredefinedItems(); // Recargar los ítems predefinidos
             } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Valor o cantidad no válidos", Toast.LENGTH_LONG).show();
+                Toast.makeText(getContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_LONG).show();
             }
         } else {
-            Toast.makeText(getContext(), "Todos los campos deben estar llenos", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), "TODOS LOS CAMPOS DEBEN ESTAR LLENOS", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    public void clearCustomItems() {
+        // Eliminar ítems personalizados de la base de datos
+        itemManager.removeCustomItems();
+
+        // Recargar los ítems predefinidos en el spinner
+        loadPredefinedItems();
+        // Mostrar un mensaje informativo al usuario
+        Toast.makeText(requireContext(), "Ítems personalizados eliminados", Toast.LENGTH_SHORT).show();
     }
 }
