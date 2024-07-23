@@ -5,9 +5,9 @@
     <color name="colorAccent">#000000</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <color name="Buton">#2196F3</color>
+    <color name="Buton">#00AAFC</color>
     <color name="toolbarBackground">#2196F3</color>
-    <color name="texcolor">#96562C</color>
+    <color name="texcolor">#8C4A1D</color>
     <color name="colorNegativo">#900000</color>
     <color name="colorPositivo">#4CAF50</color>
     <color name="colorFondoNegativo">#93F44336</color>
