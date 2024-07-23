@@ -102,6 +102,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
         baseExporter = new BaseExporter(this);
 
+        // Inicializar SearchView
+        txtBuscar = findViewById(R.id.txtBuscar);
+        // Configurar el listener para el SearchView
+        txtBuscar.setOnQueryTextListener(this);
+
         // Inicialización de la base de datos y el adaptador
         BdVentas bdVentas = new BdVentas(MainActivity.this);
         listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
