@@ -16,7 +16,7 @@ import java.io.IOException;
 public class BaseExporter {
     private static final String TAG = "BaseExporter";
     private Context context;
-
+    // Constructor que recibe el contexto de la aplicación
     public BaseExporter(Context context) {
         this.context = context;
 
