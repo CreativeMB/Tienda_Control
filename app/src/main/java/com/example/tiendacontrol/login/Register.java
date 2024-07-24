@@ -11,10 +11,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -28,7 +26,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,10 +48,10 @@ public class Register extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.register);
 
-        // Initialize Firebase Authentication
+        // Inicializar Firebase Authentication
         mAuth = FirebaseAuth.getInstance();
 
-        // Link interface components with variables
+        // Vincular los componentes de la interfaz con las variables
         editTextName = findViewById(R.id.editTextName);
         editTextEmail = findViewById(R.id.editTextEmail);
         btnRegister = findViewById(R.id.btnRegister);
@@ -63,90 +60,90 @@ public class Register extends AppCompatActivity {
         textViewTermsLink = findViewById(R.id.textViewTermsLink);
         checkBoxTerms = findViewById(R.id.checkBoxTerms);
 
-        // Initialize Firebase Firestore
+        // Inicializar Firebase Firestore
         db = FirebaseFirestore.getInstance();
 
-        // Set up "Login" button listener to redirect the user to the login screen
+        // Configurar el botón "Login" para redirigir al usuario a la pantalla de inicio de sesión
         btnLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(Register.this, Login.class);
                 startActivity(intent);
-                finish(); // Close this activity so the user cannot navigate back
+                finish(); // Cerrar esta actividad para que el usuario no pueda navegar hacia atrás
             }
         });
 
-        // Set up "Register" button listener to register the user
+        // Configurar el botón "Register" para registrar al usuario
         btnRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Check if the user has accepted the terms and conditions
+                // Verificar si el usuario ha aceptado los términos y condiciones
                 if (!checkBoxTerms.isChecked()) {
                     Toast.makeText(Register.this, "Debes aceptar los términos y condiciones", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                registerUser(); // Method to register the user
+                registerUser(); // Método para registrar al usuario
             }
         });
 
-        // Set up terms and conditions link to open the corresponding webpage
+        // Configurar el enlace de términos y condiciones para abrir la página web correspondiente
         textViewTermsLink.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // Open an activity or URL to display terms and conditions
+                // Abrir una actividad o URL para mostrar los términos y condiciones
                 Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.floristerialoslirios.com"));
                 startActivity(intent);
             }
         });
 
-        // Set up button to select profile image
+        // Configurar el botón para seleccionar una imagen de perfil
         Button btnSelectImage = findViewById(R.id.btnSelectImage);
         btnSelectImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                openFileChooser();
+                openFileChooser(); // Abrir el selector de archivos
             }
         });
     }
 
-    // Method to register the user in Firebase Authentication and Firestore
+    // Método para registrar al usuario en Firebase Authentication y Firestore
     private void registerUser() {
-        // Get user-entered data
+        // Obtener los datos ingresados por el usuario
         String name = editTextName.getText().toString().trim();
         String email = editTextEmail.getText().toString().trim();
         String password = editTextPassword.getText().toString().trim();
 
-        // Check for empty fields
+        // Verificar campos vacíos
         if (name.isEmpty() || email.isEmpty() || password.isEmpty()) {
             Toast.makeText(this, "Por favor, completa todos los campos", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Check password length
+        // Verificar la longitud de la contraseña
         if (password.length() < 6) {
             Toast.makeText(this, "La contraseña debe tener al menos 6 caracteres", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Create user in Firebase Authentication
+        // Crear usuario en Firebase Authentication
         mAuth.createUserWithEmailAndPassword(email, password)
                 .addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task) {
                         if (task.isSuccessful()) {
-                            // User successfully registered in Firebase Authentication
+                            // Usuario registrado exitosamente en Firebase Authentication
                             Log.d("Firebase Authentication", "Usuario registrado con éxito");
                             FirebaseUser user = mAuth.getCurrentUser();
                             if (user != null) {
-                                // Upload profile image if one was selected
+                                // Subir imagen de perfil si se seleccionó una
                                 if (imageUri != null) {
                                     uploadImage(user, name, email, password);
                                 } else {
-                                    saveUserData(user, name, email, password, null); // Updated to handle without image
+                                    saveUserData(user, name, email, password, null); // Actualizado para manejar sin imagen
                                 }
                             }
                         } else {
-                            // If authentication fails, show error message
+                            // Si falla la autenticación, mostrar mensaje de error
                             Log.e("Firebase Authentication", "Error al registrar usuario en Firebase Authentication", task.getException());
                             Toast.makeText(Register.this, "Error al registrar usuario en Firebase Authentication", Toast.LENGTH_SHORT).show();
                         }
@@ -154,7 +151,7 @@ public class Register extends AppCompatActivity {
                 });
     }
 
-    // Method to open file chooser to select an image
+    // Método para abrir el selector de archivos para seleccionar una imagen
     private void openFileChooser() {
         Intent intent = new Intent();
         intent.setType("image/*");
@@ -162,7 +159,7 @@ public class Register extends AppCompatActivity {
         startActivityForResult(intent, PICK_IMAGE_REQUEST);
     }
 
-    // Method to handle the result of selecting an image
+    // Método para manejar el resultado de la selección de una imagen
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -170,13 +167,13 @@ public class Register extends AppCompatActivity {
         if (requestCode == PICK_IMAGE_REQUEST && resultCode == RESULT_OK
                 && data != null && data.getData() != null) {
             imageUri = data.getData();
-            // Display the selected image in an ImageView before uploading
+            // Mostrar la imagen seleccionada en un ImageView antes de subirla
             ImageView imageViewProfile = findViewById(R.id.imageViewProfile);
             imageViewProfile.setImageURI(imageUri);
         }
     }
 
-    // Method to upload the selected image to Firebase Storage and save user data in Firestore
+    // Método para subir la imagen seleccionada a Firebase Storage y guardar los datos del usuario en Firestore
     private void uploadImage(FirebaseUser user, String name, String email, String password) {
         StorageReference storageRef = FirebaseStorage.getInstance().getReference("tiendacontrol/perfil/" + user.getUid() + ".jpg");
         storageRef.putFile(imageUri)
@@ -201,14 +198,14 @@ public class Register extends AppCompatActivity {
                 });
     }
 
-    // Method to save user data in Firestore
+    // Método para guardar los datos del usuario en Firestore
     private void saveUserData(FirebaseUser user, String name, String email, String password, String imageUrl) {
         Map<String, Object> userData = new HashMap<>();
         userData.put("name", name);
         userData.put("email", email);
         userData.put("password", password);
         if (imageUrl != null) {
-            userData.put("profileImageUrl", imageUrl); // Add profile image URL if available
+            userData.put("profileImageUrl", imageUrl); // Agregar URL de la imagen de perfil si está disponible
         }
 
         db.collection("usuarios")
@@ -217,19 +214,19 @@ public class Register extends AppCompatActivity {
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
-                        // User data successfully saved in Firestore
+                        // Datos del usuario guardados exitosamente en Firestore
                         Log.d("Firestore", "Datos del usuario guardados con éxito");
                         Toast.makeText(Register.this, "Usuario registrado con éxito", Toast.LENGTH_SHORT).show();
-                        // Redirect user to the main screen of the application
+                        // Redirigir al usuario a la pantalla principal de la aplicación
                         Intent intent = new Intent(Register.this, MainActivity.class);
                         startActivity(intent);
-                        finish(); // Close the registration activity so the user cannot navigate back
+                        finish(); // Cerrar la actividad de registro para que el usuario no pueda navegar hacia atrás
                     }
                 })
                 .addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        // If writing to Firestore fails, show error message
+                        // Si falla la escritura en Firestore, mostrar mensaje de error
                         Log.e("Firestore", "Error al guardar datos del usuario", e);
                         Toast.makeText(Register.this, "Error al registrar usuario", Toast.LENGTH_SHORT).show();
                     }

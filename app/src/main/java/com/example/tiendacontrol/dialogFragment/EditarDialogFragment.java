@@ -18,6 +18,7 @@ import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class EditarDialogFragment extends DialogFragment {
+    // Definición de variables de vista
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
     FloatingActionButton fabEditar, fabEliminar, fabMenu;
@@ -25,6 +26,7 @@ public class EditarDialogFragment extends DialogFragment {
     Items venta;
     int id = 0;
 
+    // Método estático para crear una nueva instancia del fragmento con un ID
     public static EditarDialogFragment newInstance(int id) {
         EditarDialogFragment fragment = new EditarDialogFragment();
         Bundle args = new Bundle();
@@ -36,8 +38,10 @@ public class EditarDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        // Infla el layout del fragmento
         View view = inflater.inflate(R.layout.activity_ver, container, false);
 
+        // Inicializa las vistas
         txtProducto = view.findViewById(R.id.txtProducto);
         txtValor = view.findViewById(R.id.txtValor);
         txtDetalles = view.findViewById(R.id.txtDetalles);
@@ -46,38 +50,45 @@ public class EditarDialogFragment extends DialogFragment {
         fabEditar = view.findViewById(R.id.fabEditar);
         fabEliminar = view.findViewById(R.id.fabEliminar);
         fabMenu = view.findViewById(R.id.fabMenu);
-        // Ocultar FABs en el diálogo
+
+        // Oculta los FloatingActionButtons en el diálogo
         fabEditar.setVisibility(View.INVISIBLE);
         fabEliminar.setVisibility(View.INVISIBLE);
         fabMenu.setVisibility(View.INVISIBLE);
 
+        // Obtiene el ID del argumento pasado al fragmento
         if (getArguments() != null) {
             id = getArguments().getInt("ID");
         }
 
+        // Crea una instancia de BdVentas y obtiene la venta correspondiente al ID
         final BdVentas bdVentas = new BdVentas(requireContext());
         venta = bdVentas.verVenta(id);
 
         if (venta != null) {
+            // Rellena los campos del formulario con los datos de la venta
             txtProducto.setText(venta.getProducto());
             // Mostrar valor sin decimales y sin signo negativo
             double valor = venta.getValor();
             if (valor < 0) {
                 valor = -valor; // Eliminar signo negativo
             }
-            txtValor.setText(String.format("%.0f", valor));// Convertir double a String
+            txtValor.setText(String.format("%.0f", valor)); // Convertir double a String
             txtDetalles.setText(venta.getDetalles());
             txtCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
         }
 
+        // Configura el listener para el botón de guardar
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // Obtiene los valores de los campos de texto
                 String producto = txtProducto.getText().toString().trim();
                 String valorStr = txtValor.getText().toString().trim();
                 String detalles = txtDetalles.getText().toString().trim();
                 String cantidadStr = txtCantidad.getText().toString().trim();
 
+                // Verifica si los campos obligatorios están llenos
                 if (producto.isEmpty() || valorStr.isEmpty() || cantidadStr.isEmpty()) {
                     Toast.makeText(requireContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
                     return;
@@ -87,19 +98,20 @@ public class EditarDialogFragment extends DialogFragment {
                 int cantidad;
 
                 try {
+                    // Convierte los valores a los tipos adecuados
                     valor = Double.parseDouble(valorStr);
                     cantidad = Integer.parseInt(cantidadStr);
 
-                    // Calcular el total
+                    // Calcula el total
                     double total = valor * cantidad;
 
-                    // Actualizar la base de datos
+                    // Actualiza la base de datos con los nuevos valores
                     correcto = bdVentas.editarVenta(id, producto, total, detalles, cantidad);
 
                     if (correcto) {
                         Toast.makeText(requireContext(), "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();
                         verRegistro();
-                        dismiss();
+                        dismiss(); // Cierra el diálogo
                     } else {
                         Toast.makeText(requireContext(), "ERROR AL MODIFICAR REGISTRO", Toast.LENGTH_LONG).show();
                     }
@@ -112,6 +124,7 @@ public class EditarDialogFragment extends DialogFragment {
         return view;
     }
 
+    // Método para ver el registro editado
     private void verRegistro() {
         Intent intent = new Intent(requireContext(), MainActivity.class);
         intent.putExtra("ID", id);

@@ -1,7 +1,6 @@
 package com.example.tiendacontrol.dialogFragment;
 
 import static com.example.tiendacontrol.monitor.MainActivity.REQUEST_CODE_STORAGE_PERMISSION;
-
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -16,7 +15,6 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuBuilder;
@@ -24,7 +22,6 @@ import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
-
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.MenuCustomAdapter;
 import com.example.tiendacontrol.helper.BaseExporter;
@@ -35,27 +32,25 @@ import com.example.tiendacontrol.login.PerfilUsuario;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.monitor.SetCode;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class MenuDialogFragment extends BottomSheetDialogFragment {
-
-    private ListView menuListView;
-    private MenuCustomAdapter menuAdapter;
-    private List<MenuItemImpl> menuItems = new ArrayList<>();
-    private BaseExporter baseExporter;
+    private ListView menuListView; // Vista para mostrar los elementos del menú
+    private MenuCustomAdapter menuAdapter; // Adaptador para los elementos del menú
+    private List<MenuItemImpl> menuItems = new ArrayList<>(); // Lista de elementos del menú
+    private BaseExporter baseExporter; // Exportador de base de datos
 
     public static MenuDialogFragment newInstance() {
-        return new MenuDialogFragment();
+        return new MenuDialogFragment(); // Crear una nueva instancia del fragmento
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.menu_dialog, container, false);
+        View view = inflater.inflate(R.layout.menu_dialog, container, false); // Inflar el diseño del fragmento
 
-        menuListView = view.findViewById(R.id.menu_list);
+        menuListView = view.findViewById(R.id.menu_list); // Obtener la vista de la lista del menú
 
         // Crear un MenuBuilder y cargar el menú desde XML
         MenuBuilder menuBuilder = new MenuBuilder(requireContext());
@@ -71,12 +66,11 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
 
         // Manejar clics en los elementos del menú
         menuListView.setOnItemClickListener((parent, view1, position, id) -> {
-            MenuItemImpl menuItem = menuItems.get(position);
-            handleMenuItemClick(menuItem);
+            MenuItemImpl menuItem = menuItems.get(position); // Obtener el elemento del menú clicado
+            handleMenuItemClick(menuItem); // Manejar el clic en el elemento del menú
 
             // Cerrar el diálogo al seleccionar un elemento del menú
             dismiss();
-
         });
 
         return view;
@@ -97,7 +91,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
 
     // Método para manejar el clic en los elementos del menú
     private void handleMenuItemClick(MenuItemImpl menuItem) {
-        int id = menuItem.getItemId();
+        int id = menuItem.getItemId(); // Obtener el ID del elemento del menú
 
         if (id == R.id.nueva_venta) {
             // Mostrar el diálogo de nueva venta
@@ -105,15 +99,15 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         } else if (id == R.id.inicio) {
-            // Ir a la pantalla de perfil de usuario
+            // Ir a la pantalla principal
             Intent intent = new Intent(requireContext(), MainActivity.class);
             startActivity(intent);
         } else if (id == R.id.code) {
-            // Ir a la pantalla de perfil de usuario
+            // Ir a la pantalla de configuración de código
             Intent intent = new Intent(requireContext(), SetCode.class);
             startActivity(intent);
         } else if (id == R.id.nuevo_gasto) {
-            // Mostrar el diálogo de ingreso egreso
+            // Mostrar el diálogo de nuevo gasto
             FragmentManager fragmentManager = getParentFragmentManager();
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(fragmentManager, "GastoDialogFragment");
@@ -144,7 +138,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         } else if (id == R.id.salir) {
             // Lógica para la opción "Salir"
             dirigirAInicioSesion();
-            requireActivity().finish();
+            requireActivity().finish(); // Cierra la actividad actual
         }
     }
 
@@ -200,15 +194,6 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             }
         }
     }
-
-    // Método estático para crear una nueva instancia de MenuDialogFragment
-//    public static MenuDialogFragment newInstance() {
-//        MenuDialogFragment fragment = new MenuDialogFragment();
-//        Bundle args = new Bundle();
-//        // Puedes agregar argumentos adicionales aquí si es necesario
-//        fragment.setArguments(args);
-//        return fragment;
-//    }
 
     // Método para dirigir al usuario a la pantalla de inicio de sesión
     private void dirigirAInicioSesion() {
