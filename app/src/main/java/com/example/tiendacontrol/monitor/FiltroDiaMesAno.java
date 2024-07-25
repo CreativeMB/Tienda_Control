@@ -151,7 +151,7 @@ public class FiltroDiaMesAno extends AppCompatActivity {
                         }
                     }
 
-                double difference = positiveSum + negativeSum; // La diferencia será la suma de positivos y negativos
+                double difference = positiveSum - negativeSum; // La diferencia será la suma de positivos y negativos
 
                     // Mostrar resultados
                     textViewPositiveSum.setText("$" + decimalFormat.format(positiveSum));
