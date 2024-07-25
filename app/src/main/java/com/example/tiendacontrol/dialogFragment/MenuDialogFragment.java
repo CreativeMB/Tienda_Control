@@ -29,6 +29,7 @@ import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.ExcelExporter;
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.login.PerfilUsuario;
+import com.example.tiendacontrol.model.FiltroDiaMesAno;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.monitor.SetCode;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -105,6 +106,10 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         } else if (id == R.id.code) {
             // Ir a la pantalla de configuración de código
             Intent intent = new Intent(requireContext(), SetCode.class);
+            startActivity(intent);
+        } else if (id == R.id.FilBase) {
+            // Ir a la pantalla de configuración de código
+            Intent intent = new Intent(requireContext(), FiltroDiaMesAno.class);
             startActivity(intent);
         } else if (id == R.id.nuevo_gasto) {
             // Mostrar el diálogo de nuevo gasto

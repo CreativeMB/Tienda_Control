@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:fitsSystemWindows="true">
+
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabMenu"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/baseline_density_medium_24"
+        app:backgroundTint="@color/Buton"
+        app:maxImageSize="35dp"
+        app:tint="@color/black" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="16dp">
+
+        <!-- TextView para mostrar la fecha seleccionada -->
+        <TextView
+            android:id="@+id/text_view_selected_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Selecciona una fecha"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Botón para seleccionar la fecha -->
+        <Button
+            android:id="@+id/button_select_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Seleccionar Fecha"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Botón para aplicar el filtro -->
+        <Button
+            android:id="@+id/button_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Filtrar"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- RadioGroup para seleccionar el tipo de filtro -->
+        <RadioGroup
+            android:id="@+id/radio_group_filter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="16dp">
+
+            <RadioButton
+                android:id="@+id/radio_day"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Día" />
+
+            <RadioButton
+                android:id="@+id/radio_week"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Semana" />
+
+            <RadioButton
+                android:id="@+id/radio_month"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mes" />
+
+            <RadioButton
+                android:id="@+id/radio_year"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Año" />
+        </RadioGroup>
+
+        <!-- TextView para mostrar los resultados y la diferencia -->
+        <TextView
+            android:id="@+id/text_view_positive_sum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suma Positiva: 0"
+            android:layout_marginTop="16dp"/>
+
+        <TextView
+            android:id="@+id/text_view_negative_sum"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Suma Negativa: 0"
+            android:layout_marginTop="8dp"/>
+
+        <TextView
+            android:id="@+id/text_view_difference"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Diferencia: 0"
+            android:layout_marginTop="8dp"/>
+
+        <!-- RecyclerView para mostrar los resultados -->
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler_view_results"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="16dp"/>
+    </LinearLayout>
+
+</FrameLayout>

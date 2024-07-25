@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.ListaVentasAdapter;
+import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.model.Items;
@@ -20,7 +20,7 @@ import java.util.Locale;
 
 public class EgresoTotal extends AppCompatActivity {
     private RecyclerView recyclerNegativos;
-    private ListaVentasAdapter adapterNegativos;
+    private BaseDatosAdapter adapterNegativos;
     private ArrayList<Items> listaArrayVentas;
     private TextView textGasto;
     private FloatingActionButton fabMenu;
@@ -49,7 +49,7 @@ public class EgresoTotal extends AppCompatActivity {
         }
 
         // Configurar el adaptador
-        adapterNegativos = new ListaVentasAdapter(listaNegativos);
+        adapterNegativos = new BaseDatosAdapter(listaNegativos);
         recyclerNegativos.setAdapter(adapterNegativos);
 
         fabMenu.setOnClickListener(view -> {

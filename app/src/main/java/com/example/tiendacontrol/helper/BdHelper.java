@@ -2,11 +2,18 @@ package com.example.tiendacontrol.helper;
 
 import android.content.ContentValues;
 import android.content.Context;
+import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+
 import androidx.annotation.Nullable;
+
+import com.example.tiendacontrol.model.Items;
+
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 public class BdHelper extends SQLiteOpenHelper {
@@ -66,11 +73,47 @@ public class BdHelper extends SQLiteOpenHelper {
         return dateFormat.format(date);
     }
 
-    // Método para cerrar y reabrir la base de datos
-    public void reopenDatabase() {
-        if (getWritableDatabase() != null) {
-            getWritableDatabase().close(); // Cerrar la base de datos si está abierta
-            SQLiteDatabase db = getWritableDatabase(); // Reabrir la base de datos
+    // Métodos para filtrar los resultados por día, semana, mes y año
+    public List<Items> getResultsByDay(String date) {
+        // Asegúrate de que el formato de 'date' sea 'YYYY-MM-DD'
+        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE date(fecha_registro) = ?", new String[]{date});
+    }
+
+    public List<Items> getResultsByWeek(String date) {
+        // Asegúrate de que el formato de 'date' sea 'YYYY-MM-DD'
+        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE strftime('%W', fecha_registro) = strftime('%W', ?)", new String[]{date});
+    }
+
+    public List<Items> getResultsByMonth(String date) {
+        // Asegúrate de que el formato de 'date' sea 'YYYY-MM-DD'
+        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE strftime('%m', fecha_registro) = strftime('%m', ?)", new String[]{date});
+    }
+
+    public List<Items> getResultsByYear(String date) {
+        // Asegúrate de que el formato de 'date' sea 'YYYY-MM-DD'
+        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE strftime('%Y', fecha_registro) = strftime('%Y', ?)", new String[]{date});
+    }
+
+    private List<Items> getResults(String query, String[] selectionArgs) {
+        List<Items> results = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery(query, selectionArgs);
+
+        if (cursor.moveToFirst()) {
+            do {
+                Items result = new Items();
+                result.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
+                result.setValor(cursor.getDouble(cursor.getColumnIndex("valor")));
+                result.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
+                result.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
+                result.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
+                results.add(result);
+            } while (cursor.moveToNext());
         }
+
+        cursor.close();
+        db.close();
+
+        return results;
     }
 }

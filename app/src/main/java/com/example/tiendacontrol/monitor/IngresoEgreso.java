@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.ListaVentasAdapter;
+import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.model.Items;
@@ -20,7 +20,7 @@ import java.util.Locale;
 
 public class IngresoEgreso extends AppCompatActivity {
         private RecyclerView recyclerPositivos, recyclerNegativos;
-        private ListaVentasAdapter adapterPositivos, adapterNegativos;
+        private BaseDatosAdapter adapterPositivos, adapterNegativos;
         private ArrayList<Items> listaArrayVentas;
         private TextView textVenta, textGasto;
     private FloatingActionButton  fabMenu;
@@ -54,8 +54,8 @@ public class IngresoEgreso extends AppCompatActivity {
             }
 
             // Configurar los adaptadores
-            adapterPositivos = new ListaVentasAdapter(listaPositivos);
-            adapterNegativos = new ListaVentasAdapter(listaNegativos);
+            adapterPositivos = new BaseDatosAdapter(listaPositivos);
+            adapterNegativos = new BaseDatosAdapter(listaNegativos);
 
             // Asignar los adaptadores a los RecyclerViews
             recyclerPositivos.setAdapter(adapterPositivos);

@@ -22,7 +22,10 @@
         android:theme="@style/Theme.TiendaControl"
         tools:targetApi="31">
         <activity
-            android:name=".monitor.Items"
+            android:name=".model.Items"
+            android:exported="false" />
+        <activity
+            android:name=".model.FiltroDiaMesAno"
             android:exported="false" />
         <activity
             android:name=".monitor.IngresoEgreso"

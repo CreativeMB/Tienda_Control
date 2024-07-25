@@ -20,7 +20,7 @@ import com.example.tiendacontrol.helper.BdVentas;
 import java.text.NumberFormat;
 import java.util.Locale;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.ListaVentasAdapter;
+import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.model.Items;
 import com.example.tiendacontrol.login.PerfilUsuario;
@@ -38,7 +38,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private SearchView txtBuscar;
     private RecyclerView listaVentas;
     private ArrayList<Items> listaArrayVentas;
-    private ListaVentasAdapter adapter;
+    private BaseDatosAdapter adapter;
     private FloatingActionButton fabNuevo, fabGasto, fabMenu;
     private TextView textVenta, textGanacia, textGasto;
     private ImageView imageViewProfile;
@@ -83,7 +83,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Inicialización de la base de datos y el adaptador
         BdVentas bdVentas = new BdVentas(MainActivity.this);
         listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
-        adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
+        adapter = new BaseDatosAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
         // Inicializar el BdHelper

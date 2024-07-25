@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.ListaVentasAdapter;
+import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.model.Items;
@@ -23,7 +23,7 @@ public class IngresoTotal extends AppCompatActivity {
 
 
     private RecyclerView recyclerPositivos;
-    private ListaVentasAdapter adapterPositivos;
+    private BaseDatosAdapter adapterPositivos;
     private ArrayList<Items> listaArrayVentas;
     private TextView textVenta;
     private FloatingActionButton fabMenu;
@@ -52,7 +52,7 @@ public class IngresoTotal extends AppCompatActivity {
         }
 
         // Configurar el adaptador
-        adapterPositivos = new ListaVentasAdapter(listaPositivos);
+        adapterPositivos = new BaseDatosAdapter(listaPositivos);
         recyclerPositivos.setAdapter(adapterPositivos);
 
         fabMenu.setOnClickListener(view -> {
