@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-
     <color name="color_fondo_menu">#2196F3</color>
     <color name="color_texto_menu">#FFFFFF</color>
     <style name="AppTheme.PopupMenu" parent="ThemeOverlay.AppCompat.Light">
@@ -21,6 +20,15 @@
         <style name="TopSheetStyle" parent="Widget.Design.BottomSheet.Modal">
             <item name="android:layout_gravity">top</item>
         </style>
+
+    <style name="boton_info_valido">
+        <item name="android:background">@color/colorPositivo</item>
+        <item name="android:textColor">@color/Buton</item>
+        <item name="android:paddingStart">16dp</item>
+        <item name="android:paddingEnd">16dp</item>
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+    </style>
 
 
 </resources>

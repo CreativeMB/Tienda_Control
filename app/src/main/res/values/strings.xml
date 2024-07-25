@@ -10,7 +10,7 @@
     <string name="enter_message_hint">Ingrese su mensaje</string>
     <string name="send_button_text">Enviar mensaje</string>
     <string name="login_title">Bienvenido a Tienda Control</string>
-    <string name="login_button">←Iniciar sesión</string>
+    <string name="login_button">Iniciar sesión</string>
     <string name="register_button">¿No tienes cuenta Registrate?</string>
     <string name="recuperar_button">¿Recuperar Contraseña?</string>
     <string name="home_view_title">Vista del Home</string>

@@ -15,7 +15,7 @@
         <ImageView
             android:id="@+id/imageView"
             android:layout_width="wrap_content"
-            android:layout_height="200dp"
+            android:layout_height="100dp"
             android:src="@drawable/gastos"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
@@ -83,8 +83,11 @@
                     android:layout_below="@id/editTextPassword"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="16dp"
-                    android:backgroundTint="@color/Buton"
-                    android:text="@string/login_button" />
+                    android:textColor="@color/black"
+                    android:background="@drawable/button_background"
+                    android:elevation="6dp"
+                    android:text="@string/login_button"
+                     />
 
                 <Button
                     android:id="@+id/btnCodeAcceso"
@@ -93,10 +96,11 @@
                     android:layout_below="@id/btnLogin"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="16dp"
-                    android:backgroundTint="#002196F3"
-                    android:textColor="@color/texcolor"
+                    android:textColor="@color/black"
+                    android:elevation="6dp"
+                    android:background="@drawable/button_background"
                     android:text="@string/once"
-                    android:textSize="20sp" />
+                    android:textSize="16sp" />
 
             </RelativeLayout>
 
@@ -121,7 +125,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/recuperar_button"
-            android:textColor="@color/colorPrimary"
+            android:textColor="@color/black"
             android:clickable="true"
             android:onClick="forgotPasswordClicked"
             android:layout_marginTop="16dp"

@@ -37,7 +37,9 @@
         android:layout_height="wrap_content"
         android:text="Acceder"
         android:textSize="30sp"
-        android:backgroundTint="@color/Buton"
+        android:textColor="@color/black"
+        android:background="@drawable/button_background"
+        android:elevation="6dp"
         android:padding="16dp"/>
     <Button
         android:id="@+id/btnLogin"
@@ -45,8 +47,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:backgroundTint="#002196F3"
-        android:textColor="@color/texcolor"
+        android:textColor="@color/black"
+        android:background="@drawable/button_background"
+        android:elevation="6dp"
         android:textSize="25sp"/>
 
 

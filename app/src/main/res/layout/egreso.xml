@@ -97,7 +97,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-                android:backgroundTint="@color/Buton"
+                android:textColor="@color/black"
+                android:background="@drawable/button_background"
+                android:elevation="6dp"
                 android:onClick="guardarGasto"
                 android:text="@string/btn_guarda"
                 android:textSize="18sp" />
@@ -119,7 +121,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:backgroundTint="#1800AAFC"
+                   android:background="@drawable/button_background"
+                    android:elevation="6dp"
                     android:text="Guardar Predefinido"
                     android:textColor="@color/black"
                     android:textSize="14sp" />
@@ -129,9 +132,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:backgroundTint="#1800AAFC"
-                    android:text="Eliminar Predefinido"
                     android:textColor="@color/black"
+                    android:background="@drawable/button_background"
+                    android:elevation="6dp"
+                    android:text="Eliminar Predefinido"
+
                     android:textSize="14sp" />
             </LinearLayout>
 

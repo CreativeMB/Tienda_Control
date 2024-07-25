@@ -45,7 +45,9 @@
                 android:layout_height="wrap_content"
                 android:text="Guardar Código"
                 android:textSize="30sp"
-                android:backgroundTint="@color/Buton"
+                android:textColor="@color/black"
+                android:background="@drawable/button_background"
+                android:elevation="6dp"
                 android:padding="16dp"/>
 
         </LinearLayout>
