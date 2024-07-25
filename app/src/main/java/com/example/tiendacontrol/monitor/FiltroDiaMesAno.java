@@ -1,6 +1,7 @@
-package com.example.tiendacontrol.model;
+package com.example.tiendacontrol.monitor;
 import android.app.DatePickerDialog;
 import android.os.Bundle;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.DatePicker;
@@ -19,6 +20,7 @@ import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BdHelper;
+import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
@@ -60,11 +62,20 @@ public class FiltroDiaMesAno extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ventasAdapter = new BaseDatosAdapter(new ArrayList<>());
         recyclerView.setAdapter(ventasAdapter);
+        // Deshabilitar clics en el RecyclerView
+        recyclerView.setOnTouchListener((v, event) -> {
+            if (event.getAction() == MotionEvent.ACTION_MOVE) {
+                return false; // Permitir el desplazamiento
+            }
+            return true; // Ignorar los clics
+        });
 
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
             menuDialogFragment.show(fragmentManager, "servicios_dialog");
+
+
         });
 
         buttonSelectDate.setOnClickListener(new View.OnClickListener() {
@@ -152,4 +163,5 @@ public class FiltroDiaMesAno extends AppCompatActivity {
             }
         });
     }
+
 }

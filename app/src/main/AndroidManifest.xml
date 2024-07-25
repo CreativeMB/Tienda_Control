@@ -25,7 +25,7 @@
             android:name=".model.Items"
             android:exported="false" />
         <activity
-            android:name=".model.FiltroDiaMesAno"
+            android:name=".monitor.FiltroDiaMesAno"
             android:exported="false" />
         <activity
             android:name=".monitor.IngresoEgreso"
