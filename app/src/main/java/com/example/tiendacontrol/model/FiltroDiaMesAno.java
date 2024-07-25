@@ -143,9 +143,9 @@ public class FiltroDiaMesAno extends AppCompatActivity {
                 double difference = positiveSum + negativeSum; // La diferencia será la suma de positivos y negativos
 
                     // Mostrar resultados
-                    textViewPositiveSum.setText("Suma Positiva: " + decimalFormat.format(positiveSum));
-                    textViewNegativeSum.setText("Suma Negativa: " + decimalFormat.format(negativeSum));
-                    textViewDifference.setText("Diferencia: " + decimalFormat.format(difference));
+                    textViewPositiveSum.setText("" + decimalFormat.format(positiveSum));
+                    textViewNegativeSum.setText("" + decimalFormat.format(negativeSum));
+                    textViewDifference.setText("" + decimalFormat.format(difference));
                 } else {
                     Toast.makeText(FiltroDiaMesAno.this, "No se encontraron resultados", Toast.LENGTH_SHORT).show();
                 }
