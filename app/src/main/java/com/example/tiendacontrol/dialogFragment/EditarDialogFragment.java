@@ -21,7 +21,6 @@ public class EditarDialogFragment extends DialogFragment {
     // Definición de variables de vista
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     Button btnGuarda;
-    FloatingActionButton fabEditar, fabEliminar, fabMenu;
     boolean correcto = false;
     Items venta;
     int id = 0;
@@ -47,14 +46,6 @@ public class EditarDialogFragment extends DialogFragment {
         txtDetalles = view.findViewById(R.id.txtDetalles);
         txtCantidad = view.findViewById(R.id.txtCantidad);
         btnGuarda = view.findViewById(R.id.btnGuarda);
-        fabEditar = view.findViewById(R.id.fabEditar);
-        fabEliminar = view.findViewById(R.id.fabEliminar);
-        fabMenu = view.findViewById(R.id.fabMenu);
-
-        // Oculta los FloatingActionButtons en el diálogo
-        fabEditar.setVisibility(View.INVISIBLE);
-        fabEliminar.setVisibility(View.INVISIBLE);
-        fabMenu.setVisibility(View.INVISIBLE);
 
         // Obtiene el ID del argumento pasado al fragmento
         if (getArguments() != null) {
@@ -68,12 +59,9 @@ public class EditarDialogFragment extends DialogFragment {
         if (venta != null) {
             // Rellena los campos del formulario con los datos de la venta
             txtProducto.setText(venta.getProducto());
-            // Mostrar valor sin decimales y sin signo negativo
+            // Mostrar valor directamente, con el signo negativo si es necesario
             double valor = venta.getValor();
-            if (valor < 0) {
-                valor = -valor; // Eliminar signo negativo
-            }
-            txtValor.setText(String.format("%.0f", valor)); // Convertir double a String
+            txtValor.setText(String.valueOf(valor)); // Mostrar valor con signo si corresponde
             txtDetalles.setText(venta.getDetalles());
             txtCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
         }
@@ -99,11 +87,11 @@ public class EditarDialogFragment extends DialogFragment {
 
                 try {
                     // Convierte los valores a los tipos adecuados
-                    valor = Double.parseDouble(valorStr);
+                    valor = Double.parseDouble(valorStr); // Acepta valores negativos
                     cantidad = Integer.parseInt(cantidadStr);
 
                     // Calcula el total
-                    double total = valor * cantidad;
+                    double total = valor * cantidad; // Multiplica valor por cantidad
 
                     // Actualiza la base de datos con los nuevos valores
                     correcto = bdVentas.editarVenta(id, producto, total, detalles, cantidad);

@@ -112,13 +112,14 @@ public class BdVentas extends BdHelper{
         try {
             ContentValues values = new ContentValues();
             values.put("producto", producto);
-            values.put("valor", total); // Cambiar a double
+            values.put("valor", total); // Asegúrate de que esta columna puede manejar valores negativos
             values.put("detalles", detalles);
-            values.put("cantidad", cantidad); // Cambiar a int
+            values.put("cantidad", cantidad);
 
             // Actualizar la venta con el ID específico
             int rowsAffected = db.update(TABLE_VENTAS, values, "id = ?", new String[]{String.valueOf(id)});
             correcto = rowsAffected > 0; // Verificar si la actualización fue exitosa
+
         } catch (Exception ex) {
             ex.printStackTrace(); // Imprimir el error si ocurre una excepción
             correcto = false;
@@ -128,7 +129,6 @@ public class BdVentas extends BdHelper{
 
         return correcto; // Retornar si la edición fue exitosa o no
     }
-
     // Método para eliminar una venta existente
     public boolean eliminarVenta(int id) {
         boolean correcto = false;

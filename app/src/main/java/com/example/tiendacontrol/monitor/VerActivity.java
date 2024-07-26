@@ -57,37 +57,36 @@ public class VerActivity extends AppCompatActivity {
             id = (int) savedInstanceState.getSerializable("ID");
         }
 
-        // Crea una instancia de BdVentas y obtiene la venta con el ID proporcionado
+// Crea una instancia de BdVentas y obtiene la venta con el ID proporcionado
         final BdVentas bdVentas = new BdVentas(VerActivity.this);
         venta = bdVentas.verVenta(id);
 
-        // Si la venta existe, muestra los detalles en los campos de texto
+// Si la venta existe, muestra los detalles en los campos de texto
         if (venta != null) {
             txtProducto.setText(venta.getProducto());
-            // Formatea el valor para eliminar decimales y el signo negativo
+            // Obtén el valor directamente sin modificar el signo
             double valor = venta.getValor();
-            if (valor < 0) {
-                valor = -valor; // Elimina el signo negativo
-            }
-            txtValor.setText(String.format("%.0f", valor));
+            txtValor.setText(String.valueOf(valor));
             txtDetalles.setText(venta.getDetalles());
             txtCantidad.setText(String.valueOf(venta.getCantidad())); // Asegúrate de que getCantidad devuelve int o String
-            txtProducto.setInputType(InputType.TYPE_NULL); // Hace que los campos de texto sean solo lectura
+
+            // Hace que los campos de texto sean solo lectura
+            txtProducto.setInputType(InputType.TYPE_NULL);
             txtValor.setInputType(InputType.TYPE_NULL);
             txtDetalles.setInputType(InputType.TYPE_NULL);
             txtCantidad.setInputType(InputType.TYPE_NULL);
         }
 
-        // Configura el botón flotante de edición para mostrar el EditarDialogFragment cuando se hace clic
+// Configura el botón flotante de edición para mostrar el EditarDialogFragment cuando se hace clic
         fabEditar.setOnClickListener(view -> {
             EditarDialogFragment dialogFragment = EditarDialogFragment.newInstance(id);
             dialogFragment.show(getSupportFragmentManager(), "EditarDialogFragment");
         });
 
-        // Configura el botón flotante de eliminación para mostrar un diálogo de confirmación al hacer clic
+// Configura el botón flotante de eliminación para mostrar un diálogo de confirmación al hacer clic
         fabEliminar.setOnClickListener(view -> {
             AlertDialog.Builder builder = new AlertDialog.Builder(VerActivity.this);
-            builder.setMessage("¿Desea eliminar Item?")
+            builder.setMessage("¿Desea eliminar el ítem?")
                     .setPositiveButton("SI", (dialogInterface, i) -> {
                         if (bdVentas.eliminarVenta(id)) {
                             lista(); // Llama al método lista si la venta se elimina correctamente
@@ -98,7 +97,6 @@ public class VerActivity extends AppCompatActivity {
                     }).show();
         });
     }
-
     // Método para iniciar la actividad MainActivity
     private void lista() {
         Intent intent = new Intent(this, MainActivity.class);
