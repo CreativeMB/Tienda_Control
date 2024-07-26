@@ -1,10 +1,12 @@
 package com.example.tiendacontrol.dialogFragment;
 
 import android.content.Intent;
+import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -78,6 +80,24 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
             @Override
             public void onClick(View view) {
                 clearCustomItems();
+            }
+        });
+
+        final View rootView = view.findViewById(R.id.root_layout); // Cambia esto si es necesario
+        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+            @Override
+            public void onGlobalLayout() {
+                Rect r = new Rect();
+                rootView.getWindowVisibleDisplayFrame(r);
+                int screenHeight = rootView.getRootView().getHeight();
+                int keypadHeight = screenHeight - r.bottom;
+
+                // Ajustar el padding superior según la altura del teclado
+                if (keypadHeight > screenHeight * 0.15) { // Si el teclado está visible
+                    rootView.setPadding(0, 0, 0, keypadHeight);
+                } else {
+                    rootView.setPadding(0, 0, 0, 0);
+                }
             }
         });
 

@@ -35,7 +35,7 @@
             android:exported="false" />
         <activity
             android:name=".dialogFragment.GastoDialogFragment"
-            android:exported="false" />
+            android:exported="false"/>
         <activity
             android:name=".monitor.VerActivity"
             android:exported="false" />
@@ -64,23 +64,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity
-            android:name="com.dropbox.core.android.AuthActivity"
-            android:configChanges="orientation|keyboardHidden"
-            android:exported="true"
-            android:launchMode="singleTask">
-            <intent-filter>
-                <action android:name="android.intent.action.VIEW" />
 
-                <category android:name="android.intent.category.DEFAULT" />
-                <category android:name="android.intent.category.BROWSABLE" />
-
-                <data
-                    android:host="com.example.tiendacontrol"
-                    android:path="/callback"
-                    android:scheme="db-j3bayptxiiokqde" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>
