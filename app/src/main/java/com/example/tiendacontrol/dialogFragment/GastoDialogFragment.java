@@ -13,6 +13,8 @@ import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.fragment.app.DialogFragment;
+
 import com.example.tiendacontrol.helper.ItemManager;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -50,6 +52,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         // Inicializa los objetos de manejo de base de datos
         bdHelper = new BdHelper(requireContext());
         itemManager = new ItemManager(requireContext());
+
 
         // Cargar los ítems predefinidos en el spinner
         loadPredefinedItems();
