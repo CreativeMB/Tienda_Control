@@ -3,7 +3,7 @@
     <gradient
         android:startColor="@color/startColor"
         android:endColor="@color/endColor"
-        android:angle="45" /> <!-- Aplica un degradado de color -->
+        android:angle="15" /> <!-- Aplica un degradado de color -->
     <corners android:radius="5dp" /> <!-- Ajusta el radio de las esquinas aquí -->
     <padding
         android:left="8dp"
