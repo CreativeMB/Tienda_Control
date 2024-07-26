@@ -65,19 +65,6 @@ public class FiltroDiaMesAno extends AppCompatActivity {
         ventasAdapter = new BaseDatosAdapter(new ArrayList<>());
         recyclerView.setAdapter(ventasAdapter);
 
-// Configura el RecyclerView
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        ventasAdapter = new BaseDatosAdapter(new ArrayList<>());
-        recyclerView.setAdapter(ventasAdapter);
-
-// Deshabilitar clics en el RecyclerView específico
-        recyclerView.setOnTouchListener((v, event) -> {
-            if (event.getAction() == MotionEvent.ACTION_MOVE) {
-                return false; // Permitir el desplazamiento
-            }
-            return true; // Ignorar los clics
-        });
-
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();

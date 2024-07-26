@@ -154,7 +154,7 @@
                 android:textStyle="bold" />
         </LinearLayout>
 
-        <androidx.recyclerview.widget.RecyclerView
+        <com.example.tiendacontrol.adapter.NonClickableRecyclerView
             android:id="@+id/recycler_view_results"
             android:layout_width="match_parent"
             android:layout_height="0dp"
