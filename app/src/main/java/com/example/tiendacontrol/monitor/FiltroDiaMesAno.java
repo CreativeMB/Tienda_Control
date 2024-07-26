@@ -9,6 +9,7 @@ import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
@@ -59,10 +60,17 @@ public class FiltroDiaMesAno extends AppCompatActivity {
         calendar = Calendar.getInstance();
         decimalFormat = new DecimalFormat("#,###");
 
+        // Configuración del RecyclerView
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         ventasAdapter = new BaseDatosAdapter(new ArrayList<>());
         recyclerView.setAdapter(ventasAdapter);
-        // Deshabilitar clics en el RecyclerView
+
+// Configura el RecyclerView
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        ventasAdapter = new BaseDatosAdapter(new ArrayList<>());
+        recyclerView.setAdapter(ventasAdapter);
+
+// Deshabilitar clics en el RecyclerView específico
         recyclerView.setOnTouchListener((v, event) -> {
             if (event.getAction() == MotionEvent.ACTION_MOVE) {
                 return false; // Permitir el desplazamiento
