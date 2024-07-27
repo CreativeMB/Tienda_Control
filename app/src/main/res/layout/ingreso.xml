@@ -2,11 +2,13 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:id="@+id/root_layout2"
     android:padding="16dp">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+        android:layout_height="wrap_content"
+        android:padding="16dp">
 
         <LinearLayout
             android:id="@+id/content_layout"
@@ -25,7 +27,8 @@
             <Spinner
                 android:id="@+id/spinnerPredefined"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:textSize="25dp" />
             <View
                 android:layout_width="match_parent"
                 android:layout_height="30dp" />
@@ -96,12 +99,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_horizontal"
-                android:backgroundTint="@color/Buton"
+                android:textColor="@color/black"
+                android:background="@drawable/button_background"
+                android:elevation="6dp"
                 android:text="@string/btn_guarda"
                 android:textSize="18sp" />
             <View
                 android:layout_width="match_parent"
-                android:layout_height="20dp" />
+                android:layout_height="5dp" />
 
 
             <LinearLayout
@@ -116,9 +121,11 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/Buton"
-                    android:text="Guardar Predefinido"
                     android:textColor="@color/black"
+                    android:background="@drawable/button_background"
+                    android:elevation="6dp"
+                    android:text="Guardar Predefinido"
+
                     android:textSize="14sp" />
 
                 <Button
@@ -126,9 +133,11 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-                    android:backgroundTint="@color/Buton"
-                    android:text="Eliminar Predefinido"
                     android:textColor="@color/black"
+                    android:background="@drawable/button_background"
+                    android:elevation="6dp"
+                    android:text="Eliminar Predefinido"
+
                     android:textSize="14sp" />
             </LinearLayout>
 

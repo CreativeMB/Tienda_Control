@@ -1,13 +1,11 @@
-<resources xmlns:tools="http://schemas.android.com/tools">
+<resources>
     <!-- Base application theme. -->
-    <style name="Base.Theme.TiendaControl" parent="Theme.Material3.DayNight.NoActionBar">
-        <!-- Color primario -->
+    <style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
-        <!-- Variante más oscura para la barra de estado y las barras de aplicaciones contextuales -->
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <!-- Controles de interfaz de usuario como casillas de verificación y campos de texto -->
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:textColor">@android:color/black</item>
+        <item name="android:background">@android:color/white</item>
     </style>
-
-    <style name="Theme.TiendaControl" parent="Base.Theme.TiendaControl" />
 </resources>

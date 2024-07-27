@@ -1,17 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#000000</color>
-    <color name="colorPrimaryDark">#000000</color>
+    <color name="colorPrimary">#03A9F4</color>
+    <color name="colorPrimaryDark">#FF5722</color>
     <color name="colorAccent">#000000</color>
-    <color name="black">#FF000000</color>
+
     <color name="white">#FFFFFFFF</color>
-    <color name="Buton">#2196F3</color>
+
     <color name="toolbarBackground">#2196F3</color>
-    <color name="texcolor">#96562C</color>
+    <color name="texcolor">#8C4A1D</color>
     <color name="colorNegativo">#900000</color>
     <color name="colorPositivo">#4CAF50</color>
     <color name="colorFondoNegativo">#93F44336</color>
     <color name="colorFondoPositivo">#4CAF50</color>
+
+    <color name="startColor">#2196F3</color> <!-- Ajusta el color de inicio del degradado -->
+    <color name="endColor">#009688</color> <!-- Ajusta el color final del degradado -->
+    <color name="Buton">#00AAFC</color> <!-- Tu color original del botón -->
+    <color name="black">#000000</color> <!-- Color del texto del botón -->
 
 
 </resources>

@@ -16,13 +16,13 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 
-public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.ContactoViewHolder>{
+public class BaseDatosAdapter extends RecyclerView.Adapter<BaseDatosAdapter.ContactoViewHolder>{
     // Lista de ventas y lista original para realizar filtrados
     ArrayList<Items> listaVentas;
     ArrayList<Items> listaOriginal;
 
     // Constructor del adaptador que inicializa las listas
-    public ListaVentasAdapter(ArrayList<Items> listaVentas) {
+    public BaseDatosAdapter(ArrayList<Items> listaVentas) {
         this.listaVentas = listaVentas;
         listaOriginal = new ArrayList<>();
         listaOriginal.addAll(listaVentas);
@@ -114,4 +114,11 @@ public class ListaVentasAdapter extends RecyclerView.Adapter<ListaVentasAdapter.
             });
         }
     }
+    // Método para actualizar los elementos de la lista
+    public void setItems(ArrayList<Items> items) {
+        listaVentas.clear();
+        listaVentas.addAll(items);
+        notifyDataSetChanged();
+    }
+
 }

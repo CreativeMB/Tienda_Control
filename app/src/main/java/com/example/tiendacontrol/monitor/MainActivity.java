@@ -1,49 +1,28 @@
 package com.example.tiendacontrol.monitor;
-
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.Settings;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
-
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BaseExporter;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.BdVentas;
-
 import java.text.NumberFormat;
 import java.util.Locale;
-
-import com.example.tiendacontrol.helper.ExcelExporter;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.ListaVentasAdapter;
+import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.model.Items;
-import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.login.PerfilUsuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
@@ -51,23 +30,17 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
-
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     // Declaración de variables
-    private static final String DATABASE_NAME = "MI_contabilidad.db";
-    private static final int REQUEST_CODE_WRITE_STORAGE_PERMISSION = 100;
-    public static final int REQUEST_CODE_PERFIL_USUARIO = 1;
-    // Constante para el código de solicitud de permiso de almacenamiento
     public static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
     private SearchView txtBuscar;
     private RecyclerView listaVentas;
     private ArrayList<Items> listaArrayVentas;
-    private ListaVentasAdapter adapter;
+    private BaseDatosAdapter adapter;
     private FloatingActionButton fabNuevo, fabGasto, fabMenu;
-    private TextView textVenta, textTotal, textGasto;
-    private Toolbar toolbar;
+    private TextView textVenta, textGanacia, textGasto;
     private ImageView imageViewProfile;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
@@ -76,6 +49,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private BaseExporter baseExporter;
     private BaseExporter baseInporter;
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
+
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
         txtBuscar = findViewById(R.id.txtBuscar);
@@ -92,21 +67,27 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         fabMenu = findViewById(R.id.fabMenu);
         fabGasto = findViewById(R.id.favGasto);
         textVenta = findViewById(R.id.textVenta);
-        textTotal = findViewById(R.id.textTotal);
+        textGanacia = findViewById(R.id.textGanacia);
         textGasto = findViewById(R.id.textGasto);
 
-        TextView textGasto = findViewById(R.id.textGasto);
-        TextView textVenta = findViewById(R.id.textVenta);
-        TextView textGanacia = findViewById(R.id.textTotal);
         // Configuración del RecyclerView
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
         baseExporter = new BaseExporter(this);
 
+        // Inicializar SearchView
+        txtBuscar = findViewById(R.id.txtBuscar);
+
+        // Configurar el listener para el SearchView
+        txtBuscar.setOnQueryTextListener(this);
+
         // Inicialización de la base de datos y el adaptador
         BdVentas bdVentas = new BdVentas(MainActivity.this);
         listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
-        adapter = new ListaVentasAdapter(bdVentas.mostrarVentas());
+        adapter = new BaseDatosAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
+
+        // Inicializar el BdHelper
+        bdHelper = new BdHelper(this);
 
         // Configuración de los botones flotantes
         fabGasto.setOnClickListener(view -> {
@@ -119,16 +100,14 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance();
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
+
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
             menuDialogFragment.show(fragmentManager, "servicios_dialog");
         });
 
-        // Configuración del SearchView
-        txtBuscar.setOnQueryTextListener(this);
-
-// Inicializa el lanzador para la solicitud de permisos
+        // Inicializa el lanzador para la solicitud de permisos
         requestStoragePermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(),
                 isGranted -> {
@@ -143,19 +122,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     }
                 }
         );
-// finaliza el lanzador para la solicitud de permisos
 
         // Calcular y mostrar las sumas iniciales
         calcularSumaGanancias();
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
 
-        // Inicializar el BdHelper
-        bdHelper = new BdHelper(this);
         // Obtener el usuario actual de Firebase Authentication
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             userId = user.getUid();
+
             // Cargar la imagen de perfil del usuario
             loadProfileImage(userId);
         } else {
@@ -168,7 +145,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 startActivity(intent);
             }
         });
-        // Configurar OnClickListener para abrir NegativoActivity
+
+        // Configurar OnClickListener para abrir Negativo
         textGasto.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -177,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     });
 
-// Configurar OnClickListener para abrir PositivoActivity
+// Configurar OnClickListener para abrir Positivo
         textVenta.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
@@ -186,8 +164,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     });
 
-// Configurar OnClickListener para abrir PositivoActivity
-        textTotal.setOnClickListener(new View.OnClickListener() {
+// Configurar OnClickListener para abrir Ganancia
+        textGanacia.setOnClickListener(new View.OnClickListener() {
         @Override
         public void onClick(View v) {
             Intent intent = new Intent(MainActivity.this, IngresoEgreso.class);
@@ -195,12 +173,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     });
 }
-
+//Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
     }
-
+//Este método se llama cada vez que el texto en el campo de búsqueda cambia.
     @Override
     public boolean onQueryTextChange(String newText) {
         // Filtrar el RecyclerView según el texto de búsqueda
@@ -246,7 +224,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Eliminar decimales si hay .00
         sumaFormateadaStr = sumaFormateadaStr.replaceAll("[,.]00$", "");
 
-        textTotal.setText(sumaFormateadaStr);
+        textGanacia.setText(sumaFormateadaStr);
     }
 
     // Método para calcular y mostrar la suma total de ventas sin decimales

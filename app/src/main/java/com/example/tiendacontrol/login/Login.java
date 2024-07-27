@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-
 import com.example.tiendacontrol.monitor.AccessCode;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;

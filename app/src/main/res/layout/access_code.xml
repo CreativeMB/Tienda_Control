@@ -28,26 +28,27 @@
         android:layout_height="wrap_content"
         android:hint="código acceso"
         android:inputType="text"
-        android:textSize="50sp"
+        android:textSize="40sp"
         android:gravity="center"/>
-
     <Button
         android:id="@+id/buttonAccess"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Acceder"
-        android:textSize="40sp"
-        android:backgroundTint="@color/Buton"
+        android:textSize="30sp"
+        android:textColor="@color/black"
+        android:background="@drawable/button_background"
+        android:elevation="6dp"
         android:padding="16dp"/>
-
     <Button
         android:id="@+id/btnLogin"
         android:text="@string/login_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
-        android:backgroundTint="#002196F3"
-        android:textColor="@color/texcolor"
+        android:textColor="@color/black"
+        android:background="@drawable/button_background"
+        android:elevation="6dp"
         android:textSize="25sp"/>
 
 

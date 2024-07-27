@@ -2,6 +2,9 @@ package com.example.tiendacontrol.dialogFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,9 +21,10 @@ import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class EditarDialogFragment extends DialogFragment {
+    // Definición de variables de vista
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
-    Button btnGuarda;
     FloatingActionButton fabEditar, fabEliminar, fabMenu;
+    Button btnGuarda;
     boolean correcto = false;
     Items venta;
     int id = 0;
@@ -43,10 +47,11 @@ public class EditarDialogFragment extends DialogFragment {
         txtDetalles = view.findViewById(R.id.txtDetalles);
         txtCantidad = view.findViewById(R.id.txtCantidad);
         btnGuarda = view.findViewById(R.id.btnGuarda);
+
         fabEditar = view.findViewById(R.id.fabEditar);
         fabEliminar = view.findViewById(R.id.fabEliminar);
         fabMenu = view.findViewById(R.id.fabMenu);
-        // Ocultar FABs en el diálogo
+
         fabEditar.setVisibility(View.INVISIBLE);
         fabEliminar.setVisibility(View.INVISIBLE);
         fabMenu.setVisibility(View.INVISIBLE);
@@ -60,15 +65,48 @@ public class EditarDialogFragment extends DialogFragment {
 
         if (venta != null) {
             txtProducto.setText(venta.getProducto());
-            // Mostrar valor sin decimales y sin signo negativo
             double valor = venta.getValor();
-            if (valor < 0) {
-                valor = -valor; // Eliminar signo negativo
-            }
-            txtValor.setText(String.format("%.0f", valor));// Convertir double a String
+            txtValor.setText(String.valueOf(valor));
             txtDetalles.setText(venta.getDetalles());
             txtCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
         }
+
+        txtValor.addTextChangedListener(new TextWatcher() {
+            private boolean isUpdating = false;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No se necesita implementar este método
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // No se necesita implementar este método
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isUpdating) {
+                    return;
+                }
+
+                isUpdating = true;
+
+                String str = s.toString();
+                if (!str.startsWith("-") && venta.getValor() < 0) {
+                    // Si el valor debería ser negativo pero el usuario ha eliminado el signo, mostrar un mensaje
+                    Toast.makeText(requireContext(), "El valor debe ser negativo", Toast.LENGTH_SHORT).show();
+                    Log.d("EditarDialogFragment", "El valor debe ser negativo");
+
+                    // Restaurar el signo negativo
+                    str = "-" + str.replace("-", "");
+                    txtValor.setText(str);
+                    txtValor.setSelection(txtValor.getText().length());
+                }
+
+                isUpdating = false;
+            }
+        });
 
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -88,12 +126,14 @@ public class EditarDialogFragment extends DialogFragment {
 
                 try {
                     valor = Double.parseDouble(valorStr);
+                    if (venta.getValor() < 0 && valor > 0) {
+                        Toast.makeText(requireContext(), "El valor debe ser negativo", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     cantidad = Integer.parseInt(cantidadStr);
 
-                    // Calcular el total
                     double total = valor * cantidad;
 
-                    // Actualizar la base de datos
                     correcto = bdVentas.editarVenta(id, producto, total, detalles, cantidad);
 
                     if (correcto) {
