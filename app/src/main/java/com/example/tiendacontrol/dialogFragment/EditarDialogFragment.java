@@ -20,6 +20,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 public class EditarDialogFragment extends DialogFragment {
     // Definición de variables de vista
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
+    FloatingActionButton fabEditar, fabEliminar, fabMenu;
     Button btnGuarda;
     boolean correcto = false;
     Items venta;
@@ -46,6 +47,15 @@ public class EditarDialogFragment extends DialogFragment {
         txtDetalles = view.findViewById(R.id.txtDetalles);
         txtCantidad = view.findViewById(R.id.txtCantidad);
         btnGuarda = view.findViewById(R.id.btnGuarda);
+
+        fabEditar = view.findViewById(R.id.fabEditar);
+        fabEliminar = view.findViewById(R.id.fabEliminar);
+        fabMenu = view.findViewById(R.id.fabMenu);
+
+        // Ocultar FABs en el diálogo
+        fabEditar.setVisibility(View.INVISIBLE);
+        fabEliminar.setVisibility(View.INVISIBLE);
+        fabMenu.setVisibility(View.INVISIBLE);
 
         // Obtiene el ID del argumento pasado al fragmento
         if (getArguments() != null) {
