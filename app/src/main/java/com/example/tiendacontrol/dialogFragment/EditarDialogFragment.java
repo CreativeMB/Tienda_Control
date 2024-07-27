@@ -2,6 +2,9 @@ package com.example.tiendacontrol.dialogFragment;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +29,6 @@ public class EditarDialogFragment extends DialogFragment {
     Items venta;
     int id = 0;
 
-    // Método estático para crear una nueva instancia del fragmento con un ID
     public static EditarDialogFragment newInstance(int id) {
         EditarDialogFragment fragment = new EditarDialogFragment();
         Bundle args = new Bundle();
@@ -38,10 +40,8 @@ public class EditarDialogFragment extends DialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        // Infla el layout del fragmento
         View view = inflater.inflate(R.layout.activity_ver, container, false);
 
-        // Inicializa las vistas
         txtProducto = view.findViewById(R.id.txtProducto);
         txtValor = view.findViewById(R.id.txtValor);
         txtDetalles = view.findViewById(R.id.txtDetalles);
@@ -52,41 +52,70 @@ public class EditarDialogFragment extends DialogFragment {
         fabEliminar = view.findViewById(R.id.fabEliminar);
         fabMenu = view.findViewById(R.id.fabMenu);
 
-        // Ocultar FABs en el diálogo
         fabEditar.setVisibility(View.INVISIBLE);
         fabEliminar.setVisibility(View.INVISIBLE);
         fabMenu.setVisibility(View.INVISIBLE);
 
-        // Obtiene el ID del argumento pasado al fragmento
         if (getArguments() != null) {
             id = getArguments().getInt("ID");
         }
 
-        // Crea una instancia de BdVentas y obtiene la venta correspondiente al ID
         final BdVentas bdVentas = new BdVentas(requireContext());
         venta = bdVentas.verVenta(id);
 
         if (venta != null) {
-            // Rellena los campos del formulario con los datos de la venta
             txtProducto.setText(venta.getProducto());
-            // Mostrar valor directamente, con el signo negativo si es necesario
             double valor = venta.getValor();
-            txtValor.setText(String.valueOf(valor)); // Mostrar valor con signo si corresponde
+            txtValor.setText(String.valueOf(valor));
             txtDetalles.setText(venta.getDetalles());
             txtCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
         }
 
-        // Configura el listener para el botón de guardar
+        txtValor.addTextChangedListener(new TextWatcher() {
+            private boolean isUpdating = false;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // No se necesita implementar este método
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // No se necesita implementar este método
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isUpdating) {
+                    return;
+                }
+
+                isUpdating = true;
+
+                String str = s.toString();
+                if (!str.startsWith("-") && venta.getValor() < 0) {
+                    // Si el valor debería ser negativo pero el usuario ha eliminado el signo, mostrar un mensaje
+                    Toast.makeText(requireContext(), "El valor debe ser negativo", Toast.LENGTH_SHORT).show();
+                    Log.d("EditarDialogFragment", "El valor debe ser negativo");
+
+                    // Restaurar el signo negativo
+                    str = "-" + str.replace("-", "");
+                    txtValor.setText(str);
+                    txtValor.setSelection(txtValor.getText().length());
+                }
+
+                isUpdating = false;
+            }
+        });
+
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // Obtiene los valores de los campos de texto
                 String producto = txtProducto.getText().toString().trim();
                 String valorStr = txtValor.getText().toString().trim();
                 String detalles = txtDetalles.getText().toString().trim();
                 String cantidadStr = txtCantidad.getText().toString().trim();
 
-                // Verifica si los campos obligatorios están llenos
                 if (producto.isEmpty() || valorStr.isEmpty() || cantidadStr.isEmpty()) {
                     Toast.makeText(requireContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
                     return;
@@ -96,20 +125,21 @@ public class EditarDialogFragment extends DialogFragment {
                 int cantidad;
 
                 try {
-                    // Convierte los valores a los tipos adecuados
-                    valor = Double.parseDouble(valorStr); // Acepta valores negativos
+                    valor = Double.parseDouble(valorStr);
+                    if (venta.getValor() < 0 && valor > 0) {
+                        Toast.makeText(requireContext(), "El valor debe ser negativo", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     cantidad = Integer.parseInt(cantidadStr);
 
-                    // Calcula el total
-                    double total = valor * cantidad; // Multiplica valor por cantidad
+                    double total = valor * cantidad;
 
-                    // Actualiza la base de datos con los nuevos valores
                     correcto = bdVentas.editarVenta(id, producto, total, detalles, cantidad);
 
                     if (correcto) {
                         Toast.makeText(requireContext(), "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();
                         verRegistro();
-                        dismiss(); // Cierra el diálogo
+                        dismiss();
                     } else {
                         Toast.makeText(requireContext(), "ERROR AL MODIFICAR REGISTRO", Toast.LENGTH_LONG).show();
                     }
@@ -122,7 +152,6 @@ public class EditarDialogFragment extends DialogFragment {
         return view;
     }
 
-    // Método para ver el registro editado
     private void verRegistro() {
         Intent intent = new Intent(requireContext(), MainActivity.class);
         intent.putExtra("ID", id);
