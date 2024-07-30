@@ -1,17 +1,24 @@
 package com.example.tiendacontrol.helper;
 
+import static android.app.PendingIntent.getActivity;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
+
 import androidx.annotation.Nullable;
+
 import com.example.tiendacontrol.model.Items;
+import com.example.tiendacontrol.monitor.MainActivity;
+
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class BdVentas extends BdHelper{
+public class BdVentas extends BdHelper {
     Context context;
 
     public BdVentas(@Nullable Context context) {
@@ -129,6 +136,7 @@ public class BdVentas extends BdHelper{
 
         return correcto; // Retornar si la edición fue exitosa o no
     }
+
     // Método para eliminar una venta existente
     public boolean eliminarVenta(int id) {
         boolean correcto = false;
@@ -155,5 +163,29 @@ public class BdVentas extends BdHelper{
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date date = new Date();
         return dateFormat.format(date);
+    }
+
+    public boolean eliminarTodo() {
+        SQLiteDatabase db = null;
+        try {
+            db = this.getWritableDatabase();
+            if (db != null) {
+                // Eliminar todas las filas de las tablas
+                db.execSQL("DELETE FROM " + TABLE_VENTAS); // Cambia "TABLE_VENTAS" por el nombre de tu tabla
+                // Agrega otras tablas si es necesario
+                Log.d("BdVentas", "Todas las filas eliminadas de " + TABLE_VENTAS);
+                return true;
+            } else {
+                Log.d("BdVentas", "Base de datos no disponible.");
+                return false;
+            }
+        } catch (Exception e) {
+            Log.e("BdVentas", "Error al eliminar las filas", e);
+            return false;
+        } finally {
+            if (db != null && db.isOpen()) {
+                db.close();
+            }
+        }
     }
 }

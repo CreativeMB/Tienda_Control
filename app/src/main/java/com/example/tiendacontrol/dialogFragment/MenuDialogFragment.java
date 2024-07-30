@@ -1,7 +1,10 @@
 package com.example.tiendacontrol.dialogFragment;
 
 import static com.example.tiendacontrol.monitor.MainActivity.REQUEST_CODE_STORAGE_PERMISSION;
+
 import android.Manifest;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -9,19 +12,23 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.MenuCustomAdapter;
 import com.example.tiendacontrol.helper.BaseExporter;
@@ -33,6 +40,7 @@ import com.example.tiendacontrol.monitor.FiltroDiaMesAno;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.monitor.SetCode;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,14 +50,25 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
     private List<MenuItemImpl> menuItems = new ArrayList<>(); // Lista de elementos del menú
     private BaseExporter baseExporter; // Exportador de base de datos
 
+    public interface MainActivityListener { // Interfaz para la comunicación
+        void confirmarEliminarTodo();
+    }
+
+    private MainActivityListener listener; // Referencia al listener de MainActivity
+
     public static MenuDialogFragment newInstance() {
         return new MenuDialogFragment(); // Crear una nueva instancia del fragmento
+    }
+
+    public void setListener(MainActivityListener listener) {
+        this.listener = listener;
     }
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.menu_dialog, container, false); // Inflar el diseño del fragmento
+
 
         menuListView = view.findViewById(R.id.menu_list); // Obtener la vista de la lista del menú
 
@@ -65,6 +84,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         menuAdapter = new MenuCustomAdapter(requireContext(), menuItems);
         menuListView.setAdapter(menuAdapter);
 
+
         // Manejar clics en los elementos del menú
         menuListView.setOnItemClickListener((parent, view1, position, id) -> {
             MenuItemImpl menuItem = menuItems.get(position); // Obtener el elemento del menú clicado
@@ -76,6 +96,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
 
         return view;
     }
+
 
     // Método para obtener los elementos del menú como una lista de MenuItemImpl
     private List<MenuItemImpl> getMenuItemsFromMenuBuilder(MenuBuilder menuBuilder) {
@@ -144,6 +165,26 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             // Lógica para la opción "Salir"
             dirigirAInicioSesion();
             requireActivity().finish(); // Cierra la actividad actual
+        } else if (id == R.id.borrardados)
+            if (isStoragePermissionGranted()) {
+                showDeleteConfirmationDialog();
+            } else {
+                Log.d("MenuDialogFragment", "Permiso de almacenamiento no concedido");
+            }
+    }
+
+    // Método para mostrar el diálogo de confirmación de eliminación de base de datos
+    private void showDeleteConfirmationDialog() {
+        // Verificar si el fragmento está adjunto a una actividad antes de continuar
+        if (!isAdded()) {
+            Log.e("MenuDialogFragment", "Fragmento no está adjunto a una actividad");
+            return;
+        }
+        // Verificar si el listener de MainActivity no es nulo antes de llamar al método para eliminar la base de datos
+        if (listener != null) {
+            listener.confirmarEliminarTodo(); // Llamar al método para eliminar la base de datos
+        } else {
+            Log.e("MenuDialogFragment", "El listener de MainActivity es nulo");
         }
     }
 
@@ -207,4 +248,5 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         startActivity(intent);
         requireActivity().finishAffinity(); // Cierra todas las actividades en la pila de tareas
     }
+
 }
