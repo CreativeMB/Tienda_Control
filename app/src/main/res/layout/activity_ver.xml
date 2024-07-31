@@ -139,5 +139,4 @@
         app:backgroundTint="@color/Buton"
         app:maxImageSize="35dp"
         app:tint="@color/black" />
-
 </RelativeLayout>
