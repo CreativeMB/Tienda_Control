@@ -9,11 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="16dp">
+
         <LinearLayout
             android:id="@+id/content_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -27,6 +29,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:textSize="25dp" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="30dp" />
@@ -91,19 +94,18 @@
                 android:labelFor="@+id/viewCantidad"
                 android:textSize="18sp" />
 
-            <!-- Botón dentro del LinearLayout para que se desplace con el contenido -->
             <Button
                 android:id="@+id/btnGuarda"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-
-
-                android:elevation="6dp"
+                android:layout_gravity="center"
+                android:elevation="3dp"
                 android:text="@string/btn_guarda" />
+
             <View
                 android:layout_width="match_parent"
                 android:layout_height="5dp" />
+
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
@@ -116,9 +118,8 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:elevation="6dp"
-                    android:text="Guardar Predefinido"
-                    />
+                    android:elevation="3dp"
+                    android:text="Guardar Predefinido" />
 
                 <Button
                     android:id="@+id/btnClearCustom"
@@ -128,8 +129,6 @@
                     android:elevation="6dp"
                     android:text="Eliminar Predefinido" />
             </LinearLayout>
-
-
 
         </LinearLayout>
     </ScrollView>

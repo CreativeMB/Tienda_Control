@@ -81,26 +81,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
                 clearCustomItems(); // Limpiar ítems personalizados
             }
         });
-
-        final View rootView = view.findViewById(R.id.root_layout2); // Cambia esto si es necesario
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                rootView.getWindowVisibleDisplayFrame(r);
-                int screenHeight = rootView.getRootView().getHeight();
-                int keypadHeight = screenHeight - r.bottom;
-
-                // Ajustar el padding superior según la altura del teclado
-                if (keypadHeight > screenHeight * 0.15) { // Si el teclado está visible
-                    rootView.setPadding(0, 0, 0, keypadHeight);
-                } else {
-                    rootView.setPadding(0, 0, 0, 0);
-                }
-            }
-        });
-
-        // Configuración del listener para el spinner
+                // Configuración del listener para el spinner
         spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {

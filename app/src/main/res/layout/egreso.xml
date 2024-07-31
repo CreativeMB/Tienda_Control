@@ -27,7 +27,8 @@
             <Spinner
                 android:id="@+id/spinnerPredefined"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
+                android:layout_height="wrap_content"
+                android:textSize="25dp"/>
 
             <View
                 android:layout_width="match_parent"
@@ -93,15 +94,12 @@
                 android:labelFor="@+id/viewCantidad"
                 android:textSize="18sp" />
 
-            <!-- Botón dentro del LinearLayout para que se desplace con el contenido -->
             <Button
                 android:id="@+id/btnGuarda"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
-
-                android:elevation="6dp"
-                android:onClick="guardarGasto"
+                android:elevation="3dp"
                 android:text="@string/btn_guarda" />
 
             <View
@@ -121,7 +119,7 @@
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
-                    android:elevation="6dp"
+                    android:elevation="3dp"
                     android:text="Guardar Predefinido" />
 
                 <Button
@@ -129,8 +127,7 @@
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
-
-                    android:elevation="6dp"
+                    android:elevation="3dp"
                     android:text="Eliminar Predefinido" />
             </LinearLayout>
 

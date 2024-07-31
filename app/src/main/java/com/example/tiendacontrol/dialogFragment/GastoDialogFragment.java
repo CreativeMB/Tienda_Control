@@ -82,25 +82,6 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
                 clearCustomItems();
             }
         });
-
-        final View rootView = view.findViewById(R.id.root_layout); // Cambia esto si es necesario
-        rootView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
-            @Override
-            public void onGlobalLayout() {
-                Rect r = new Rect();
-                rootView.getWindowVisibleDisplayFrame(r);
-                int screenHeight = rootView.getRootView().getHeight();
-                int keypadHeight = screenHeight - r.bottom;
-
-                // Ajustar el padding superior según la altura del teclado
-                if (keypadHeight > screenHeight * 0.15) { // Si el teclado está visible
-                    rootView.setPadding(0, 0, 0, keypadHeight);
-                } else {
-                    rootView.setPadding(0, 0, 0, 0);
-                }
-            }
-        });
-
         // Configura el listener para el Spinner de ítems predefinidos
         spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
