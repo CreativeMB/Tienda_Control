@@ -78,6 +78,13 @@ dependencies {
     implementation ("androidx.appcompat:appcompat:1.4.0")
 
     implementation ("com.google.code.gson:gson:2.8.9")
+
+
+    // Material Components for Android
+    implementation ("com.google.android.material:material:1.8.0")
+
+    // Material3 library (for Material You)
+    implementation ("androidx.compose.material3:material3:1.1.0")
 }
 
 

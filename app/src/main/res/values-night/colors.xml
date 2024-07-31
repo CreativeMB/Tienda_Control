@@ -1,20 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Colores de fondo y superficie -->
-    <color name="colorBackground">#F2F1F1</color> <!-- Fondo principal -->
-    <color name="colorSurface">#F5F5F5</color> <!-- Superficie de los elementos -->
+    <color name="colorBackground">#BCBCBC</color> <!-- Fondo principal -->
+    <color name="colorSurface">#989898</color> <!-- Superficie de los elementos -->
 
     <!-- Colores de texto -->
-    <color name="colorOnBackground">#000000</color> <!-- Texto sobre el fondo -->
-    <color name="colorOnSurface">#000000</color> <!-- Texto sobre la superficie -->
+    <color name="colorOnBackground">#FFFFFF</color> <!-- Texto sobre el fondo -->
+    <color name="colorOnSurface">#FFFFFF</color> <!-- Texto sobre la superficie -->
 
     <!-- Colores de acento -->
     <color name="colorPrimary">@color/Buton</color> <!-- Color principal -->
-    <color name="colorOnPrimary">#000000</color> <!-- Texto sobre el color principal -->
-    <color name="colorSecondary">#00B8D4</color> <!-- Color secundario -->
-    <color name="colorOnSecondary">#000000</color> <!-- Texto sobre el color secundario -->
-
-
+    <color name="colorOnPrimary">#FFFFFF</color> <!-- Texto sobre el color principal -->
+    <color name="colorSecondary">#565656</color> <!-- Color secundario -->
+    <color name="colorOnSecondary">#FFFFFF</color> <!-- Texto sobre el color secundario -->
 
     <color name="toolbarBackground">#2196F3</color>
     <color name="texcolor">#8C4A1D</color>
@@ -27,7 +25,5 @@
     <color name="endColor">#009688</color> <!-- Ajusta el color final del degradado -->
     <color name="Buton">#00AAFC</color> <!-- Tu color original del botón -->
     <color name="black">#000000</color> <!-- Color del texto del botón -->
-    <color name="buttonTextColor">#FF6D00</color> <!-- Color del texto del botón -->
-
 
 </resources>

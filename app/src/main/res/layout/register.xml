@@ -57,7 +57,6 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.5"
-            android:theme="@style/Theme.MaterialComponents"
             app:layout_constraintWidth_percent="0.9"
             app:cardBackgroundColor="#FDF2E2">
 
@@ -120,7 +119,6 @@
                     android:layout_marginTop="8dp"
                     android:clickable="true"
                     android:textStyle="italic"
-                    android:textColorLink="@color/colorPrimaryDark"
                     android:onClick="openTermsPage" />
 
                 <!-- Button to select profile image -->
@@ -131,8 +129,6 @@
                     android:layout_below="@id/textViewTermsLink"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="16dp"
-                    android:textColor="@color/black"
-                    android:background="@drawable/button_background"
                     android:elevation="6dp"
                     android:text="Logo Empresarial"
                     android:onClick="openFileChooser" />
@@ -145,8 +141,6 @@
                     android:layout_below="@id/btnSelectImage"
                     android:layout_centerHorizontal="true"
                     android:layout_marginTop="16dp"
-                    android:textColor="@color/black"
-                    android:background="@drawable/button_background"
                     android:elevation="6dp"
                     android:gravity="center"
                     android:text="@string/register_button" />
