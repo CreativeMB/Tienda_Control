@@ -25,8 +25,8 @@ public class Items {
         this.producto = producto;
     }
 
-    public double getValor() {
-        return valor;
+    public int getValor() {
+        return (int) valor;
     }
 
     public void setValor(double valor) {
