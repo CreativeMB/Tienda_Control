@@ -1,6 +1,17 @@
 package com.example.tiendacontrol.monitor;
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
+import android.provider.Settings;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
@@ -8,7 +19,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,7 +47,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, MenuDialogFragment.MainActivityListener {
     // Declaración de variables
     public static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
     private SearchView txtBuscar;
@@ -86,6 +101,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new BaseDatosAdapter(bdVentas.mostrarVentas());
         listaVentas.setAdapter(adapter);
 
+
         // Inicializar el BdHelper
         bdHelper = new BdHelper(this);
 
@@ -103,8 +119,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
-            menuDialogFragment.show(fragmentManager, "servicios_dialog");
+            MenuDialogFragment menuDialogFragment = new MenuDialogFragment();
+            menuDialogFragment.setListener(this);
+            menuDialogFragment.show(fragmentManager, "MenuDialogFragment");
         });
 
         // Inicializa el lanzador para la solicitud de permisos
@@ -148,37 +165,38 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Configurar OnClickListener para abrir Negativo
         textGasto.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, EgresoTotal.class);
-            startActivity(intent);
-        }
-    });
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, EgresoTotal.class);
+                startActivity(intent);
+            }
+        });
 
 // Configurar OnClickListener para abrir Positivo
         textVenta.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, IngresoTotal.class);
-            startActivity(intent);
-        }
-    });
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, IngresoTotal.class);
+                startActivity(intent);
+            }
+        });
+
 
 // Configurar OnClickListener para abrir Ganancia
         textGanacia.setOnClickListener(new View.OnClickListener() {
-        @Override
-        public void onClick(View v) {
-            Intent intent = new Intent(MainActivity.this, IngresoEgreso.class);
-            startActivity(intent);
-        }
-    });
-}
-//Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, IngresoEgreso.class);
+                startActivity(intent);
+            }
+        });
+    }
+    //Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
     }
-//Este método se llama cada vez que el texto en el campo de búsqueda cambia.
+    //Este método se llama cada vez que el texto en el campo de búsqueda cambia.
     @Override
     public boolean onQueryTextChange(String newText) {
         // Filtrar el RecyclerView según el texto de búsqueda
@@ -270,5 +288,69 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         sumaFormateadaStr = sumaFormateadaStr.replaceAll("[,.]00$", "");
 
         textGasto.setText(sumaFormateadaStr);
+    }
+    // Método para confirmar la eliminación de la base de datos
+    public void confirmarEliminarTodo() {
+        // Crear y mostrar el diálogo
+        new AlertDialog.Builder(this)
+                .setTitle("Eliminar base de datos")
+                .setMessage("¿Estás seguro de que deseas eliminar toda la base de datos?")
+                .setPositiveButton("Sí", (dialog, which) -> {
+                    BdVentas bdVentas = new BdVentas(this); // Crear instancia de BdVentas
+                    boolean resultado = bdVentas.eliminarTodo(); // Llamar al método para eliminar datos
+                    if (resultado) {
+                        Toast.makeText(this, "Base de datos eliminada", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(this, "Error al eliminar la base de datos", Toast.LENGTH_SHORT).show();
+                    }
+
+                })
+                .setNegativeButton("No", (dialog, which) -> {
+                    // Acción al cancelar
+                })
+                .setIcon(android.R.drawable.ic_dialog_alert)
+                .show();
+    }
+    // Método para verificar si el permiso de escritura en almacenamiento externo está concedido
+    private boolean isStoragePermissionGranted() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            return Environment.isExternalStorageManager();
+        } else {
+            return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    == PackageManager.PERMISSION_GRANTED;
+        }
+    }
+
+    // Método para solicitar el permiso de escritura en almacenamiento externo
+    private void requestStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Solicitar permiso MANAGE_EXTERNAL_STORAGE
+            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+            intent.addCategory(Intent.CATEGORY_DEFAULT);
+            intent.setData(Uri.parse("package:" + getPackageName()));
+            startActivityForResult(intent, REQUEST_CODE_STORAGE_PERMISSION);
+        } else {
+            // Solicitar permiso WRITE_EXTERNAL_STORAGE
+            ActivityCompat.requestPermissions(this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_STORAGE_PERMISSION);
+        }
+    }
+
+    // Método para manejar el resultado de la solicitud de permisos
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permiso concedido
+                Toast.makeText(this, "Permiso de almacenamiento concedido", Toast.LENGTH_SHORT).show();
+                // Realiza la operación que requería el permiso
+            } else {
+                // Permiso denegado
+                Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

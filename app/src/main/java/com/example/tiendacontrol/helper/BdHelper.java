@@ -40,7 +40,7 @@ public class BdHelper extends SQLiteOpenHelper {
                 "valor INTEGER NOT NULL," +
                 "detalles TEXT NOT NULL," +
                 "cantidad INTEGER," +
-                "fecha_registro TEXT" +
+                "fecha_registro DATETIME"  +
                 ");");
     }
 
@@ -115,5 +115,34 @@ public class BdHelper extends SQLiteOpenHelper {
         db.close();
 
         return results;
+    }
+
+    public List<Items> getItemsByDates(String startDate, String endDate) {
+        List<Items> filteredItems = new ArrayList<>();
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        // Consulta SQL para obtener elementos dentro del rango de fechas
+        String query = "SELECT * FROM " + TABLE_VENTAS +
+                " WHERE date(fecha_registro) BETWEEN date(?) AND date(?)"; // Usa date() para comparar fechas
+
+        // Ejecutar la consulta con las fechas de inicio y fin como parámetros
+        Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Items result = new Items();
+                result.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
+                result.setValor(cursor.getDouble(cursor.getColumnIndex("valor")));
+                result.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
+                result.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
+                result.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
+                filteredItems.add(result);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return filteredItems;
     }
 }

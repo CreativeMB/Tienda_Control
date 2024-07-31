@@ -80,7 +80,7 @@ public class BaseDatosAdapter extends RecyclerView.Adapter<BaseDatosAdapter.Cont
     }
 
     // Método para formatear los valores numéricos con separador de miles
-    private String formatoNumerico(double valor) {
+    public String formatoNumerico(double valor) {
         DecimalFormatSymbols symbols = new DecimalFormatSymbols();
         symbols.setGroupingSeparator('.'); // Punto como separador de miles
         DecimalFormat df = new DecimalFormat("#,###", symbols);
