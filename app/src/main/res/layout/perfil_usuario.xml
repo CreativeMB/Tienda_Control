@@ -91,6 +91,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:elevation="6dp"
+                style="@style/Widget.AppTheme.Button"
                 android:text="Editar Perfil Empresa" />
 
         </LinearLayout>

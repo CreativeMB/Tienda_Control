@@ -1,21 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
-    <color name="color_fondo_menu">#2196F3</color>
-    <color name="color_texto_menu">#FFFFFF</color>
-    <style name="AppTheme.PopupMenu" parent="ThemeOverlay.AppCompat.Light">
-        <!-- Fondo del menú -->
-        <item name="android:background">@color/color_fondo_menu</item>
-        <!-- Color del texto del menú -->
+    <!-- Estilo personalizado para botones -->
+    <style name="Widget.AppTheme.Button" parent="Widget.Material3.Button">
+        <item name="android:background">@drawable/button_background</item>
         <item name="android:textColor">@color/black</item>
-        <!-- Alineación del menú dentro de la AppBarLayout -->
-        <item name="android:layout_gravity">bottom</item>
+        <item name="android:elevation">10dp</item>
+        <item name="android:padding">10dp</item>
+        <item name="android:minWidth">180dp</item>
+         <item name="android:textSize">20sp</item>
     </style>
-        <style name="BottomSheetDialogTheme_Top" parent="Theme.Design.Light.BottomSheetDialog">
-            <item name="bottomSheetStyle">@style/TopSheetStyle</item>
-        </style>
-        <style name="TopSheetStyle" parent="Widget.Design.BottomSheet.Modal">
-            <item name="android:layout_gravity">top</item>
-        </style>
 
 </resources>

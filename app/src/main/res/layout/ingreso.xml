@@ -100,6 +100,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:elevation="3dp"
+                style="@style/Widget.AppTheme.Button"
                 android:text="@string/btn_guarda" />
 
             <View
@@ -119,6 +120,7 @@
                     android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:elevation="3dp"
+                    style="@style/Widget.AppTheme.Button"
                     android:text="Guardar Predefinido" />
 
                 <Button
@@ -127,6 +129,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:elevation="6dp"
+                    style="@style/Widget.AppTheme.Button"
                     android:text="Eliminar Predefinido" />
             </LinearLayout>
 

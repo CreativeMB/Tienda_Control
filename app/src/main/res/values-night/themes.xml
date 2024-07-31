@@ -10,5 +10,6 @@
         <item name="colorOnPrimary">@color/colorOnPrimary</item>
         <item name="colorSecondary">@color/colorSecondary</item>
         <item name="colorOnSecondary">@color/colorOnSecondary</item>
+        <item name="buttonStyle">@style/Widget.AppTheme.Button</item>
     </style>
 </resources>

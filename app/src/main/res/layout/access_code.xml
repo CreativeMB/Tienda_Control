@@ -27,8 +27,10 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="código acceso"
+        android:textColorHint="@color/black"
         android:inputType="text"
         android:textSize="40sp"
+        android:textColor="@color/Buton"
         android:gravity="center"/>
     <Button
         android:id="@+id/buttonAccess"
@@ -36,6 +38,8 @@
         android:layout_height="wrap_content"
         android:text="Acceder"
         android:elevation="6dp"
+        android:layout_marginTop="16dp"
+        style="@style/Widget.AppTheme.Button"
         android:padding="16dp"/>
     <Button
         android:id="@+id/btnLogin"
@@ -43,6 +47,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="16dp"
+        style="@style/Widget.AppTheme.Button"
         android:elevation="6dp" />
 
 
