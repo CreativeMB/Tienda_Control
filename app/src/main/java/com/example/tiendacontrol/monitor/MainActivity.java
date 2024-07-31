@@ -308,7 +308,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 .setNegativeButton("No", (dialog, which) -> {
                     // Acción al cancelar
                 })
-                .setIcon(android.R.drawable.ic_dialog_alert)
+                .setIcon(R.drawable.baseline_delete_forever_24)
                 .show();
     }
     // Método para verificar si el permiso de escritura en almacenamiento externo está concedido
