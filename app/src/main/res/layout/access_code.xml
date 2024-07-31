@@ -27,7 +27,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="código acceso"
-        android:textColorHint="@color/black"
+        android:textColorHint="#262626"
         android:inputType="text"
         android:textSize="40sp"
         android:textColor="@color/Buton"

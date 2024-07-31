@@ -35,7 +35,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:hint="Ingrese un código"
-                android:textColorHint="@color/black"
+                android:textColorHint="#262626"
                 android:inputType="text"
                 android:textSize="30sp"
                 android:textColor="@color/Buton"
