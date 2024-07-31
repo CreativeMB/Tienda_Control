@@ -311,46 +311,46 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 .setIcon(R.drawable.baseline_delete_forever_24)
                 .show();
     }
-    // Método para verificar si el permiso de escritura en almacenamiento externo está concedido
-    private boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            return Environment.isExternalStorageManager();
-        } else {
-            return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED;
-        }
-    }
+//    // Método para verificar si el permiso de escritura en almacenamiento externo está concedido
+//    private boolean isStoragePermissionGranted() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            return Environment.isExternalStorageManager();
+//        } else {
+//            return ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                    == PackageManager.PERMISSION_GRANTED;
+//        }
+//    }
+//
+//    // Método para solicitar el permiso de escritura en almacenamiento externo
+//    private void requestStoragePermission() {
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+//            // Solicitar permiso MANAGE_EXTERNAL_STORAGE
+//            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
+//            intent.addCategory(Intent.CATEGORY_DEFAULT);
+//            intent.setData(Uri.parse("package:" + getPackageName()));
+//            startActivityForResult(intent, REQUEST_CODE_STORAGE_PERMISSION);
+//        } else {
+//            // Solicitar permiso WRITE_EXTERNAL_STORAGE
+//            ActivityCompat.requestPermissions(this,
+//                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+//                    REQUEST_CODE_STORAGE_PERMISSION);
+//        }
+//    }
 
-    // Método para solicitar el permiso de escritura en almacenamiento externo
-    private void requestStoragePermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Solicitar permiso MANAGE_EXTERNAL_STORAGE
-            Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-            intent.addCategory(Intent.CATEGORY_DEFAULT);
-            intent.setData(Uri.parse("package:" + getPackageName()));
-            startActivityForResult(intent, REQUEST_CODE_STORAGE_PERMISSION);
-        } else {
-            // Solicitar permiso WRITE_EXTERNAL_STORAGE
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    REQUEST_CODE_STORAGE_PERMISSION);
-        }
-    }
-
-    // Método para manejar el resultado de la solicitud de permisos
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permiso concedido
-                Toast.makeText(this, "Permiso de almacenamiento concedido", Toast.LENGTH_SHORT).show();
-                // Realiza la operación que requería el permiso
-            } else {
-                // Permiso denegado
-                Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
+//    // Método para manejar el resultado de la solicitud de permisos
+//    @Override
+//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+//
+//        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
+//            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+//                // Permiso concedido
+//                Toast.makeText(this, "Permiso de almacenamiento concedido", Toast.LENGTH_SHORT).show();
+//                // Realiza la operación que requería el permiso
+//            } else {
+//                // Permiso denegado
+//                Toast.makeText(this, "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+//    }
 }
