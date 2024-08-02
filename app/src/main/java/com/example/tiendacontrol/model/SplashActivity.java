@@ -10,6 +10,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.login.Login;
+import com.example.tiendacontrol.monitor.MainActivity;
 
 public class SplashActivity extends AppCompatActivity {
 

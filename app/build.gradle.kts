@@ -85,6 +85,8 @@ dependencies {
 
     // Material3 library (for Material You)
     implementation ("androidx.compose.material3:material3:1.1.0")
+
+    implementation ("androidx.fragment:fragment:1.4.0")
 }
 
 

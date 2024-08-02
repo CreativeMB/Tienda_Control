@@ -1,6 +1,8 @@
 package com.example.tiendacontrol.dialogFragment;
 
+import static androidx.core.app.ActivityCompat.startActivityForResult;
 import static com.example.tiendacontrol.monitor.MainActivity.REQUEST_CODE_STORAGE_PERMISSION;
+import static com.google.common.reflect.Reflection.getPackageName;
 
 import android.Manifest;
 import android.app.Dialog;
@@ -27,6 +29,7 @@ import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuItemImpl;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.tiendacontrol.R;
@@ -49,6 +52,9 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
     private MenuCustomAdapter menuAdapter; // Adaptador para los elementos del menú
     private List<MenuItemImpl> menuItems = new ArrayList<>(); // Lista de elementos del menú
     private BaseExporter baseExporter; // Exportador de base de datos
+    private FragmentActivity activity; // Variable para la Activity
+
+    private OnStoragePermissionResultListener storagePermissionResultListener; // Listener para permisos
 
     public interface MainActivityListener { // Interfaz para la comunicación
         void confirmarEliminarTodo();
@@ -64,11 +70,14 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         this.listener = listener;
     }
 
+    public void setStoragePermissionResultListener(OnStoragePermissionResultListener listener) {
+        this.storagePermissionResultListener = listener;
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.menu_dialog, container, false); // Inflar el diseño del fragmento
-
 
         menuListView = view.findViewById(R.id.menu_list); // Obtener la vista de la lista del menú
 
@@ -84,7 +93,6 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         menuAdapter = new MenuCustomAdapter(requireContext(), menuItems);
         menuListView.setAdapter(menuAdapter);
 
-
         // Manejar clics en los elementos del menú
         menuListView.setOnItemClickListener((parent, view1, position, id) -> {
             MenuItemImpl menuItem = menuItems.get(position); // Obtener el elemento del menú clicado
@@ -96,7 +104,6 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
 
         return view;
     }
-
 
     // Método para obtener los elementos del menú como una lista de MenuItemImpl
     private List<MenuItemImpl> getMenuItemsFromMenuBuilder(MenuBuilder menuBuilder) {
@@ -129,7 +136,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             Intent intent = new Intent(requireContext(), SetCode.class);
             startActivity(intent);
         } else if (id == R.id.FilBase) {
-            // Ir a la pantalla de configuración de código
+            // Ir a la pantalla de filtro por día, mes o año
             Intent intent = new Intent(requireContext(), FiltroDiaMesAno.class);
             startActivity(intent);
         } else if (id == R.id.nuevo_gasto) {
@@ -142,35 +149,59 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             Intent intent = new Intent(requireContext(), PerfilUsuario.class);
             startActivity(intent);
         } else if (id == R.id.exportar_exel) {
-            // Lógica para la opción "Exportar a Excel"
-            if (isStoragePermissionGranted()) {
-                // Suponiendo que ExcelExporter tenga un método estático
+            // Exportar a Excel
+            BaseExporter baseExporter = new BaseExporter(requireContext(), getActivity()); // Crea una instancia de BaseExporter
+            if (baseExporter.isStoragePermissionGranted()) {
                 ExcelExporter.exportToExcel(requireContext());
+            } else {
+                requestStoragePermission(granted -> {
+                    if (granted) {
+                        ExcelExporter.exportToExcel(requireContext());
+                    } else {
+                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
+
         } else if (id == R.id.exportar_db) {
-            // Lógica para la opción "Exportar Base de Datos"
-            if (isStoragePermissionGranted()) {
-                // Lógica para exportar la base de datos
-                BaseExporter baseExporter = new BaseExporter(requireContext());
+            // Exportar base de datos
+            BaseExporter baseExporter = new BaseExporter(requireContext(), getActivity()); // Crea una instancia de BaseExporter
+            // Comprueba si ya se concedió el permiso
+            if (baseExporter.isStoragePermissionGranted()) {
                 baseExporter.exportDatabase(BdHelper.DATABASE_NAME);
+            } else {
+                // Si no se tiene el permiso, solicita permiso
+              requestStoragePermission(granted -> {
+                    if (granted) {
+                        baseExporter.exportDatabase(BdHelper.DATABASE_NAME); // Ejecuta la exportación si se concede el permiso
+                    } else {
+                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
         } else if (id == R.id.importar_db) {
-            // Lógica para la opción "Importar Base de Datos"
-            if (isStoragePermissionGranted()) {
-                // Lógica para importar la base de datos
-                BaseExporter baseImporter = new BaseExporter(requireContext());
-                baseImporter.importDatabase(BdHelper.DATABASE_NAME);
+            // Exportar base de datos
+            BaseExporter baseExporter = new BaseExporter(requireContext(), getActivity()); // Crea una instancia de BaseExporter
+            // Comprueba si ya se concedió el permiso
+            if (baseExporter.isStoragePermissionGranted()) {
+                baseExporter.importDatabase(BdHelper.DATABASE_NAME);
+            } else {
+                // Si no se tiene el permiso, solicita permiso
+                requestStoragePermission(granted -> {
+                            if (granted) {
+            baseExporter.importDatabase(BdHelper.DATABASE_NAME);// Ejecuta la exportación si se concede el permiso
+                            } else {
+                                Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+                            }
+                });
             }
         } else if (id == R.id.salir) {
-            // Lógica para la opción "Salir"
+            // Salir de la aplicación
             dirigirAInicioSesion();
             requireActivity().finish(); // Cierra la actividad actual
-        } else if (id == R.id.borrardados)
-            if (isStoragePermissionGranted()) {
+        } else if (id == R.id.borrardados) {
                 showDeleteConfirmationDialog();
-            } else {
-                Log.d("MenuDialogFragment", "Permiso de almacenamiento no concedido");
-            }
+        }
     }
 
     // Método para mostrar el diálogo de confirmación de eliminación de base de datos
@@ -188,59 +219,6 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         }
     }
 
-    // Método para verificar y solicitar permisos de almacenamiento
-    private boolean isStoragePermissionGranted() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                return true; // Permiso concedido
-            } else {
-                // Solicitar permiso MANAGE_EXTERNAL_STORAGE
-                Intent intent = new Intent(Settings.ACTION_MANAGE_APP_ALL_FILES_ACCESS_PERMISSION);
-                intent.addCategory(Intent.CATEGORY_DEFAULT);
-                intent.setData(Uri.parse("package:" + requireContext().getPackageName()));
-                startActivityForResult(intent, REQUEST_CODE_STORAGE_PERMISSION);
-                return false; // Permiso no concedido aún
-            }
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                return true; // Permiso concedido
-            } else {
-                ActivityCompat.requestPermissions(requireActivity(),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_CODE_STORAGE_PERMISSION);
-                return false; // Permiso no concedido aún
-            }
-        } else {
-            // Verifica si el permiso ya ha sido concedido
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.READ_EXTERNAL_STORAGE)
-                    == PackageManager.PERMISSION_GRANTED) {
-                return true; // Permiso concedido
-            } else {
-                // Si el permiso no ha sido concedido, solicítalo al usuario
-                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE},
-                        REQUEST_CODE_STORAGE_PERMISSION);
-                // El resultado de la solicitud se manejará en onRequestPermissionsResult()
-                return false; // Permiso no concedido aún
-            }
-        }
-    }
-
-    // Método para manejar el resultado de la solicitud de permisos
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (requestCode == REQUEST_CODE_STORAGE_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // Permiso concedido, realiza la operación que requiere el permiso
-                Toast.makeText(requireContext(), "Permiso de almacenamiento concedido", Toast.LENGTH_SHORT).show();
-                // Realiza la operación que requería el permiso
-            } else {
-                // Permiso denegado, muestra un mensaje o realiza alguna acción adicional
-                Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     // Método para dirigir al usuario a la pantalla de inicio de sesión
     private void dirigirAInicioSesion() {
         Intent intent = new Intent(requireContext(), Login.class);
@@ -248,5 +226,33 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         startActivity(intent);
         requireActivity().finishAffinity(); // Cierra todas las actividades en la pila de tareas
     }
-
+    // Método para solicitar permisos de almacenamiento
+    private void requestStoragePermission(OnStoragePermissionResultListener listener) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Android 11 y versiones posteriores - Solicitar permiso "MANAGE_EXTERNAL_STORAGE"
+            if (!Environment.isExternalStorageManager()) {
+                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
+                startActivity(intent); // Usar startActivity en lugar de startActivityForResult()
+            } else {
+                if (listener != null) {
+                    listener.onPermissionResult(true); // Permiso ya concedido
+                }
+            }
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            // Android 6.0 a Android 10 - Solicitar permiso "WRITE_EXTERNAL_STORAGE"
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) { // Usar requireContext()
+                ActivityCompat.requestPermissions(getActivity(),
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_CODE_STORAGE_PERMISSION);
+            } else {
+                if (listener != null) {
+                    listener.onPermissionResult(true); // Permiso ya concedido
+                }
+            }
+        }
+    }
+    // Interface para manejar el resultado del permiso de almacenamiento
+    public interface OnStoragePermissionResultListener {
+        void onPermissionResult(boolean granted);
+    }
 }
