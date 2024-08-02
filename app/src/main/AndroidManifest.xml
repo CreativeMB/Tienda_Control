@@ -14,18 +14,21 @@
         android:theme="@style/TiendaControl"
         tools:targetApi="31">
         <activity android:name=".model.Items" />
-        <activity android:name=".monitor.FiltroDiaMesAno" />
-        <activity android:name=".monitor.IngresoEgreso" />
-        <activity android:name=".login.PerfilUsuario" />
+        <activity android:name=".dialogFragment.EditarDialogFragment" />
+        <activity android:name=".dialogFragment.IngresoDialogFragment" />
         <activity android:name=".dialogFragment.GastoDialogFragment" />
+        <activity android:name=".dialogFragment.MenuDialogFragment" />
         <activity android:name=".monitor.VerActivity" />
-        <activity android:name=".login.Register" />
         <activity android:name=".monitor.EgresoTotal" />
         <activity android:name=".monitor.IngresoTotal" />
         <activity android:name=".monitor.SetCode"/>
         <activity android:name=".monitor.AccessCode"/>
-        <activity android:name=".login.Login" />
         <activity android:name=".monitor.MainActivity" />
+        <activity android:name=".monitor.FiltroDiaMesAno" />
+        <activity android:name=".monitor.IngresoEgreso" />
+        <activity android:name=".login.Login" />
+        <activity android:name=".login.Register" />
+        <activity android:name=".login.PerfilUsuario" />
         <activity
             android:name=".model.SplashActivity"
             android:exported="true">
