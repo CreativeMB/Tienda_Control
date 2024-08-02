@@ -226,6 +226,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         startActivity(intent);
         requireActivity().finishAffinity(); // Cierra todas las actividades en la pila de tareas
     }
+
     // Método para solicitar permisos de almacenamiento
     private void requestStoragePermission(OnStoragePermissionResultListener listener) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
