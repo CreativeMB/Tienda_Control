@@ -37,6 +37,7 @@ import java.util.Locale;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
+import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.model.Items;
 import com.example.tiendacontrol.login.PerfilUsuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -72,6 +73,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
+        // Verificar si el usuario ya ha iniciado sesión
+
+
         db = FirebaseFirestore.getInstance();
 
         // Referencias a vistas
@@ -191,6 +195,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             }
         });
     }
+
     //Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
     @Override
     public boolean onQueryTextSubmit(String query) {

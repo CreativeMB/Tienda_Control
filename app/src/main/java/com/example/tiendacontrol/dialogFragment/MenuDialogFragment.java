@@ -22,6 +22,8 @@ import android.view.ViewGroup;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -43,6 +45,7 @@ import com.example.tiendacontrol.monitor.FiltroDiaMesAno;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.monitor.SetCode;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -197,7 +200,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             }
         } else if (id == R.id.salir) {
             // Salir de la aplicación
-            dirigirAInicioSesion();
+            signOut();
             requireActivity().finish(); // Cierra la actividad actual
         } else if (id == R.id.borrardados) {
                 showDeleteConfirmationDialog();
@@ -218,22 +221,20 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             Log.e("MenuDialogFragment", "El listener de MainActivity es nulo");
         }
     }
-
-    // Método para dirigir al usuario a la pantalla de inicio de sesión
-    private void dirigirAInicioSesion() {
-        Intent intent = new Intent(requireContext(), Login.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
-        requireActivity().finishAffinity(); // Cierra todas las actividades en la pila de tareas
+    // Método para firmar al usuario
+    private void signOut() {
+        FirebaseAuth.getInstance().signOut(); // Cerrar sesión en Firebase
+        Intent intent = new Intent(requireContext(), Login.class); // Crear la intención para ir a la pantalla de inicio de sesión
+        startActivity(intent); // Iniciar la actividad de inicio de sesión
     }
-
     // Método para solicitar permisos de almacenamiento
     private void requestStoragePermission(OnStoragePermissionResultListener listener) {
+        this.storagePermissionResultListener = listener;
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Android 11 y versiones posteriores - Solicitar permiso "MANAGE_EXTERNAL_STORAGE"
             if (!Environment.isExternalStorageManager()) {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                startActivity(intent); // Usar startActivity en lugar de startActivityForResult()
+                manageAllFilesPermissionLauncher.launch(intent);
             } else {
                 if (listener != null) {
                     listener.onPermissionResult(true); // Permiso ya concedido
@@ -241,10 +242,8 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             }
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             // Android 6.0 a Android 10 - Solicitar permiso "WRITE_EXTERNAL_STORAGE"
-            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) { // Usar requireContext()
-                ActivityCompat.requestPermissions(getActivity(),
-                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                        REQUEST_CODE_STORAGE_PERMISSION);
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+                requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             } else {
                 if (listener != null) {
                     listener.onPermissionResult(true); // Permiso ya concedido
@@ -252,6 +251,51 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             }
         }
     }
+    // Declarar los lanzadores de resultados de actividad
+    private ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher;
+    private ActivityResultLauncher<String> requestWritePermissionLauncher;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        manageAllFilesPermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                        if (Environment.isExternalStorageManager()) {
+                            // Permiso concedido
+                            if (storagePermissionResultListener != null) {
+                                storagePermissionResultListener.onPermissionResult(true);
+                            }
+                        } else {
+                            // Permiso denegado
+                            if (storagePermissionResultListener != null) {
+                                storagePermissionResultListener.onPermissionResult(false);
+                            }
+                        }
+                    }
+                }
+        );
+
+        requestWritePermissionLauncher = registerForActivityResult(
+                new ActivityResultContracts.RequestPermission(),
+                isGranted -> {
+                    if (isGranted) {
+                        // Permiso concedido
+                        if (storagePermissionResultListener != null) {
+                            storagePermissionResultListener.onPermissionResult(true);
+                        }
+                    } else {
+                        // Permiso denegado
+                        if (storagePermissionResultListener != null) {
+                            storagePermissionResultListener.onPermissionResult(false);
+                        }
+                    }
+                }
+        );
+    }
+
     // Interface para manejar el resultado del permiso de almacenamiento
     public interface OnStoragePermissionResultListener {
         void onPermissionResult(boolean granted);
