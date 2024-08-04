@@ -29,11 +29,6 @@
         android:title="@string/once"
         app:showAsAction="never" />
     <item
-        android:id="@+id/perfil_usuario"
-        android:orderInCategory="100"
-        android:title="@string/quinto"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/exportar_exel"
         android:orderInCategory="100"
         android:title="@string/octavo"

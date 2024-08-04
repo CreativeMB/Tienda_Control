@@ -147,10 +147,6 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             FragmentManager fragmentManager = getParentFragmentManager();
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(fragmentManager, "GastoDialogFragment");
-        } else if (id == R.id.perfil_usuario) {
-            // Ir a la pantalla de perfil de usuario
-            Intent intent = new Intent(requireContext(), PerfilUsuario.class);
-            startActivity(intent);
         } else if (id == R.id.exportar_exel) {
             // Exportar a Excel
             BaseExporter baseExporter = new BaseExporter(requireContext(), getActivity()); // Crea una instancia de BaseExporter
