@@ -161,7 +161,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         } else {
             // Oculta el ImageView si el usuario no está autenticado
             imageViewProfile.setVisibility(View.GONE);
-            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "No autenticado Estas en modo local", Toast.LENGTH_LONG).show();
         }
         imageViewProfile.setOnClickListener(new View.OnClickListener() {
             @Override

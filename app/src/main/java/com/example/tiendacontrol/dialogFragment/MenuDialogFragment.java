@@ -59,6 +59,34 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
 
     private OnStoragePermissionResultListener storagePermissionResultListener; // Listener para permisos
 
+    private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            result -> {
+                // Aquí manejarías el resultado de la solicitud de permisos MANAGE_EXTERNAL_STORAGE
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                    if (Environment.isExternalStorageManager()) {
+                        if (storagePermissionResultListener != null) {
+                            storagePermissionResultListener.onPermissionResult(true);
+                        }
+                    } else {
+                        if (storagePermissionResultListener != null) {
+                            storagePermissionResultListener.onPermissionResult(false);
+                        }
+                    }
+                }
+            }
+    );
+
+    private final ActivityResultLauncher<String> requestWritePermissionLauncher = registerForActivityResult(
+            new ActivityResultContracts.RequestPermission(),
+            granted -> {
+                // Aquí manejarías el resultado de la solicitud de permisos WRITE_EXTERNAL_STORAGE
+                if (storagePermissionResultListener != null) {
+                    storagePermissionResultListener.onPermissionResult(granted);
+                }
+            }
+    );
+
     public interface MainActivityListener { // Interfaz para la comunicación
         void confirmarEliminarTodo();
     }
@@ -106,6 +134,9 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         });
 
         return view;
+    }
+    public interface OnStoragePermissionResultListener {
+        void onPermissionResult(boolean granted);
     }
 
     // Método para obtener los elementos del menú como una lista de MenuItemImpl
@@ -246,54 +277,5 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
                 }
             }
         }
-    }
-    // Declarar los lanzadores de resultados de actividad
-    private ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher;
-    private ActivityResultLauncher<String> requestWritePermissionLauncher;
-
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-
-        manageAllFilesPermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.StartActivityForResult(),
-                result -> {
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                        if (Environment.isExternalStorageManager()) {
-                            // Permiso concedido
-                            if (storagePermissionResultListener != null) {
-                                storagePermissionResultListener.onPermissionResult(true);
-                            }
-                        } else {
-                            // Permiso denegado
-                            if (storagePermissionResultListener != null) {
-                                storagePermissionResultListener.onPermissionResult(false);
-                            }
-                        }
-                    }
-                }
-        );
-
-        requestWritePermissionLauncher = registerForActivityResult(
-                new ActivityResultContracts.RequestPermission(),
-                isGranted -> {
-                    if (isGranted) {
-                        // Permiso concedido
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(true);
-                        }
-                    } else {
-                        // Permiso denegado
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(false);
-                        }
-                    }
-                }
-        );
-    }
-
-    // Interface para manejar el resultado del permiso de almacenamiento
-    public interface OnStoragePermissionResultListener {
-        void onPermissionResult(boolean granted);
     }
 }
