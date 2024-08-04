@@ -2,9 +2,8 @@ package com.example.tiendacontrol.monitor;
 
 import android.app.DatePickerDialog;
 import android.os.Bundle;
-import android.view.View;
-import android.widget.Button;
-import android.widget.DatePicker;
+
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,14 +22,14 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
 
-public class FiltroDiaMesAno extends AppCompatActivity {
+import java.util.List;
+
+
+public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQueryTextListener {
     private FloatingActionButton fabMenu;
     private TextView textViewSelectedDateRange;
     private RecyclerView recyclerView;
@@ -39,6 +38,7 @@ public class FiltroDiaMesAno extends AppCompatActivity {
     private String startDate, endDate;
     private BdHelper bdHelper; // Instancia de BdHelper
     private TextView textViewPositiveSum, textViewNegativeSum, textViewDifference;
+    private SearchView txtBuscar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +56,11 @@ public class FiltroDiaMesAno extends AppCompatActivity {
         // Inicializar la base de datos
         bdHelper = new BdHelper(this);
 
+        // Inicializar SearchView
+        txtBuscar = findViewById(R.id.txtBuscar);
+        // Configurar el listener para el SearchView
+        txtBuscar.setOnQueryTextListener(this);
+
         // Inicializar el adaptador y el RecyclerView
         itemAdapter = new ItemAdapter(new ArrayList<>()); // Inicializa con una lista vacía
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -68,6 +73,18 @@ public class FiltroDiaMesAno extends AppCompatActivity {
         });
 
         selectStartDate();
+    }
+
+    @Override
+    public boolean onQueryTextSubmit(String query) {
+        return false;
+    }
+
+    @Override
+    public boolean onQueryTextChange(String newText) {
+        // Filtrar el RecyclerView según el texto de búsqueda
+        itemAdapter.getFilter().filter(newText);
+        return false;
     }
 
     private void selectStartDate() {

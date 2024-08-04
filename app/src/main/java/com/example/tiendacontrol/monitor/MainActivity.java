@@ -62,8 +62,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private FirebaseFirestore db;
     private String userId;
     private BdHelper bdHelper;
-    private BaseExporter baseExporter;
-    private BaseExporter baseInporter;
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
 
     @Override
@@ -80,7 +78,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
-        txtBuscar = findViewById(R.id.txtBuscar);
+
         listaVentas = findViewById(R.id.listaVentas);
         fabNuevo = findViewById(R.id.favNuevo);
         fabMenu = findViewById(R.id.fabMenu);
