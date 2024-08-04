@@ -149,24 +149,32 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         calcularSumaTotalVenta();
         calcularSumaTotalGasto();
 
+
         // Obtener el usuario actual de Firebase Authentication
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null) {
             userId = user.getUid();
-
             // Cargar la imagen de perfil del usuario
             loadProfileImage(userId);
+            // Muestra el ImageView si el usuario está autenticado
+            imageViewProfile.setVisibility(View.VISIBLE);
         } else {
+            // Oculta el ImageView si el usuario no está autenticado
+            imageViewProfile.setVisibility(View.GONE);
             Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
         }
         imageViewProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, PerfilUsuario.class);
-                startActivity(intent);
+                // Verifica si el usuario está autenticado antes de abrir la actividad
+                if (mAuth.getCurrentUser() != null) {
+                    Intent intent = new Intent(MainActivity.this, PerfilUsuario.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, "Debes estar autenticado para acceder a este perfil", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-
         // Configurar OnClickListener para abrir Negativo
         textGasto.setOnClickListener(new View.OnClickListener() {
             @Override

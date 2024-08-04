@@ -8,16 +8,16 @@
     <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="4dp"
+        android:layout_margin="10dp"
         android:padding="5dp"
         app:cardCornerRadius="8dp"
-        app:cardElevation="4dp">
+        app:cardElevation="10dp">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="10dp">
+            android:padding="5dp">
 
             <!-- Detalles y imagen -->
             <LinearLayout
@@ -45,7 +45,6 @@
                             android:layout_height="wrap_content"
                             android:text="@string/hint_Producto"
                             android:textSize="15sp"
-                            android:textColor="#000000"
                             android:textStyle="bold" />
 
                         <TextView
@@ -54,7 +53,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:paddingLeft="8dp"
-                            android:textColor="#000000"
                             android:textSize="15sp"
                             android:textStyle="bold" />
                     </LinearLayout>
@@ -70,8 +68,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="@string/hint_Detalles"
-                            android:textSize="15sp"
-                            android:textColor="#000000" />
+                            android:textSize="15sp" />
 
                         <TextView
                             android:id="@+id/viewDetalles"
@@ -79,7 +76,6 @@
                             android:layout_height="wrap_content"
                             android:layout_weight="1"
                             android:paddingLeft="8dp"
-                            android:textColor="#000000"
                             android:textSize="15sp" />
                     </LinearLayout>
                     <LinearLayout
@@ -90,8 +86,8 @@
                         <!-- Imagen -->
                         <ImageView
                             android:id="@+id/imageView"
-                            android:layout_width="70dp"
-                            android:layout_height="70dp"
+                            android:layout_width="60dp"
+                            android:layout_height="60dp"
                             android:layout_marginEnd="10dp"
                             android:src="@drawable/gastos"
                             tools:srcCompat="@drawable/gastos" />
@@ -121,9 +117,7 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/hint_Valor"
-                                        android:textSize="20sp"
-                                        android:textColor="#000000"
-                                        />
+                                        android:textSize="15sp" />
 
                                     <TextView
                                         android:id="@+id/viewValor"
@@ -131,8 +125,7 @@
                                         android:layout_height="wrap_content"
                                         android:layout_weight="1"
                                         android:paddingLeft="8dp"
-                                        android:textColor="#000000"
-                                        android:textSize="30sp"
+                                        android:textSize="20sp"
                                         android:textStyle="bold" />
                                 </LinearLayout>
 
@@ -157,16 +150,13 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:text="@string/hint_Cantidad"
-                                        android:textSize="15sp"
-                                        android:textColor="#000000"
-                                        />
+                                        android:textSize="15sp" />
 
                                     <TextView
                                         android:id="@+id/viewCantidad"
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:paddingLeft="8dp"
-                                        android:textColor="#000000"
                                         android:textSize="15sp" />
                                 </LinearLayout>
 
@@ -184,7 +174,6 @@
                                         android:layout_width="wrap_content"
                                         android:layout_height="wrap_content"
                                         android:layout_marginStart="10dp"
-                                        android:textColor="#000000"
                                         android:textSize="15sp" />
                                 </LinearLayout>
                             </LinearLayout>

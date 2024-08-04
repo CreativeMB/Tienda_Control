@@ -94,7 +94,7 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Total Egreso"
-                android:textColor="#BA1735"
+                android:textColor="@color/colorNegativo"
                 android:textSize="18sp" />
         </LinearLayout>
 
