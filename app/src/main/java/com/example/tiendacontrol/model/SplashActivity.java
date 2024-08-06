@@ -10,6 +10,7 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.tiendacontrol.R;
+import com.example.tiendacontrol.adapter.DatabaseManagerActivity;
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
@@ -59,7 +60,7 @@ public class SplashActivity extends AppCompatActivity {
             finish();
         } else {
             // Si hay un usuario logueado, redirigir a MainActivity
-            Intent intent = new Intent(SplashActivity.this, MainActivity.class);
+            Intent intent = new Intent(SplashActivity.this, DatabaseManagerActivity.class);
             startActivity(intent);
             finish();
 

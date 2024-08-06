@@ -4,12 +4,14 @@ import static androidx.core.content.ContentProviderCompat.requireContext;
 import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
@@ -27,12 +29,15 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.example.tiendacontrol.adapter.DatabaseManagerActivity;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BaseExporter;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.BdVentas;
 import java.text.NumberFormat;
+import java.util.List;
 import java.util.Locale;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.BaseDatosAdapter;
@@ -48,9 +53,14 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, MenuDialogFragment.MainActivityListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, MenuDialogFragment.MainActivityListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener {
     // Declaración de variables
+    private static final String PREFS_NAME = "TiendaControlPrefs";
+    private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     public static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
+
+    private SharedPreferences sharedPreferences;
+
     private SearchView txtBuscar;
     private RecyclerView listaVentas;
     private ArrayList<Items> listaArrayVentas;
@@ -63,7 +73,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private String userId;
     private BdHelper bdHelper;
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
-
+    private String currentDatabase; // Variable para almacenar el nombre de la base de datos
+    private boolean userLoggedIn; // Flag para indicar si el usuario está autenticado
+    private BdVentas bdVentas; // Declaración de la variable BdVentas
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -71,14 +83,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
-        // Verificar si el usuario ya ha iniciado sesión
-
-
         db = FirebaseFirestore.getInstance();
+        // Inicializar SharedPreferences (dentro del método onCreate)
+        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        currentDatabase = getCurrentDatabaseName();
+// 1. Obtén el nombre de la base de datos actual de SharedPreferences
+        currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, null);
 
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
-
         listaVentas = findViewById(R.id.listaVentas);
         fabNuevo = findViewById(R.id.favNuevo);
         fabMenu = findViewById(R.id.fabMenu);
@@ -86,36 +99,48 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textVenta = findViewById(R.id.textVenta);
         textGanacia = findViewById(R.id.textGanacia);
         textGasto = findViewById(R.id.textGasto);
+        txtBuscar = findViewById(R.id.txtBuscar);
 
         // Configuración del RecyclerView
         listaVentas.setLayoutManager(new LinearLayoutManager(this));
+
+        // Inicializar el adaptador AQUÍ, solo una vez
+        listaArrayVentas = new ArrayList<>();
+        adapter = new BaseDatosAdapter(listaArrayVentas); // Pasar la lista vacía al adaptador
+        listaVentas.setAdapter(adapter);
+
+        // Crea una instancia de BdHelper (solo una vez)
+        bdHelper = new BdHelper(this, currentDatabase);
+        bdVentas = new BdVentas(this, currentDatabase);
+
+        // Obtén el nombre de la base de datos desde bdHelper
+        String databaseName = bdHelper.getDatabaseName(); // <-- Añade esta línea
+
+        // Crea una instancia de BdVentas utilizando el nombre de la base de datos
+        bdVentas = new BdVentas(this, databaseName); // <-- Pasa 'databaseName'
+
         BaseExporter exporter = new BaseExporter(this, this);
 
         // Inicializar SearchView
-        txtBuscar = findViewById(R.id.txtBuscar);
-
-        // Configurar el listener para el SearchView
         txtBuscar.setOnQueryTextListener(this);
 
-        // Inicialización de la base de datos y el adaptador
-        BdVentas bdVentas = new BdVentas(MainActivity.this);
-        listaArrayVentas = new ArrayList<>(bdVentas.mostrarVentas());
-        adapter = new BaseDatosAdapter(bdVentas.mostrarVentas());
-        listaVentas.setAdapter(adapter);
-
-
-        // Inicializar el BdHelper
-        bdHelper = new BdHelper(this);
+        // Cargar la imagen de perfil del usuario si ya está autenticado
+        cargarimperfil();
 
         // Configuración de los botones flotantes
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
-            dialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
+            // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
+            GastoDialogFragment gastoDialogFragment = GastoDialogFragment.newInstance(currentDatabase);
+            gastoDialogFragment.setDataChangedListener(this); // Ahora debería funcionar sin errores
+            gastoDialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
         });
 
         fabNuevo.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
-            IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance();
+            // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
+            IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase);
+            ingresoDialogFragment.setDataChangedListener( this); // Asegúrate de esta línea
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
 
@@ -125,6 +150,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             menuDialogFragment.setListener(this);
             menuDialogFragment.show(fragmentManager, "MenuDialogFragment");
         });
+
 
         // Inicializa el lanzador para la solicitud de permisos
         requestStoragePermissionLauncher = registerForActivityResult(
@@ -142,25 +168,35 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 }
         );
 
-        // Calcular y mostrar las sumas iniciales
-        calcularSumaGanancias();
-        calcularSumaTotalVenta();
-        calcularSumaTotalGasto();
 
+        // Configurar OnClickListener para abrir Negativo
+        textGasto.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, EgresoTotal.class);
+                startActivity(intent);
+            }
+        });
 
-        // Obtener el usuario actual de Firebase Authentication
-        FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            userId = user.getUid();
-            // Cargar la imagen de perfil del usuario
-            loadProfileImage(userId);
-            // Muestra el ImageView si el usuario está autenticado
-            imageViewProfile.setVisibility(View.VISIBLE);
-        } else {
-            // Oculta el ImageView si el usuario no está autenticado
-            imageViewProfile.setVisibility(View.GONE);
-            Toast.makeText(this, "No autenticado Estas en modo local", Toast.LENGTH_LONG).show();
-        }
+        // Configurar OnClickListener para abrir Positivo
+        textVenta.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, IngresoTotal.class);
+                startActivity(intent);
+            }
+        });
+
+        // Configurar OnClickListener para abrir Ganancia
+        textGanacia.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, IngresoEgreso.class);
+                startActivity(intent);
+            }
+        });
+
+        // Configurar OnClickListener para el ImageView de perfil
         imageViewProfile.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -173,41 +209,121 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 }
             }
         });
-        // Configurar OnClickListener para abrir Negativo
-        textGasto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, EgresoTotal.class);
-                startActivity(intent);
-            }
-        });
-
-// Configurar OnClickListener para abrir Positivo
-        textVenta.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, IngresoTotal.class);
-                startActivity(intent);
-            }
-        });
-
-
-// Configurar OnClickListener para abrir Ganancia
-        textGanacia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, IngresoEgreso.class);
-                startActivity(intent);
-            }
-        });
+        onDataChanged();
     }
 
-    //Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
+    public void onDataChanged() {
+        if (adapter != null) {
+            listaArrayVentas.clear();
+            listaArrayVentas.addAll(bdVentas.mostrarVentas());
+            // ¡Aquí debes llamar al método de ordenación!
+            adapter.ordenarPorFecha();
+
+            adapter.notifyDataSetChanged(); // Notifica al adaptador sobre el cambio
+            Log.d("MainActivity", "RecyclerView actualizado, tamaño de la lista: " + listaArrayVentas.size());
+            calcularSumaGanancias();
+            calcularSumaTotalVenta();
+            calcularSumaTotalGasto();
+        }
+    }
+
+    private void cargarimperfil() {
+
+        if (userLoggedIn) {
+            FirebaseUser user = mAuth.getCurrentUser();
+            if (user != null) {
+                userId = user.getUid();
+                loadProfileImage(userId);
+                imageViewProfile.setVisibility(View.VISIBLE);
+            }
+        } else {
+            imageViewProfile.setVisibility(View.GONE);
+        }
+    }
+    @Override
+    protected void onStart() {
+
+        super.onStart();
+               FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            userLoggedIn = true;
+            // Ya hay un usuario autenticado, actualiza el estado y la imagen de perfil
+            userId = user.getUid();
+            loadProfileImage(userId);
+            imageViewProfile.setVisibility(View.VISIBLE);
+            Toast.makeText(this, "Autenticado", Toast.LENGTH_LONG).show();
+        } else {
+            // No hay un usuario autenticado, muestra el mensaje "No autenticado"
+            userLoggedIn = false;
+            imageViewProfile.setVisibility(View.GONE);
+            Toast.makeText(this, "No autenticado", Toast.LENGTH_LONG).show();
+        }
+    }
+    // Método para obtener el nombre de la base de datos desde SharedPreferences
+    private String getCurrentDatabaseName() {
+        return sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
+    }
+    // Método para actualizar la base de datos actual
+    private void setCurrentDatabaseName(String dbName) {
+        currentDatabase = dbName;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_CURRENT_DATABASE, currentDatabase);
+        editor.apply();
+    }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        // Actualizar el Intent actual
+        setIntent(intent);
+        // 1. Obtener el nombre de la nueva base de datos (si existe)
+        String newDatabase = intent.getStringExtra("databaseName");
+
+        // 2. Verificar si la base de datos ha cambiado
+        if (newDatabase != null && !newDatabase.equals(currentDatabase)) {
+
+            // 3. Actualizar el nombre de la base de datos actual
+            setCurrentDatabaseName(newDatabase);
+
+            // 4. Cerrar la conexión con la base de datos anterior (si existe)
+            if (bdHelper != null) {
+                bdHelper.close();
+            }
+
+            // 5. Inicializar bdHelper y bdVentas con la nueva base de datos
+            bdHelper = new BdHelper(this, currentDatabase);
+            bdVentas = new BdVentas(this, currentDatabase);
+
+            // 6. Actualizar el adaptador y la UI
+            onDataChanged();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        // Inicializar bdHelper y bdVentas con el nombre de la base de datos correcto
+        bdHelper = new BdHelper(this, currentDatabase);
+        bdVentas = new BdVentas(this, currentDatabase);
+
+        // Inicializar el adaptador AQUÍ, solo si aún no está inicializado
+        if (adapter == null) {
+            listaArrayVentas = new ArrayList<>();
+            adapter = new BaseDatosAdapter(listaArrayVentas);
+            listaVentas.setAdapter(adapter);
+        }
+
+        // Cargar los datos
+        onDataChanged();
+    }
+
+    // Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
     }
-    //Este método se llama cada vez que el texto en el campo de búsqueda cambia.
+
+    // Este método se llama cada vez que el texto en el campo de búsqueda cambia.
     @Override
     public boolean onQueryTextChange(String newText) {
         // Filtrar el RecyclerView según el texto de búsqueda
@@ -240,9 +356,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     // Método para calcular y mostrar la suma de ganancias sin decimales
     private void calcularSumaGanancias() {
         double suma = 0.0;
+        Log.d("MainActivity", "calcularSumaGanancias ");
         for (Items venta : listaArrayVentas) {
             double valorVenta = venta.getValorAsDouble();
             suma += valorVenta;
+
         }
 
         // Redondear suma a valor entero
@@ -300,26 +418,66 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         textGasto.setText(sumaFormateadaStr);
     }
+
     // Método para confirmar la eliminación de la base de datos
     public void confirmarEliminarTodo() {
-        // Crear y mostrar el diálogo
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar base de datos")
                 .setMessage("¿Estás seguro de que deseas eliminar toda la base de datos?")
                 .setPositiveButton("Sí", (dialog, which) -> {
-                    BdVentas bdVentas = new BdVentas(this); // Crear instancia de BdVentas
-                    boolean resultado = bdVentas.eliminarTodo(); // Llamar al método para eliminar datos
+                    // Usa la instancia 'bdVentas' existente en la actividad
+                    boolean resultado = bdVentas.eliminarTodo();
                     if (resultado) {
                         Toast.makeText(this, "Base de datos eliminada", Toast.LENGTH_SHORT).show();
+
+                        // 1. Limpia la lista del adaptador
+                        listaArrayVentas.clear();
+
+                        // 2. Notifica al adaptador que los datos han cambiado
+                        adapter.notifyDataSetChanged();
+
+                        // 3. Actualiza la UI
+                        onDataChanged();
+
+                        // 4. Opcional: Reinicia la actividad para una actualización completa
+                        // Intent intent = getIntent();
+                        // finish();
+                        // startActivity(intent);
                     } else {
                         Toast.makeText(this, "Error al eliminar la base de datos", Toast.LENGTH_SHORT).show();
                     }
-
                 })
-                .setNegativeButton("No", (dialog, which) -> {
-                    // Acción al cancelar
-                })
+                .setNegativeButton("No", null)
                 .setIcon(R.drawable.baseline_delete_forever_24)
                 .show();
     }
+
+    @Override
+    protected void onDestroy() {
+        if (bdHelper != null) {
+            bdHelper.close(); // Cierra la base de datos
+            bdHelper = null; // Establece bdHelper a null
+        }
+        super.onDestroy();
+    }
+//
+//    public void onLogout() {
+//        // Cierra sesión del usuario de Firebase
+//        mAuth.signOut();
+//        // Actualiza el estado de usuario en SharedPreferences
+//        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+//        SharedPreferences.Editor editor = sharedPreferences.edit();
+//        editor.putBoolean(KEY_USER_LOGGED_IN, false);
+//        editor.apply();
+//        // Redirige al usuario a la pantalla de inicio de sesión
+//        Intent intent = new Intent(this, Login.class);
+//        startActivity(intent);
+//        finish();
+////    }
+//
+//    public void onSelectDatabase() {
+//        // Inicia la actividad de gestión de bases de datos
+//        Intent intent = new Intent(this, DatabaseManagerActivity.class);
+//        startActivity(intent);
+//    }
 }

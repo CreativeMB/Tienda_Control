@@ -6,6 +6,7 @@
         android:orderInCategory="100"
         android:title="@string/decimo"
         app:showAsAction="never" />
+
     <item
         android:id="@+id/nueva_venta"
         android:orderInCategory="100"
@@ -44,13 +45,18 @@
         android:title="@string/Septimo"
         app:showAsAction="never" />
     <item
+        android:id="@+id/basedatos"
+        android:orderInCategory="100"
+        android:title="@string/quinto"
+        app:showAsAction="never" />
+    <item
         android:id="@+id/borrardados"
         android:orderInCategory="100"
         android:title="@string/catorce"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/salir"
+        android:id="@+id/cerrar_sesion"
         android:orderInCategory="100"
         android:title="@string/cuatro"
         app:showAsAction="never" />

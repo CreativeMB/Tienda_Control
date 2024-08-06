@@ -21,18 +21,19 @@ import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class EditarDialogFragment extends DialogFragment {
-    // Definición de variables de vista
     EditText txtProducto, txtValor, txtDetalles, txtCantidad;
     FloatingActionButton fabEditar, fabEliminar, fabMenu;
     Button btnGuarda;
     boolean correcto = false;
     Items venta;
     int id = 0;
+    String currentDatabase;
 
-    public static EditarDialogFragment newInstance(int id) {
+    public static EditarDialogFragment newInstance(int id, String currentDatabase) {
         EditarDialogFragment fragment = new EditarDialogFragment();
         Bundle args = new Bundle();
         args.putInt("ID", id);
+        args.putString("databaseName", currentDatabase);
         fragment.setArguments(args);
         return fragment;
     }
@@ -58,9 +59,10 @@ public class EditarDialogFragment extends DialogFragment {
 
         if (getArguments() != null) {
             id = getArguments().getInt("ID");
+            currentDatabase = getArguments().getString("databaseName");
         }
 
-        final BdVentas bdVentas = new BdVentas(requireContext());
+        final BdVentas bdVentas = new BdVentas(requireContext(), currentDatabase);
         venta = bdVentas.verVenta(id);
 
         if (venta != null) {
@@ -68,7 +70,7 @@ public class EditarDialogFragment extends DialogFragment {
             double valor = venta.getValor();
             txtValor.setText(String.valueOf(valor));
             txtDetalles.setText(venta.getDetalles());
-            txtCantidad.setText(String.valueOf(venta.getCantidad())); // Convertir int a String
+            txtCantidad.setText(String.valueOf(venta.getCantidad()));
         }
 
         txtValor.addTextChangedListener(new TextWatcher() {
@@ -76,12 +78,10 @@ public class EditarDialogFragment extends DialogFragment {
 
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                // No se necesita implementar este método
             }
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                // No se necesita implementar este método
             }
 
             @Override
@@ -94,11 +94,9 @@ public class EditarDialogFragment extends DialogFragment {
 
                 String str = s.toString();
                 if (!str.startsWith("-") && venta.getValor() < 0) {
-                    // Si el valor debería ser negativo pero el usuario ha eliminado el signo, mostrar un mensaje
                     Toast.makeText(requireContext(), "El valor debe ser negativo", Toast.LENGTH_SHORT).show();
                     Log.d("EditarDialogFragment", "El valor debe ser negativo");
 
-                    // Restaurar el signo negativo
                     str = "-" + str.replace("-", "");
                     txtValor.setText(str);
                     txtValor.setSelection(txtValor.getText().length());
@@ -108,44 +106,40 @@ public class EditarDialogFragment extends DialogFragment {
             }
         });
 
-        btnGuarda.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String producto = txtProducto.getText().toString().trim();
-                String valorStr = txtValor.getText().toString().trim();
-                String detalles = txtDetalles.getText().toString().trim();
-                String cantidadStr = txtCantidad.getText().toString().trim();
+        btnGuarda.setOnClickListener(view1 -> {
+            String producto = txtProducto.getText().toString().trim();
+            String valorStr = txtValor.getText().toString().trim();
+            String detalles = txtDetalles.getText().toString().trim();
+            String cantidadStr = txtCantidad.getText().toString().trim();
 
-                if (producto.isEmpty() || valorStr.isEmpty() || cantidadStr.isEmpty()) {
-                    Toast.makeText(requireContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
+            if (producto.isEmpty() || valorStr.isEmpty() || cantidadStr.isEmpty()) {
+                Toast.makeText(requireContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
+                return;
+            }
+
+            double valor;
+            int cantidad;
+
+            try {
+                valor = Double.parseDouble(valorStr);
+                if (venta.getValor() < 0 && valor > 0) {
+                    Toast.makeText(requireContext(), "El valor debe ser negativo", Toast.LENGTH_SHORT).show();
                     return;
                 }
+                cantidad = Integer.parseInt(cantidadStr);
 
-                double valor;
-                int cantidad;
+                double total = valor * cantidad;
 
-                try {
-                    valor = Double.parseDouble(valorStr);
-                    if (venta.getValor() < 0 && valor > 0) {
-                        Toast.makeText(requireContext(), "El valor debe ser negativo", Toast.LENGTH_SHORT).show();
-                        return;
-                    }
-                    cantidad = Integer.parseInt(cantidadStr);
+                correcto = bdVentas.editarVenta(id, producto, total, detalles, cantidad);
 
-                    double total = valor * cantidad;
-
-                    correcto = bdVentas.editarVenta(id, producto, total, detalles, cantidad);
-
-                    if (correcto) {
-                        Toast.makeText(requireContext(), "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();
-                        verRegistro();
-                        dismiss();
-                    } else {
-                        Toast.makeText(requireContext(), "ERROR AL MODIFICAR REGISTRO", Toast.LENGTH_LONG).show();
-                    }
-                } catch (NumberFormatException e) {
-                    Toast.makeText(requireContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_LONG).show();
+                if (correcto) {
+                    Toast.makeText(requireContext(), "REGISTRO MODIFICADO", Toast.LENGTH_LONG).show();
+                    verRegistro();
+                } else {
+                    Toast.makeText(requireContext(), "ERROR AL MODIFICAR REGISTRO", Toast.LENGTH_LONG).show();
                 }
+            } catch (NumberFormatException e) {
+                Toast.makeText(requireContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_LONG).show();
             }
         });
 
@@ -155,6 +149,8 @@ public class EditarDialogFragment extends DialogFragment {
     private void verRegistro() {
         Intent intent = new Intent(requireContext(), MainActivity.class);
         intent.putExtra("ID", id);
+        intent.putExtra("databaseName", currentDatabase); // Pasa el nombre de la base de datos actual
         startActivity(intent);
+        dismiss(); // Cerrar el diálogo después de volver a MainActivity
     }
 }

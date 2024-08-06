@@ -1,6 +1,8 @@
 package com.example.tiendacontrol.monitor;
 
 import android.app.DatePickerDialog;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.widget.SearchView;
@@ -39,6 +41,10 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     private BdHelper bdHelper; // Instancia de BdHelper
     private TextView textViewPositiveSum, textViewNegativeSum, textViewDifference;
     private SearchView txtBuscar;
+    private String currentDatabase; // Variable para almacenar el nombre de la base de datos
+    private static final String PREFS_NAME = "TiendaControlPrefs";
+    private static final String KEY_CURRENT_DATABASE = "currentDatabase";
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -54,7 +60,9 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         calendar = Calendar.getInstance();
 
         // Inicializar la base de datos
-        bdHelper = new BdHelper(this);
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "");
+        bdHelper = new BdHelper(this, currentDatabase);
 
         // Inicializar SearchView
         txtBuscar = findViewById(R.id.txtBuscar);

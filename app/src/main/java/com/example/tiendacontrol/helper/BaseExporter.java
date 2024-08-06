@@ -28,11 +28,11 @@ import java.io.IOException;
 public class BaseExporter {
     private static final String TAG = "BaseExporter";
     private Context context;
-    private Activity activity; // Agrega una variable para la Activity
+    private Activity activity;
 
-    public BaseExporter(Context context, Activity activity) { // Modifica el constructor
+    public BaseExporter(Context context, Activity activity) {
         this.context = context;
-        this.activity = activity; // Asigna la Activity
+        this.activity = activity;
     }
 
     public void exportDatabase(String dbFileName) {
@@ -118,7 +118,7 @@ public class BaseExporter {
             fos.flush();
         }
     }
-    // Metodo para verificar y solicitar permisos de almacenamiento
+
     public boolean isStoragePermissionGranted() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             // Android 11 y versiones posteriores - Verificar permiso "MANAGE_EXTERNAL_STORAGE"
@@ -129,6 +129,14 @@ public class BaseExporter {
         } else {
             // Versiones anteriores a Android 6.0
             return true;
+        }
+    }
+
+    public void requestStoragePermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            ActivityCompat.requestPermissions(activity,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_CODE_STORAGE_PERMISSION);
         }
     }
 }

@@ -1,5 +1,7 @@
 package com.example.tiendacontrol.monitor;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -19,15 +21,15 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class IngresoTotal extends AppCompatActivity {
-
-
-
+    private BdHelper bdHelper;
     private RecyclerView recyclerPositivos;
     private BaseDatosAdapter adapterPositivos;
     private ArrayList<Items> listaArrayVentas;
     private TextView textVenta;
     private FloatingActionButton fabMenu;
-
+    private String currentDatabase; // Variable para almacenar el nombre de la base de datos
+    private static final String PREFS_NAME = "TiendaControlPrefs";
+    private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -40,8 +42,13 @@ public class IngresoTotal extends AppCompatActivity {
         // Configurar el RecyclerView
         recyclerPositivos.setLayoutManager(new LinearLayoutManager(this));
 
+        // Inicializar la base de datos
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "");
+        bdHelper = new BdHelper(this, currentDatabase);
+
         // Obtener la lista original de ventas
-        listaArrayVentas = obtenerListaVentas();
+        listaArrayVentas = obtenerListaVentas(bdHelper);
 
         // Filtrar elementos positivos
         ArrayList<Items> listaPositivos = new ArrayList<>();
@@ -65,28 +72,14 @@ public class IngresoTotal extends AppCompatActivity {
         calcularSumaTotalVenta();
     }
 
-    private ArrayList<Items> obtenerListaVentas() {
+    private ArrayList<Items> obtenerListaVentas(BdHelper bdHelper) {
         ArrayList<Items> listaVentas = new ArrayList<>();
-        BdHelper bdHelper = new BdHelper(this);
-        SQLiteDatabase db = bdHelper.getReadableDatabase();
+        // Obtener la fecha de inicio y fin para la consulta (puedes ajustar esto según tus necesidades)
+        String startDate = "2024-01-01"; // Ejemplo de fecha de inicio
+        String endDate = "2024-12-31";   // Ejemplo de fecha de fin
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + BdHelper.TABLE_VENTAS, null);
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                Items venta = new Items();
-                venta.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                venta.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
-                venta.setValor(cursor.getDouble(cursor.getColumnIndex("valor"))); // Utilizar setValor con double
-                venta.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
-                venta.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
-                venta.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
-
-                listaVentas.add(venta);
-            }
-            cursor.close();
-        }
-        db.close();
+        // Obtener los resultados filtrados por fechas
+        listaVentas = (ArrayList<Items>) bdHelper.getItemsByDates(startDate, endDate);
 
         return listaVentas;
     }
@@ -110,5 +103,4 @@ public class IngresoTotal extends AppCompatActivity {
 
         textVenta.setText(sumaFormateadaStr);
     }
-
 }

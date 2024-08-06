@@ -1,5 +1,8 @@
 package com.example.tiendacontrol.monitor;
 
+import android.content.Context;
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
@@ -19,17 +22,22 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class EgresoTotal extends AppCompatActivity {
+    private BdHelper bdHelper;
     private RecyclerView recyclerNegativos;
     private BaseDatosAdapter adapterNegativos;
     private ArrayList<Items> listaArrayVentas;
     private TextView textGasto;
     private FloatingActionButton fabMenu;
+    private String currentDatabase; // Variable para almacenar el nombre de la base de datos
+    private static final String PREFS_NAME = "TiendaControlPrefs";
+    private static final String KEY_CURRENT_DATABASE = "currentDatabase";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.egreso_total);
+        setContentView(R.layout.egreso_total); // Asegúrate de que el nombre del layout sea correcto
 
+        // Inicializar vistas
         recyclerNegativos = findViewById(R.id.recyclerNegativos);
         textGasto = findViewById(R.id.textNegativo);
         fabMenu = findViewById(R.id.fabMenu);
@@ -37,8 +45,13 @@ public class EgresoTotal extends AppCompatActivity {
         // Configurar el RecyclerView
         recyclerNegativos.setLayoutManager(new LinearLayoutManager(this));
 
+        // Inicializar la base de datos
+        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "");
+        bdHelper = new BdHelper(this, currentDatabase);
+
         // Obtener la lista original de ventas
-        listaArrayVentas = obtenerListaVentas();
+        listaArrayVentas = obtenerListaVentas(bdHelper);
 
         // Filtrar elementos negativos
         ArrayList<Items> listaNegativos = new ArrayList<>();
@@ -52,6 +65,7 @@ public class EgresoTotal extends AppCompatActivity {
         adapterNegativos = new BaseDatosAdapter(listaNegativos);
         recyclerNegativos.setAdapter(adapterNegativos);
 
+        // Configurar el botón de menú
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
@@ -62,28 +76,14 @@ public class EgresoTotal extends AppCompatActivity {
         calcularSumaTotalGasto();
     }
 
-    private ArrayList<Items> obtenerListaVentas() {
+    private ArrayList<Items> obtenerListaVentas(BdHelper bdHelper) {
         ArrayList<Items> listaVentas = new ArrayList<>();
-        BdHelper bdHelper = new BdHelper(this);
-        SQLiteDatabase db = bdHelper.getReadableDatabase();
+        // Obtener la fecha de inicio y fin para la consulta (puedes ajustar esto según tus necesidades)
+        String startDate = "2024-01-01"; // Ejemplo de fecha de inicio
+        String endDate = "2024-12-31";   // Ejemplo de fecha de fin
 
-        Cursor cursor = db.rawQuery("SELECT * FROM " + BdHelper.TABLE_VENTAS, null);
-
-        if (cursor != null) {
-            while (cursor.moveToNext()) {
-                Items venta = new Items();
-                venta.setId(cursor.getInt(cursor.getColumnIndex("id")));
-                venta.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
-                venta.setValor(cursor.getDouble(cursor.getColumnIndex("valor"))); // Utilizar setValor con double
-                venta.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
-                venta.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
-                venta.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
-
-                listaVentas.add(venta);
-            }
-            cursor.close();
-        }
-        db.close();
+        // Obtener los resultados filtrados por fechas
+        listaVentas = (ArrayList<Items>) bdHelper.getItemsByDates(startDate, endDate);
 
         return listaVentas;
     }
@@ -97,10 +97,10 @@ public class EgresoTotal extends AppCompatActivity {
             }
         }
 
-        // Asegurarse de que suma sea positiva
+        // Asegurarse de que la suma sea positiva
         suma = Math.abs(suma);
 
-        // Redondear suma a valor entero
+        // Redondear la suma a valor entero
         long sumaEntera = Math.round(suma);
 
         // Formatear la suma como moneda colombiana sin decimales
@@ -108,6 +108,7 @@ public class EgresoTotal extends AppCompatActivity {
         // Eliminar decimales si hay .00
         sumaFormateadaStr = sumaFormateadaStr.replaceAll("[,.]00$", "");
 
+        // Establecer el texto en el TextView
         textGasto.setText(sumaFormateadaStr);
     }
 }

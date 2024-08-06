@@ -29,11 +29,11 @@
     <string name="dos">Ingreso</string>
     <string name="tres">Egreso</string>
     <string name="cuatro">Cerrar Sesión</string>
-    <string name="quinto">Perfil Usuario</string>
+    <string name="quinto">Mis Bases Datos</string>
     <string name="sexto">Tienda Control</string>
     <string name="Septimo">Importar Datos</string>
     <string name="octavo">Exportar Exel</string>
-    <string name="decimo">Inicio</string>
+    <string name="decimo">Atras</string>
     <string name="once">Codigo Acceso</string>
     <string name="doce">Buscar</string>
     <string name="trece">Contabilidad</string>

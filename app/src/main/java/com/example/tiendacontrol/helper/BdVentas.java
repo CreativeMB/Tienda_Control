@@ -5,6 +5,7 @@ import static android.app.PendingIntent.getActivity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
@@ -18,22 +19,24 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
-public class BdVentas extends BdHelper {
-    Context context;
-
-    public BdVentas(@Nullable Context context) {
-        super(context);
+public class BdVentas  {
+    private Context context;
+    private BdHelper bdHelper; // Instancia de BdHelper
+    private SQLiteDatabase database;
+    public BdVentas(Context context, String databaseName) {
         this.context = context;
+        // Inicializa bdHelper solo una vez
+        if (bdHelper == null) {
+            bdHelper = new BdHelper(context, databaseName);
+        }
     }
-
     // Método para insertar una venta en la base de datos
     public long insertarVenta(String producto, double total, String detalles, int cantidad) {
         long id = 0;
-
+        SQLiteDatabase db = null;
         try {
-            // Crear una instancia de BdHelper y obtener una base de datos de escritura
-            BdHelper dbHelper = new BdHelper(context);
-            SQLiteDatabase db = dbHelper.getWritableDatabase();
+            // Obtener una base de datos de escritura
+            db = bdHelper.getWritableDatabase();
 
             // Crear un ContentValues para almacenar los datos de la venta
             ContentValues values = new ContentValues();
@@ -44,94 +47,128 @@ public class BdVentas extends BdHelper {
             values.put("fecha_registro", obtenerFechaActual()); // Obtener la fecha actual
 
             // Insertar los datos en la tabla y obtener el ID de la fila insertada
-            id = db.insert(TABLE_VENTAS, null, values);
+            id = db.insert(BdHelper.TABLE_VENTAS, null, values);
         } catch (Exception ex) {
             ex.printStackTrace(); // Imprimir el error si ocurre una excepción
+        } finally {
+            if (db != null && db.isOpen()) {
+                db.close(); // Cerrar la base de datos
+            }
         }
-
         return id; // Retornar el ID de la fila insertada
     }
 
     // Método para mostrar todas las ventas de la base de datos
     public ArrayList<Items> mostrarVentas() {
-        BdHelper dbHelper = new BdHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         ArrayList<Items> listaVentas = new ArrayList<>();
-        Items venta;
-        Cursor cursorVentas;
+        SQLiteDatabase db = null;
+        Cursor cursorVentas = null;
 
-        // Consultar todas las ventas y ordenarlas por el nombre del producto en orden ascendente
-        cursorVentas = db.rawQuery("SELECT * FROM " + TABLE_VENTAS + " ORDER BY producto ASC", null);
+        try {
+            db = bdHelper.getReadableDatabase();
+            Log.d("Database", "Abriendo base de datos: " + db.getPath());
 
-        if (cursorVentas.moveToFirst()) {
-            do {
-                venta = new Items();
-                // Obtener los datos de la venta desde el cursor
-                venta.setId(cursorVentas.getInt(0));
-                venta.setProducto(cursorVentas.getString(1));
-                venta.setValor(cursorVentas.getDouble(2)); // Cambiar a double
-                venta.setDetalles(cursorVentas.getString(3));
-                venta.setCantidad(cursorVentas.getInt(4)); // Cambiar a int
-                venta.setFechaRegistro(cursorVentas.getString(5));
-                // Añadir la venta a la lista
-                listaVentas.add(venta);
-            } while (cursorVentas.moveToNext());
+            cursorVentas = db.rawQuery("SELECT * FROM " + BdHelper.TABLE_VENTAS + " ORDER BY producto ASC", null);
+
+            if (cursorVentas.moveToFirst()) {
+                do {
+                    Items venta = new Items();
+                    venta.setId(cursorVentas.getInt(0));
+                    venta.setProducto(cursorVentas.getString(1));
+                    venta.setValor(cursorVentas.getDouble(2));
+                    venta.setDetalles(cursorVentas.getString(3));
+                    venta.setCantidad(cursorVentas.getInt(4));
+                    venta.setFechaRegistro(cursorVentas.getString(5));
+                    listaVentas.add(venta);
+                } while (cursorVentas.moveToNext());
+            } else {
+                Log.d("Database", "La base de datos está vacía");
+                listaVentas = new ArrayList<>();
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        } finally {
+            if (cursorVentas != null) {
+                cursorVentas.close();
+            }
+            if (db != null && db.isOpen()) {
+                db.close();
+            }
         }
 
-        cursorVentas.close(); // Cerrar el cursor
-
-        return listaVentas; // Retornar la lista de ventas
+        return listaVentas;
     }
-
+    // Cierra la base de datos en el método close()
+    public void close() {
+        if (bdHelper != null) {
+            bdHelper.close();
+        }
+    }
     // Método para ver una venta específica por ID
     public Items verVenta(int id) {
-        BdHelper dbHelper = new BdHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
-
         Items venta = null;
-        Cursor cursorVentas;
+        SQLiteDatabase db = null;
+        Cursor cursorVentas = null;
 
-        // Consultar la venta con el ID específico
-        cursorVentas = db.rawQuery("SELECT * FROM " + TABLE_VENTAS + " WHERE id = " + id + " LIMIT 1", null);
+        try {
+            // Obtener una base de datos de lectura
+            db = bdHelper.getReadableDatabase();
 
-        if (cursorVentas.moveToFirst()) {
-            venta = new Items();
-            // Obtener los datos de la venta desde el cursor
-            venta.setId(cursorVentas.getInt(0));
-            venta.setProducto(cursorVentas.getString(1));
-            venta.setValor(cursorVentas.getDouble(2)); // Cambiar a double
-            venta.setDetalles(cursorVentas.getString(3));
-            venta.setCantidad(cursorVentas.getInt(4)); // Cambiar a int
+            // Consultar la venta con el ID específico
+            cursorVentas = db.rawQuery("SELECT * FROM " + BdHelper.TABLE_VENTAS + " WHERE id = ? LIMIT 1", new String[]{String.valueOf(id)});
+
+            // Verificar si el cursor contiene al menos un registro
+            if (cursorVentas.moveToFirst()) {
+                venta = new Items();
+                // Obtener los datos de la venta desde el cursor
+                venta.setId(cursorVentas.getInt(cursorVentas.getColumnIndex("id"))); // Usar el nombre de columna si es posible
+                venta.setProducto(cursorVentas.getString(cursorVentas.getColumnIndex("producto")));
+                venta.setValor(cursorVentas.getDouble(cursorVentas.getColumnIndex("valor")));
+                venta.setDetalles(cursorVentas.getString(cursorVentas.getColumnIndex("detalles")));
+                venta.setCantidad(cursorVentas.getInt(cursorVentas.getColumnIndex("cantidad")));
+                venta.setFechaRegistro(cursorVentas.getString(cursorVentas.getColumnIndex("fechaRegistro"))); // Verifica el nombre de columna
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace(); // Imprimir el error si ocurre una excepción
+        } finally {
+            if (cursorVentas != null) {
+                cursorVentas.close(); // Cerrar el cursor
+            }
+            if (db != null && db.isOpen()) {
+                db.close(); // Cerrar la base de datos
+            }
         }
-
-        cursorVentas.close(); // Cerrar el cursor
 
         return venta; // Retornar la venta
     }
 
     // Método para editar una venta existente
-    public boolean editarVenta(int id, String producto, double total, String detalles, int cantidad) {
+    public boolean editarVenta(int id, String producto, double valor, String detalles, int cantidad) {
         boolean correcto = false;
-        BdHelper bdHelper = new BdHelper(context);
-        SQLiteDatabase db = bdHelper.getWritableDatabase();
+        SQLiteDatabase db = null;
 
         try {
+            // Obtener una base de datos de escritura
+            db = bdHelper.getWritableDatabase();
+
             ContentValues values = new ContentValues();
             values.put("producto", producto);
-            values.put("valor", total); // Asegúrate de que esta columna puede manejar valores negativos
+            values.put("valor", valor); // Asegúrate de que esta columna puede manejar valores negativos
             values.put("detalles", detalles);
             values.put("cantidad", cantidad);
 
             // Actualizar la venta con el ID específico
-            int rowsAffected = db.update(TABLE_VENTAS, values, "id = ?", new String[]{String.valueOf(id)});
+            int rowsAffected = db.update(BdHelper.TABLE_VENTAS, values, "id = ?", new String[]{String.valueOf(id)});
             correcto = rowsAffected > 0; // Verificar si la actualización fue exitosa
 
-        } catch (Exception ex) {
-            ex.printStackTrace(); // Imprimir el error si ocurre una excepción
-            correcto = false;
+        } catch (SQLException e) {
+            e.printStackTrace(); // Imprimir el error si ocurre una excepción SQL
+        } catch (Exception e) {
+            e.printStackTrace(); // Imprimir el error si ocurre una excepción general
         } finally {
-            db.close(); // Cerrar la base de datos
+            if (db != null && db.isOpen()) {
+                db.close(); // Cerrar la base de datos
+            }
         }
 
         return correcto; // Retornar si la edición fue exitosa o no
@@ -140,19 +177,22 @@ public class BdVentas extends BdHelper {
     // Método para eliminar una venta existente
     public boolean eliminarVenta(int id) {
         boolean correcto = false;
-
-        BdHelper dbHelper = new BdHelper(context);
-        SQLiteDatabase db = dbHelper.getWritableDatabase();
+        SQLiteDatabase db = null;
 
         try {
+            // Obtener una base de datos de escritura
+            db = bdHelper.getWritableDatabase();
+
             // Eliminar la venta con el ID específico
-            int rowsAffected = db.delete(TABLE_VENTAS, "id = ?", new String[]{String.valueOf(id)});
+            int rowsAffected = db.delete(BdHelper.TABLE_VENTAS, "id = ?", new String[]{String.valueOf(id)});
             correcto = rowsAffected > 0; // Verificar si la eliminación fue exitosa
         } catch (Exception ex) {
             ex.printStackTrace(); // Imprimir el error si ocurre una excepción
             correcto = false;
         } finally {
-            db.close(); // Cerrar la base de datos
+            if (db != null && db.isOpen()) {
+                db.close(); // Cerrar la base de datos
+            }
         }
 
         return correcto; // Retornar si la eliminación fue exitosa o no
@@ -165,20 +205,13 @@ public class BdVentas extends BdHelper {
         return dateFormat.format(date);
     }
 
+    // Método para eliminar todas las filas de la tabla de ventas
     public boolean eliminarTodo() {
         SQLiteDatabase db = null;
         try {
-            db = this.getWritableDatabase();
-            if (db != null) {
-                // Eliminar todas las filas de las tablas
-                db.execSQL("DELETE FROM " + TABLE_VENTAS); // Cambia "TABLE_VENTAS" por el nombre de tu tabla
-                // Agrega otras tablas si es necesario
-                Log.d("BdVentas", "Todas las filas eliminadas de " + TABLE_VENTAS);
-                return true;
-            } else {
-                Log.d("BdVentas", "Base de datos no disponible.");
-                return false;
-            }
+            db = bdHelper.getWritableDatabase();
+            db.execSQL("DELETE FROM " + BdHelper.TABLE_VENTAS);
+            return true;
         } catch (Exception e) {
             Log.e("BdVentas", "Error al eliminar las filas", e);
             return false;

@@ -44,7 +44,7 @@ public class ExcelExporter {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            BdHelper dbHelper = new BdHelper(context);
+            BdHelper dbHelper = new BdHelper(context, "mi_base_de_datos.db");
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             // Consulta para obtener todos los datos de la tabla de ventas
@@ -84,30 +84,23 @@ public class ExcelExporter {
             String fileName = generateFileName();
 
             // Guardar el libro de Excel en la carpeta de descargas del dispositivo
-            try {
-                File dir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
-                if (!dir.exists()) {
-                    if (!dir.mkdirs()) {
-                        Log.e(TAG, "Error: No se pudo crear el directorio de destino para la exportación.");
-                        return false;
-                    }
-                }
+            File dir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+            if (dir != null && !dir.exists() && !dir.mkdirs()) {
+                Log.e(TAG, "Error: No se pudo crear el directorio de destino para la exportación.");
+                return false;
+            }
 
-                File file = new File(dir, fileName + ".xlsx");
-                FileOutputStream outputStream = new FileOutputStream(file);
+            try (FileOutputStream outputStream = new FileOutputStream(new File(dir, fileName + ".xlsx"))) {
                 workbook.write(outputStream); // Escribir el libro en el archivo
-                outputStream.close(); // Cerrar el flujo de salida
                 return true;
-
             } catch (IOException e) {
-                e.printStackTrace();
                 Log.e(TAG, "Error al exportar a Excel: " + e.getMessage());
                 return false;
             } finally {
                 try {
                     workbook.close(); // Cerrar el libro de Excel
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Log.e(TAG, "Error al cerrar el libro de Excel: " + e.getMessage());
                 }
             }
         }
@@ -129,5 +122,4 @@ public class ExcelExporter {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         return "Mi_contabilidad_" + timeStamp;
     }
-
 }

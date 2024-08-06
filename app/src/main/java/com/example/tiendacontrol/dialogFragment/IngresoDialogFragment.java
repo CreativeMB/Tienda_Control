@@ -29,10 +29,23 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
     Button btnGuarda, btnSavePredefined, btnClearCustom;
     Spinner spinnerPredefined;
     ItemManager itemManager;
+    String currentDatabase; // Variable para almacenar el nombre de la base de datos actual
 
+    public interface OnDataChangedListener {
+        void onDataChanged();
+    }
+    private OnDataChangedListener dataChangedListener;
+
+    public void setDataChangedListener(OnDataChangedListener listener) {
+        this.dataChangedListener = listener;
+    }
     // Constructor estático para crear una nueva instancia del fragmento
-    public static IngresoDialogFragment newInstance() {
-        return new IngresoDialogFragment();
+    public static IngresoDialogFragment newInstance(String currentDatabase) {
+        IngresoDialogFragment fragment = new IngresoDialogFragment();
+        Bundle args = new Bundle();
+        args.putString("databaseName", currentDatabase);
+        fragment.setArguments(args);
+        return fragment;
     }
 
     @Nullable
@@ -60,6 +73,11 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         // Limpiar los campos al iniciar el fragmento
         limpiar();
 
+        // Obtener el nombre de la base de datos actual desde los argumentos
+        if (getArguments() != null) {
+            currentDatabase = getArguments().getString("databaseName");
+        }
+
         // Configuración de los eventos para los botones
         btnGuarda.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -81,7 +99,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
                 clearCustomItems(); // Limpiar ítems personalizados
             }
         });
-                // Configuración del listener para el spinner
+        // Configuración del listener para el spinner
         spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -169,39 +187,40 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
 
     private void guardarRegistro() {
         // Obtener los datos de los campos
-        String producto = txtProducto.getText().toString();
-        String valorStr = txtValor.getText().toString();
-        String detalles = txtDetalles.getText().toString();
-        String cantidadStr = txtCantidad.getText().toString();
+        String producto = txtProducto.getText().toString().trim(); // Eliminar espacios en blanco
+        String valorStr = txtValor.getText().toString().trim();
+        String detalles = txtDetalles.getText().toString().trim();
+        String cantidadStr = txtCantidad.getText().toString().trim();
 
         // Verificar que todos los campos estén llenos
-        if (!producto.isEmpty() && !valorStr.isEmpty() && !detalles.isEmpty() && !cantidadStr.isEmpty()) {
-            try {
-                // Convertir los datos a los tipos correctos
-                double valor = Double.parseDouble(valorStr);
-                int cantidad = Integer.parseInt(cantidadStr);
-                double total = valor * cantidad; // Calcular el total
+        if (producto.isEmpty() || valorStr.isEmpty() || detalles.isEmpty() || cantidadStr.isEmpty()) {
+            Toast.makeText(getContext(), "DEBE LLENAR TODOS LOS CAMPOS", Toast.LENGTH_LONG).show();
+            return; // Salir del método si hay campos vacíos
+        }
 
-                // Crear una instancia de BdVentas y guardar el registro
-                BdVentas bdVentas = new BdVentas(getContext());
-                long id = bdVentas.insertarVenta(producto, total, detalles, cantidad);
+        try {
+            // Convertir los datos a los tipos correctos
+            double valor = Double.parseDouble(valorStr);
+            int cantidad = Integer.parseInt(cantidadStr);
+            double total = valor * cantidad;
 
-                // Mostrar un mensaje de éxito o error según el resultado
-                if (id > 0) {
-                    Toast.makeText(getContext(), "REGISTRO GUARDADO", Toast.LENGTH_LONG).show();
-                    limpiar();
-                    verRegistro();
-                    dismiss(); // Cerrar el diálogo
-                } else {
-                    Toast.makeText(getContext(), "ERROR AL GUARDAR REGISTRO", Toast.LENGTH_LONG).show();
+            // Crear una instancia de BdVentas y guardar el registro
+            BdVentas bdVentas = new BdVentas(getContext(), currentDatabase);
+            long id = bdVentas.insertarVenta(producto, total, detalles, cantidad);
+
+            if (id > 0) {
+                Toast.makeText(getContext(), "REGISTRO GUARDADO", Toast.LENGTH_SHORT).show();
+                limpiar();
+                dismiss();
+                if (dataChangedListener != null) {
+                    dataChangedListener.onDataChanged();
                 }
-            } catch (NumberFormatException e) {
-                // Mostrar un mensaje de error si los valores no son válidos
-                Toast.makeText(getContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_LONG).show();
+            } else {
+                Toast.makeText(getContext(), "ERROR AL GUARDAR REGISTRO", Toast.LENGTH_SHORT).show();
+                // Considera agregar un Log.e aquí para registrar el error en detalle
             }
-        } else {
-            // Mostrar un mensaje si algún campo está vacío
-            Toast.makeText(getContext(), "DEBE LLENAR LOS CAMPOS OBLIGATORIOS", Toast.LENGTH_LONG).show();
+        } catch (NumberFormatException e) {
+            Toast.makeText(getContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -216,7 +235,10 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
     private void verRegistro() {
         // Crear una intención para abrir MainActivity
         Intent intent = new Intent(getActivity(), MainActivity.class);
+        // Agregar el flag "updateMain" al intent
+        intent.putExtra("updateMain", true);
         startActivity(intent);
+        dismiss(); // Cerrar el diálogo
     }
 
     public void clearCustomItems() {

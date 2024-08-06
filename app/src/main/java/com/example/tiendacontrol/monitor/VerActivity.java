@@ -2,6 +2,7 @@ package com.example.tiendacontrol.monitor;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.InputType;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,18 +17,18 @@ import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class VerActivity extends AppCompatActivity {
-    EditText txtProducto, txtValor, txtDetalles, txtCantidad; // Campos de texto para mostrar los detalles del ítem
-    FloatingActionButton fabEditar, fabEliminar, fabMenu; // Botones flotantes para editar, eliminar y abrir el menú
-    Button btnGuarda; // Botón para guardar, que está oculto en esta actividad
-    Items venta; // Objeto para almacenar la venta que se va a mostrar
-    int id = 0; // ID de la venta que se va a mostrar
+    EditText txtProducto, txtValor, txtDetalles, txtCantidad;
+    FloatingActionButton fabEditar, fabEliminar, fabMenu;
+    Button btnGuarda;
+    Items venta;
+    int id = -1;
+    String currentDatabase;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_ver); // Establece el diseño de la actividad
+        setContentView(R.layout.activity_ver);
 
-        // Inicializa las vistas
         txtProducto = findViewById(R.id.txtProducto);
         txtValor = findViewById(R.id.txtValor);
         txtDetalles = findViewById(R.id.txtDetalles);
@@ -35,71 +36,89 @@ public class VerActivity extends AppCompatActivity {
         fabEditar = findViewById(R.id.fabEditar);
         fabEliminar = findViewById(R.id.fabEliminar);
         btnGuarda = findViewById(R.id.btnGuarda);
-        btnGuarda.setVisibility(View.INVISIBLE); // Oculta el botón de guardar
+        btnGuarda.setVisibility(View.INVISIBLE);
         fabMenu = findViewById(R.id.fabMenu);
 
-        // Configura el botón flotante para mostrar el menú cuando se hace clic
         fabMenu.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
             menuDialogFragment.show(fragmentManager, "servicios_dialog");
         });
 
-        // Obtiene el ID del ítem desde el Intent o el estado guardado
         if (savedInstanceState == null) {
             Bundle extras = getIntent().getExtras();
-            if (extras == null) {
-                id = -1; // Asigna un valor predeterminado en caso de que no se proporcione el ID
-            } else {
-                id = extras.getInt("ID");
+            if (extras != null) {
+                id = extras.getInt("ID", -1);
+                currentDatabase = extras.getString("databaseName");
             }
         } else {
-            id = (int) savedInstanceState.getSerializable("ID");
+            id = savedInstanceState.getInt("ID", -1);
+            currentDatabase = savedInstanceState.getString("databaseName");
         }
 
-// Crea una instancia de BdVentas y obtiene la venta con el ID proporcionado
-        final BdVentas bdVentas = new BdVentas(VerActivity.this);
+        Log.d("VerActivity", "onCreate() - ID recibido: " + id);
+        Log.d("VerActivity", "onCreate() - Base de datos: " + currentDatabase);
+
+        if (id == -1 || currentDatabase == null) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Error")
+                    .setMessage("No se pudo recuperar los datos del ítem.")
+                    .setPositiveButton("OK", (dialog, which) -> finish())
+                    .show();
+            return;
+        }
+
+        final BdVentas bdVentas = new BdVentas(VerActivity.this, currentDatabase);
         venta = bdVentas.verVenta(id);
 
-// Si la venta existe, muestra los detalles en los campos de texto
         if (venta != null) {
             txtProducto.setText(venta.getProducto());
-            // Obtén el valor directamente sin modificar el signo
             double valor = venta.getValor();
             txtValor.setText(String.valueOf(valor));
             txtDetalles.setText(venta.getDetalles());
-            txtCantidad.setText(String.valueOf(venta.getCantidad())); // Asegúrate de que getCantidad devuelve int o String
+            txtCantidad.setText(String.valueOf(venta.getCantidad()));
 
-            // Hace que los campos de texto sean solo lectura
             txtProducto.setInputType(InputType.TYPE_NULL);
             txtValor.setInputType(InputType.TYPE_NULL);
             txtDetalles.setInputType(InputType.TYPE_NULL);
             txtCantidad.setInputType(InputType.TYPE_NULL);
+        } else {
+            Log.e("VerActivity", "Error: venta con ID " + id + " no encontrada.");
+            new AlertDialog.Builder(this)
+                    .setTitle("Error")
+                    .setMessage("No se encontraron los datos del ítem.")
+                    .setPositiveButton("OK", (dialog, which) -> finish())
+                    .show();
         }
 
-// Configura el botón flotante de edición para mostrar el EditarDialogFragment cuando se hace clic
         fabEditar.setOnClickListener(view -> {
-            EditarDialogFragment dialogFragment = EditarDialogFragment.newInstance(id);
+            EditarDialogFragment dialogFragment = EditarDialogFragment.newInstance(id, currentDatabase);
             dialogFragment.show(getSupportFragmentManager(), "EditarDialogFragment");
         });
 
-// Configura el botón flotante de eliminación para mostrar un diálogo de confirmación al hacer clic
         fabEliminar.setOnClickListener(view -> {
-            AlertDialog.Builder builder = new AlertDialog.Builder(VerActivity.this);
-            builder.setMessage("¿Desea eliminar el ítem?")
+            new AlertDialog.Builder(VerActivity.this)
+                    .setMessage("¿Desea eliminar el ítem?")
                     .setPositiveButton("SI", (dialogInterface, i) -> {
                         if (bdVentas.eliminarVenta(id)) {
-                            lista(); // Llama al método lista si la venta se elimina correctamente
+                            lista();
+                        } else {
+                            new AlertDialog.Builder(VerActivity.this)
+                                    .setTitle("Error")
+                                    .setMessage("No se pudo eliminar el ítem.")
+                                    .setPositiveButton("OK", null)
+                                    .show();
                         }
                     })
-                    .setNegativeButton("NO", (dialogInterface, i) -> {
-                        // No hacer nada si se selecciona NO
-                    }).show();
+                    .setNegativeButton("NO", null)
+                    .show();
         });
     }
-    // Método para iniciar la actividad MainActivity
+
     private void lista() {
         Intent intent = new Intent(this, MainActivity.class);
+        intent.putExtra("databaseName", currentDatabase);
         startActivity(intent);
+        finish();
     }
 }
