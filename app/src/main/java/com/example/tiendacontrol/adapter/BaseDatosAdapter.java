@@ -59,7 +59,7 @@ public class BaseDatosAdapter extends RecyclerView.Adapter<BaseDatosAdapter.Cont
                 valor < 0 ? R.color.colorNegativo : R.color.colorPositivo));
 
         holder.viewDetalles.setText(venta.getDetalles());
-        holder.viewCantidad.setText(String.valueOf(venta.getCantidad()));
+        holder.viewCantidad.setText(String.valueOf("Unds: " + venta.getCantidad()));
         holder.viewFecha.setText(venta.getFechaRegistro());
 
         // Cambiar el color de fondo del item según el valor

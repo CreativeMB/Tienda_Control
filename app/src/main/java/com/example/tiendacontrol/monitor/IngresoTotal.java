@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
@@ -40,7 +41,7 @@ public class IngresoTotal extends AppCompatActivity {
         fabMenu = findViewById(R.id.fabMenu);
 
         // Configurar el RecyclerView
-        recyclerPositivos.setLayoutManager(new LinearLayoutManager(this));
+        recyclerPositivos.setLayoutManager(new GridLayoutManager(this, 2));
 
         // Inicializar la base de datos
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);

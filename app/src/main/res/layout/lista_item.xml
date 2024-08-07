@@ -9,178 +9,119 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"
-        android:padding="5dp"
         app:cardCornerRadius="8dp"
         app:cardElevation="10dp">
 
-        <LinearLayout
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="5dp">
+            android:layout_height="match_parent">
 
-            <!-- Detalles y imagen -->
-            <LinearLayout
+
+            <TextView
+                android:id="@+id/viewProducto"
+                android:layout_width="0dp"
+                android:textAlignment="center"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:paddingLeft="8dp"
+                android:text="hjjgkñ"
+                android:textSize="15sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <!-- Detalles -->
+            <ImageView
+                android:id="@+id/imageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:src="@drawable/gastos"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewProducto"
+                tools:srcCompat="@drawable/gastos" />
+
+
+            <TextView
+                android:id="@+id/viewDetalles"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingBottom="5dp">
 
-                <!-- Detalles encima de la imagen -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:paddingBottom="0dp">
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:paddingLeft="8dp"
+                android:text="@string/hint_Detalles"
+                android:textSize="15sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageView" />
 
-                    <!-- Producto -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingBottom="5dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/hint_Valor"
+                android:textSize="15sp"
+                android:visibility="gone" />
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/hint_Producto"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-
-                        <TextView
-                            android:id="@+id/viewProducto"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:paddingLeft="8dp"
-                            android:textSize="15sp"
-                            android:textStyle="bold" />
-                    </LinearLayout>
-
-                    <!-- Detalles -->
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:paddingBottom="5dp">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="@string/hint_Detalles"
-                            android:textSize="15sp" />
-
-                        <TextView
-                            android:id="@+id/viewDetalles"
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:paddingLeft="8dp"
-                            android:textSize="15sp" />
-                    </LinearLayout>
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal">
-
-                        <!-- Imagen -->
-                        <ImageView
-                            android:id="@+id/imageView"
-                            android:layout_width="60dp"
-                            android:layout_height="60dp"
-                            android:layout_marginEnd="10dp"
-                            android:src="@drawable/gastos"
-                            tools:srcCompat="@drawable/gastos" />
-
-                        <!-- Valores y Fecha -->
-                        <LinearLayout
-                            android:layout_width="0dp"
-                            android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:orientation="vertical">
-
-                            <!-- Valores -->
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="vertical"
-                                android:paddingBottom="5dp">
-
-                                <!-- Valor -->
-                                <LinearLayout
-                                    android:layout_width="match_parent"
-                                    android:layout_height="wrap_content"
-                                    android:orientation="horizontal"
-                                    android:paddingBottom="5dp">
-
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/hint_Valor"
-                                        android:textSize="15sp" />
-
-                                    <TextView
-                                        android:id="@+id/viewValor"
-                                        android:layout_width="0dp"
-                                        android:layout_height="wrap_content"
-                                        android:layout_weight="1"
-                                        android:paddingLeft="8dp"
-                                        android:textSize="20sp"
-                                        android:textStyle="bold" />
-                                </LinearLayout>
+            <TextView
+                android:id="@+id/viewValor"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:layout_weight="1"
+                android:paddingLeft="8dp"
+                android:text="hjkahskhk"
+                android:textSize="16sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintTop_toBottomOf="@+id/viewProducto" />
 
 
-                            </LinearLayout>
+            <TextView
+                android:id="@+id/viewCantidad"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:paddingLeft="8dp"
+                android:text="cantidad"
+                android:textSize="12sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintTop_toBottomOf="@+id/viewValor" />
 
-                            <LinearLayout
-                                android:layout_width="match_parent"
-                                android:layout_height="wrap_content"
-                                android:orientation="horizontal"
-                                android:paddingBottom="5dp">
 
-                                <!-- Cantidad -->
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="4"
-                                    android:orientation="horizontal"
-                                    android:paddingEnd="5dp">
+            <TextView
+                android:id="@+id/viewFecha"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginBottom="4dp"
+                android:paddingLeft="8dp"
+                android:text="fecha"
+                android:textSize="12sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/viewDetalles" />
 
-                                    <TextView
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:text="@string/hint_Cantidad"
-                                        android:textSize="15sp" />
 
-                                    <TextView
-                                        android:id="@+id/viewCantidad"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:paddingLeft="8dp"
-                                        android:textSize="15sp" />
-                                </LinearLayout>
-
-                                <!-- Fecha -->
-                                <LinearLayout
-                                    android:layout_width="0dp"
-                                    android:layout_height="wrap_content"
-                                    android:layout_weight="6"
-                                    android:orientation="horizontal"
-                                    android:paddingStart="5dp"
-                                    android:gravity="start">
-
-                                    <TextView
-                                        android:id="@+id/viewFecha"
-                                        android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_marginStart="10dp"
-                                        android:textSize="15sp" />
-                                </LinearLayout>
-                            </LinearLayout>
-                        </LinearLayout>
-                    </LinearLayout>
-                    </LinearLayout>
-                </LinearLayout>
-        </LinearLayout>
+        </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
+
+
 </RelativeLayout>

@@ -29,22 +29,24 @@ public class BaseExporter {
     private static final String TAG = "BaseExporter";
     private Context context;
     private Activity activity;
+    private String databaseName; // Añadir nombre de la base de datos
 
-    public BaseExporter(Context context, Activity activity) {
+    public BaseExporter(Context context, Activity activity, String databaseName) {
         this.context = context;
         this.activity = activity;
+        this.databaseName = databaseName; // Inicializar el nombre de la base de datos
     }
 
-    public void exportDatabase(String dbFileName) {
+    public void exportDatabase() {
         if (!isStoragePermissionGranted()) {
             Toast.makeText(context, "Permisos de almacenamiento no concedidos", Toast.LENGTH_SHORT).show();
             return;
         }
 
         Log.d(TAG, "Iniciando exportación de la base de datos.");
-        File dbFile = context.getDatabasePath(dbFileName);
+        File dbFile = context.getDatabasePath(databaseName); // Usar el nombre de la base de datos
         if (!dbFile.exists()) {
-            Log.e(TAG, "El archivo de la base de datos no existe: " + dbFileName);
+            Log.e(TAG, "El archivo de la base de datos no existe: " + databaseName);
             Toast.makeText(context, "El archivo de la base de datos no existe", Toast.LENGTH_SHORT).show();
             return;
         }
@@ -68,7 +70,7 @@ public class BaseExporter {
         }
     }
 
-    public void importDatabase(String dbFileName) {
+    public void importDatabase() {
         if (!isStoragePermissionGranted()) {
             Toast.makeText(context, "Permisos de almacenamiento no concedidos", Toast.LENGTH_SHORT).show();
             return;
@@ -82,14 +84,14 @@ public class BaseExporter {
             return;
         }
 
-        File sourceFile = new File(downloadDir, dbFileName);
+        File sourceFile = new File(downloadDir, databaseName); // Usar el nombre de la base de datos
         if (!sourceFile.exists()) {
             Log.e(TAG, "El archivo de la base de datos no existe en la carpeta de descargas: " + sourceFile.getAbsolutePath());
             Toast.makeText(context, "El archivo de la base de datos no existe en la carpeta de descargas", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        File destFile = context.getDatabasePath(dbFileName);
+        File destFile = context.getDatabasePath(databaseName); // Usar el nombre de la base de datos
         try {
             if (destFile.exists() && !destFile.delete()) {
                 Log.e(TAG, "Error al eliminar el archivo existente: " + destFile.getAbsolutePath());

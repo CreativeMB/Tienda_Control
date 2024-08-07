@@ -19,21 +19,23 @@ import java.util.Locale;
 
 public class ExcelExporter {
     private static final String TAG = "ExcelExporter";
+    private String databaseName;
+
+    public ExcelExporter(String databaseName) {
+        this.databaseName = databaseName;
+    }
 
     // Método público para iniciar la exportación a Excel
-    public static void exportToExcel(Context context) {
-        // Mostrar el ProgressDialog mientras se realiza la exportación
+    public void exportToExcel(Context context) {
         ProgressDialog progressDialog = new ProgressDialog(context);
-        progressDialog.setMessage("Exportando en Excel a Descargas...");
+        progressDialog.setMessage("Exportando en Excel...");
         progressDialog.setCancelable(false);
         progressDialog.show();
 
-        // Ejecutar la exportación en segundo plano utilizando AsyncTask
         new ExportTask(context, progressDialog).execute();
     }
 
-    // Tarea en segundo plano para exportar los datos a Excel
-    private static class ExportTask extends AsyncTask<Void, Void, Boolean> {
+    private class ExportTask extends AsyncTask<Void, Void, Boolean> {
         private Context context;
         private ProgressDialog progressDialog;
 
@@ -44,17 +46,15 @@ public class ExcelExporter {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            BdHelper dbHelper = new BdHelper(context, "mi_base_de_datos.db");
+            BdHelper dbHelper = new BdHelper(context, databaseName + ".db");
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             // Consulta para obtener todos los datos de la tabla de ventas
             String query = "SELECT * FROM " + BdHelper.TABLE_VENTAS;
             Cursor cursor = db.rawQuery(query, null);
 
-            Workbook workbook = new XSSFWorkbook(); // Crear un nuevo libro de Excel
+            Workbook workbook = new XSSFWorkbook();
             CreationHelper createHelper = workbook.getCreationHelper();
-
-            // Crear una hoja dentro del libro
             Sheet sheet = workbook.createSheet("Datos");
 
             // Escribir los encabezados en la primera fila
@@ -77,28 +77,28 @@ public class ExcelExporter {
                 row.createCell(5).setCellValue(cursor.getString(cursor.getColumnIndex("fecha_registro")));
             }
 
-            cursor.close(); // Cerrar el cursor
-            db.close(); // Cerrar la base de datos
+            cursor.close();
+            db.close();
 
-            // Generar un nombre de archivo único para el archivo Excel
-            String fileName = generateFileName();
+            // Generar un nombre de archivo basado en el nombre de la base de datos y una marca de tiempo
+            String fileName = generateFileName(databaseName);
 
-            // Guardar el libro de Excel en la carpeta de descargas del dispositivo
-            File dir = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-            if (dir != null && !dir.exists() && !dir.mkdirs()) {
-                Log.e(TAG, "Error: No se pudo crear el directorio de destino para la exportación.");
+            // Obtener la ruta de documentos públicos
+            File dir = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
+            if (!dir.exists() && !dir.mkdirs()) {
+                Log.e(TAG, "Error al crear el directorio de documentos");
                 return false;
             }
 
             try (FileOutputStream outputStream = new FileOutputStream(new File(dir, fileName + ".xlsx"))) {
-                workbook.write(outputStream); // Escribir el libro en el archivo
+                workbook.write(outputStream);
                 return true;
             } catch (IOException e) {
                 Log.e(TAG, "Error al exportar a Excel: " + e.getMessage());
                 return false;
             } finally {
                 try {
-                    workbook.close(); // Cerrar el libro de Excel
+                    workbook.close();
                 } catch (IOException e) {
                     Log.e(TAG, "Error al cerrar el libro de Excel: " + e.getMessage());
                 }
@@ -107,19 +107,17 @@ public class ExcelExporter {
 
         @Override
         protected void onPostExecute(Boolean success) {
-            // Ocultar el ProgressDialog y mostrar un mensaje Toast según el resultado
             progressDialog.dismiss();
             if (success) {
-                Toast.makeText(context, "En Descargas: " + generateFileName() + ".xlsx", Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Exportado: " + databaseName + ".xlsx", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(context, "Error al exportar a Excel", Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    // Método para generar un nombre de archivo único basado en la fecha y hora actuales
-    private static String generateFileName() {
+    private String generateFileName(String baseName) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        return "Mi_contabilidad_" + timeStamp;
+        return baseName + "_" + timeStamp;
     }
 }

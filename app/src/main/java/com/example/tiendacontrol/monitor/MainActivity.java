@@ -1,18 +1,11 @@
 package com.example.tiendacontrol.monitor;
-import static androidx.core.content.ContentProviderCompat.requireContext;
 
-import android.Manifest;
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -21,28 +14,23 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.tiendacontrol.adapter.DatabaseManagerActivity;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BaseExporter;
 import com.example.tiendacontrol.helper.BdHelper;
 import com.example.tiendacontrol.helper.BdVentas;
 import java.text.NumberFormat;
-import java.util.List;
 import java.util.Locale;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
-import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.model.Items;
 import com.example.tiendacontrol.login.PerfilUsuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -102,32 +90,37 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         txtBuscar = findViewById(R.id.txtBuscar);
 
         // Configuración del RecyclerView
-        listaVentas.setLayoutManager(new LinearLayoutManager(this));
+        listaVentas.setLayoutManager(new GridLayoutManager(this, 2));
 
         // Inicializar el adaptador AQUÍ, solo una vez
         listaArrayVentas = new ArrayList<>();
         adapter = new BaseDatosAdapter(listaArrayVentas); // Pasar la lista vacía al adaptador
         listaVentas.setAdapter(adapter);
 
+
+
+        // Verificar si el Intent contiene un nombre de base de datos
+        Intent intent = getIntent();
+        if (intent.hasExtra("databaseName")) {
+            currentDatabase = intent.getStringExtra("databaseName");
+        } else {
+            currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
+        }
         // Crea una instancia de BdHelper (solo una vez)
         bdHelper = new BdHelper(this, currentDatabase);
         bdVentas = new BdVentas(this, currentDatabase);
 
-        // Obtén el nombre de la base de datos desde bdHelper
-        String databaseName = bdHelper.getDatabaseName(); // <-- Añade esta línea
+        // Crear una instancia de BaseExporter
+        BaseExporter exporter = new BaseExporter(this, this, currentDatabase);
 
-        // Crea una instancia de BdVentas utilizando el nombre de la base de datos
-        bdVentas = new BdVentas(this, databaseName); // <-- Pasa 'databaseName'
-
-        BaseExporter exporter = new BaseExporter(this, this);
-
-        // Inicializar SearchView
-        txtBuscar.setOnQueryTextListener(this);
 
         // Cargar la imagen de perfil del usuario si ya está autenticado
         cargarimperfil();
 
+// Inicializar SearchView
+        txtBuscar.setOnQueryTextListener(this);
         // Configuración de los botones flotantes
+
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
@@ -211,6 +204,55 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         });
         onDataChanged();
     }
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        String newDatabase = intent.getStringExtra("databaseName");
+
+        Log.d(TAG, "onNewIntent: Nueva base de datos recibida: " + newDatabase);
+
+        if (newDatabase != null && !newDatabase.equals(currentDatabase)) {
+            Log.d(TAG, "onNewIntent: Cambiando base de datos de " + currentDatabase + " a " + newDatabase);
+            setCurrentDatabaseName(newDatabase);
+
+            if (bdHelper != null) {
+                Log.d(TAG, "onNewIntent: Cerrando bdHelper existente");
+                bdHelper.close();
+            }
+
+            bdHelper = new BdHelper(this, currentDatabase);
+            bdVentas = new BdVentas(this, currentDatabase);
+
+            Log.d(TAG, "onNewIntent: Nueva instancia de BdHelper y BdVentas creada para " + currentDatabase);
+
+            onDataChanged();
+        } else {
+            Log.d(TAG, "onNewIntent: No se requiere cambio de base de datos");
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        Log.d(TAG, "onResume: Re-inicializando BdHelper y BdVentas para " + currentDatabase);
+
+        bdHelper = new BdHelper(this, currentDatabase);
+        bdVentas = new BdVentas(this, currentDatabase);
+
+        if (adapter == null) {
+            Log.d(TAG, "onResume: Creando nuevo adaptador y lista");
+            listaArrayVentas = new ArrayList<>();
+            adapter = new BaseDatosAdapter(listaArrayVentas);
+            listaVentas.setAdapter(adapter);
+        } else {
+            Log.d(TAG, "onResume: Adaptador ya existe");
+        }
+
+        onDataChanged();
+    }
+
 
     public void onDataChanged() {
         if (adapter != null) {
@@ -240,6 +282,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             imageViewProfile.setVisibility(View.GONE);
         }
     }
+
+    // Método para obtener el nombre de la base de datos desde SharedPreferences
+    private String getCurrentDatabaseName() {
+        return sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
+    }
+
+    // Método para actualizar la base de datos actual
+    private void setCurrentDatabaseName(String dbName) {
+        currentDatabase = dbName;
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(KEY_CURRENT_DATABASE, currentDatabase);
+        editor.apply();
+    }
     @Override
     protected void onStart() {
 
@@ -259,64 +314,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             Toast.makeText(this, "No autenticado", Toast.LENGTH_LONG).show();
         }
     }
-    // Método para obtener el nombre de la base de datos desde SharedPreferences
-    private String getCurrentDatabaseName() {
-        return sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
-    }
-    // Método para actualizar la base de datos actual
-    private void setCurrentDatabaseName(String dbName) {
-        currentDatabase = dbName;
-        SharedPreferences.Editor editor = sharedPreferences.edit();
-        editor.putString(KEY_CURRENT_DATABASE, currentDatabase);
-        editor.apply();
-    }
-    @Override
-    protected void onNewIntent(Intent intent) {
-        super.onNewIntent(intent);
-        // Actualizar el Intent actual
-        setIntent(intent);
-        // 1. Obtener el nombre de la nueva base de datos (si existe)
-        String newDatabase = intent.getStringExtra("databaseName");
-
-        // 2. Verificar si la base de datos ha cambiado
-        if (newDatabase != null && !newDatabase.equals(currentDatabase)) {
-
-            // 3. Actualizar el nombre de la base de datos actual
-            setCurrentDatabaseName(newDatabase);
-
-            // 4. Cerrar la conexión con la base de datos anterior (si existe)
-            if (bdHelper != null) {
-                bdHelper.close();
-            }
-
-            // 5. Inicializar bdHelper y bdVentas con la nueva base de datos
-            bdHelper = new BdHelper(this, currentDatabase);
-            bdVentas = new BdVentas(this, currentDatabase);
-
-            // 6. Actualizar el adaptador y la UI
-            onDataChanged();
-        }
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-
-        // Inicializar bdHelper y bdVentas con el nombre de la base de datos correcto
-        bdHelper = new BdHelper(this, currentDatabase);
-        bdVentas = new BdVentas(this, currentDatabase);
-
-        // Inicializar el adaptador AQUÍ, solo si aún no está inicializado
-        if (adapter == null) {
-            listaArrayVentas = new ArrayList<>();
-            adapter = new BaseDatosAdapter(listaArrayVentas);
-            listaVentas.setAdapter(adapter);
-        }
-
-        // Cargar los datos
-        onDataChanged();
-    }
-
     // Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -460,24 +457,4 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
         super.onDestroy();
     }
-//
-//    public void onLogout() {
-//        // Cierra sesión del usuario de Firebase
-//        mAuth.signOut();
-//        // Actualiza el estado de usuario en SharedPreferences
-//        SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-//        SharedPreferences.Editor editor = sharedPreferences.edit();
-//        editor.putBoolean(KEY_USER_LOGGED_IN, false);
-//        editor.apply();
-//        // Redirige al usuario a la pantalla de inicio de sesión
-//        Intent intent = new Intent(this, Login.class);
-//        startActivity(intent);
-//        finish();
-////    }
-//
-//    public void onSelectDatabase() {
-//        // Inicia la actividad de gestión de bases de datos
-//        Intent intent = new Intent(this, DatabaseManagerActivity.class);
-//        startActivity(intent);
-//    }
 }

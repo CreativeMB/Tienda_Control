@@ -11,9 +11,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.tiendacontrol.adapter.DatabaseManagerActivity;
+import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.monitor.AccessCode;
-import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -91,7 +90,7 @@ public class Login extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             // Inicio de sesión exitoso, mostrar mensaje de éxito y redirigir a la actividad principal
                             Toast.makeText(Login.this, "Inicio de sesión exitoso", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(Login.this, DatabaseManagerActivity.class);
+                            Intent intent = new Intent(Login.this, Database.class);
                             startActivity(intent);
                             finish(); // Cierra esta actividad para que el usuario no pueda volver atrás
                         } else {

@@ -1,17 +1,10 @@
 package com.example.tiendacontrol.dialogFragment;
 
-import static androidx.core.app.ActivityCompat.startActivityForResult;
-import static com.example.tiendacontrol.monitor.MainActivity.REQUEST_CODE_STORAGE_PERMISSION;
 import static com.google.common.reflect.Reflection.getPackageName;
 
 import android.Manifest;
-import android.app.Dialog;
-import android.content.Context;
-import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -22,30 +15,24 @@ import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
-import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuItemImpl;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.DatabaseManagerActivity;
+import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.adapter.MenuCustomAdapter;
 import com.example.tiendacontrol.helper.BaseExporter;
 import com.example.tiendacontrol.helper.BdHelper;
-import com.example.tiendacontrol.helper.ExcelExporter;
 import com.example.tiendacontrol.login.Login;
-import com.example.tiendacontrol.login.PerfilUsuario;
 import com.example.tiendacontrol.monitor.FiltroDiaMesAno;
-import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.monitor.SetCode;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
@@ -180,9 +167,9 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             Intent intent = new Intent(requireContext(), FiltroDiaMesAno.class);
             startActivity(intent);
         } else if (id == R.id.basedatos) {
-            // Simplemente inicia DatabaseManagerActivity
-            Log.d("ActivityLifecycle", "Starting DatabaseManagerActivity");
-            Intent intent = new Intent(requireContext(), DatabaseManagerActivity.class);
+            // Simplemente inicia Database
+            Log.d("ActivityLifecycle", "Starting Database");
+            Intent intent = new Intent(requireContext(), Database.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
         } else if (id == R.id.nuevo_gasto) {
@@ -190,42 +177,54 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             FragmentManager fragmentManager = getParentFragmentManager();
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(fragmentManager, "GastoDialogFragment");
-        } else if (id == R.id.exportar_exel) {
-            BaseExporter baseExporter = new BaseExporter(requireContext(), getActivity());
-            if (baseExporter.isStoragePermissionGranted()) {
-                ExcelExporter.exportToExcel(requireContext());
-            } else {
-                requestStoragePermission(granted -> {
-                    if (granted) {
-                        ExcelExporter.exportToExcel(requireContext());
-                    } else {
-                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
 
-        } else if (id == R.id.exportar_db) {
-            // Exportar base de datos
-            BaseExporter baseExporter = new BaseExporter(requireContext(), getActivity());
-            if (baseExporter.isStoragePermissionGranted()) {
-                // Obtener el nombre de la base de datos en uso de SharedPreferences
-                SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                String currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "");
-                baseExporter.exportDatabase(currentDatabase);
-            } else {
-                // Si no se tiene el permiso, solicitarlo
-                requestStoragePermission(granted -> {
-                    if (granted) {
-                        // Obtener el nombre de la base de datos en uso de SharedPreferences
-                        SharedPreferences sharedPreferences = requireContext().getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-                        String currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "");
-                        baseExporter.exportDatabase(currentDatabase);
-                    } else {
-                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            }
 
+//        } else if (id == R.id.exportar_exel) {
+//            BaseExporter baseExporter = new BaseExporter(requireContext()); // Utiliza requireContext()
+//            if (baseExporter.isStoragePermissionGranted()) {
+//                ExcelExporter.exportToExcel(requireContext(), bdVentas.obtenerVentas()); // Pasa la lista de ventas a exportar
+//            } else {
+//                requestStoragePermission(granted -> {
+//                    if (granted) {
+//                        ExcelExporter.exportToExcel(requireContext(), bdVentas.obtenerVentas()); // Pasa la lista de ventas a exportar
+//                    } else {
+//                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
+//
+//        } else if (id == R.id.exportar_db) {
+//            // Exportar base de datos
+//            BaseExporter baseExporter = new BaseExporter(requireContext()); // Utiliza requireContext()
+//            // Comprueba si ya se concedió el permiso
+//            if (baseExporter.isStoragePermissionGranted()) {
+//                baseExporter.exportDatabase(BdHelper.DATABASE_NAME);
+//            } else {
+//                // Si no se tiene el permiso, solicita permiso
+//                requestStoragePermission(granted -> {
+//                    if (granted) {
+//                        baseExporter.exportDatabase(BdHelper.DATABASE_NAME); // Ejecuta la exportación si se concede el permiso
+//                    } else {
+//                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
+//        } else if (id == R.id.importar_db) {
+//            // Importar base de datos
+//            BaseExporter baseExporter = new BaseExporter(requireContext()); // Utiliza requireContext()
+//            // Comprueba si ya se concedió el permiso
+//            if (baseExporter.isStoragePermissionGranted()) {
+//                baseExporter.importDatabase(BdHelper.DATABASE_NAME);
+//            } else {
+//                // Si no se tiene el permiso, solicita permiso
+//                requestStoragePermission(granted -> {
+//                    if (granted) {
+//                        baseExporter.importDatabase(BdHelper.DATABASE_NAME); // Ejecuta la importación si se concede el permiso
+//                    } else {
+//                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//            }
         } else if (id == R.id.cerrar_sesion) {
             // Cerrar sesión
             FirebaseAuth.getInstance().signOut();

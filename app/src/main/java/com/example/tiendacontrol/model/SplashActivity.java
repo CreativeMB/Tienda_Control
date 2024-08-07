@@ -1,7 +1,6 @@
 package com.example.tiendacontrol.model;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -10,9 +9,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.DatabaseManagerActivity;
+import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.login.Login;
-import com.example.tiendacontrol.monitor.MainActivity;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -55,12 +53,12 @@ public class SplashActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             // Si no hay usuario logueado, redirigir a la actividad de login
-            Intent intent = new Intent(SplashActivity.this, Login.class);
+            Intent intent = new Intent(SplashActivity.this, Database.class);
             startActivity(intent);
             finish();
         } else {
             // Si hay un usuario logueado, redirigir a MainActivity
-            Intent intent = new Intent(SplashActivity.this, DatabaseManagerActivity.class);
+            Intent intent = new Intent(SplashActivity.this, Database.class);
             startActivity(intent);
             finish();
 

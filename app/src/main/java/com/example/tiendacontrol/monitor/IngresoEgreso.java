@@ -8,6 +8,7 @@ import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
@@ -48,8 +49,8 @@ public class IngresoEgreso extends AppCompatActivity {
         bdHelper = new BdHelper(this, currentDatabase);
 
         // Configurar los RecyclerViews
-        recyclerPositivos.setLayoutManager(new LinearLayoutManager(this));
-        recyclerNegativos.setLayoutManager(new LinearLayoutManager(this));
+        recyclerPositivos.setLayoutManager(new GridLayoutManager(this, 2));
+        recyclerNegativos.setLayoutManager(new GridLayoutManager(this, 2));
 
         // Obtener la lista original de ventas
         listaArrayVentas = obtenerListaVentas();

@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -71,7 +72,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
 
         // Inicializar el adaptador y el RecyclerView
         itemAdapter = new ItemAdapter(new ArrayList<>()); // Inicializa con una lista vacía
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
         recyclerView.setAdapter(itemAdapter);
 
         fabMenu.setOnClickListener(view -> {

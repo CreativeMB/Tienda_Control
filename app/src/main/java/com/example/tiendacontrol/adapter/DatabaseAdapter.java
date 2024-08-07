@@ -1,9 +1,12 @@
 package com.example.tiendacontrol.adapter;
 
 import android.content.Context;
+import android.net.Uri;
+import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -12,17 +15,22 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
 
+import java.io.File;
 import java.util.List;
 
 public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.DatabaseViewHolder> {
-    private List<String> databaseList;
-    private Context context;
-    private OnDatabaseClickListener onDatabaseClickListener;
+    public interface OnDatabaseClickListener {
+        void onDatabaseClick(String databaseName);
+    }
 
-    public DatabaseAdapter(Context context, List<String> databaseList, OnDatabaseClickListener onDatabaseClickListener) {
+    private Context context;
+    private List<String> databaseList;
+    private OnDatabaseClickListener listener;
+
+    public DatabaseAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
         this.context = context;
         this.databaseList = databaseList;
-        this.onDatabaseClickListener = onDatabaseClickListener;
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,11 +44,11 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.Databa
     public void onBindViewHolder(@NonNull DatabaseViewHolder holder, int position) {
         String databaseName = databaseList.get(position);
         holder.textViewDatabaseName.setText(databaseName);
-        holder.itemView.setOnClickListener(v -> {
-            // Evita mostrar muchos toasts al mismo tiempo
-            Toast.makeText(context, "Base de datos seleccionada: " + databaseName, Toast.LENGTH_SHORT).show();
-            onDatabaseClickListener.onDatabaseClick(databaseName);
-        });
+
+        // Usa una imagen por defecto para los ítems
+        holder.imageViewDatabaseIcon.setImageResource(R.drawable.gastos);
+
+        holder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
     }
 
     @Override
@@ -50,14 +58,12 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.Databa
 
     public static class DatabaseViewHolder extends RecyclerView.ViewHolder {
         TextView textViewDatabaseName;
+        ImageView imageViewDatabaseIcon;
 
         public DatabaseViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewDatabaseName = itemView.findViewById(R.id.textViewDatabaseName);
+            imageViewDatabaseIcon = itemView.findViewById(R.id.imageViewDatabase);
         }
-    }
-
-    public interface OnDatabaseClickListener {
-        void onDatabaseClick(String databaseName);
     }
 }

@@ -7,12 +7,14 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
 
 import androidx.annotation.Nullable;
 
 import com.example.tiendacontrol.model.Items;
 
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -22,12 +24,23 @@ import java.util.Locale;
 public class BdHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
     public static final String TABLE_VENTAS = "Mi_Contabilidad";
+    private static final String DATABASE_NAME = "TiendaControl"; // Nombre base de datos predeterminado
     private static BdHelper instance;
     private SQLiteDatabase database;
 
     public BdHelper(@Nullable Context context, String databaseName) {
-        super(context, databaseName, null, DATABASE_VERSION);
+        super(context, getDatabasePath(context, databaseName), null, DATABASE_VERSION);
     }
+
+    // Método para obtener la ruta completa de la base de datos
+    private static String getDatabasePath(Context context, String databaseName) {
+        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
+        if (!documentsFolder.exists()) {
+            documentsFolder.mkdirs(); // Crear el directorio si no existe
+        }
+        return new File(documentsFolder, databaseName + ".db").getAbsolutePath();
+    }
+
     @Override
     public synchronized SQLiteDatabase getWritableDatabase() {
         if (database == null || !database.isOpen()) {
@@ -36,12 +49,13 @@ public class BdHelper extends SQLiteOpenHelper {
         return database;
     }
 
-    // Método para cerrar la base de datos
     @Override
     public void close() {
         super.close();
+        if (database != null && database.isOpen()) {
+            database.close();
+        }
     }
-
 
     public static synchronized BdHelper getInstance(Context context, String databaseName) {
         if (instance == null) {
@@ -67,30 +81,6 @@ public class BdHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_VENTAS);
         onCreate(sqLiteDatabase);
     }
-
-
-
-//    public long insertarGasto(String producto, double total, String detalles, int cantidad) {
-//        long id = 0;
-//        SQLiteDatabase db = null;
-//        try {
-//            db = getWritableDatabase();
-//            ContentValues values = new ContentValues();
-//            values.put("producto", producto);
-//            values.put("valor", total);
-//            values.put("detalles", detalles);
-//            values.put("cantidad", cantidad);
-//            values.put("fecha_registro", obtenerFechaActual());
-//            id = db.insert(TABLE_VENTAS, null, values);
-//        } catch (Exception ex) {
-//            ex.printStackTrace();
-//        } finally {
-//            if (db != null && db.isOpen()) {
-//                db.close();
-//            }
-//        }
-//        return id;
-//    }
 
     private String obtenerFechaActual() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
@@ -137,9 +127,6 @@ public class BdHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
-            if (db != null && db.isOpen()) {
-                db.close();
-            }
         }
         return results;
     }
@@ -169,9 +156,6 @@ public class BdHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.close();
             }
-            if (db != null && db.isOpen()) {
-                db.close();
-            }
         }
         return filteredItems;
     }
@@ -198,9 +182,6 @@ public class BdHelper extends SQLiteOpenHelper {
         } finally {
             if (cursor != null) {
                 cursor.close();
-            }
-            if (db != null && db.isOpen()) {
-                db.close();
             }
         }
         return itemsList;
