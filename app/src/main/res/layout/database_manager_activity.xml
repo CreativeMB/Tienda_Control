@@ -3,18 +3,22 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:gravity="center"
     android:padding="16dp">
 
     <EditText
         android:id="@+id/editTextDatabaseName"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center"
         android:hint="Ingrese el nombre de la base de datos" />
 
     <Button
         android:id="@+id/buttonCreateDatabase"
-        android:layout_width="match_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:gravity="center"
+        style="@style/Widget.AppTheme.Button"
         android:text="Crear Base de Datos" />
 
     <androidx.recyclerview.widget.RecyclerView
