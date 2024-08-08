@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Inicializar SharedPreferences (dentro del método onCreate)
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         currentDatabase = getCurrentDatabaseName();
-// 1. Obtén el nombre de la base de datos actual de SharedPreferences
+        // 1. Obtén el nombre de la base de datos actual de SharedPreferences
         currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, null);
 
         // Referencias a vistas
@@ -97,8 +97,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new BaseDatosAdapter(listaArrayVentas); // Pasar la lista vacía al adaptador
         listaVentas.setAdapter(adapter);
 
-
-
         // Verificar si el Intent contiene un nombre de base de datos
         Intent intent = getIntent();
         if (intent.hasExtra("databaseName")) {
@@ -106,6 +104,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         } else {
             currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
         }
+
         // Crea una instancia de BdHelper (solo una vez)
         bdHelper = new BdHelper(this, currentDatabase);
         bdVentas = new BdVentas(this, currentDatabase);
@@ -252,7 +251,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         onDataChanged();
     }
-
 
     public void onDataChanged() {
         if (adapter != null) {
@@ -436,11 +434,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         // 3. Actualiza la UI
                         onDataChanged();
 
-                        // 4. Opcional: Reinicia la actividad para una actualización completa
-                        // Intent intent = getIntent();
-                        // finish();
-                        // startActivity(intent);
-                    } else {
+                                       } else {
                         Toast.makeText(this, "Error al eliminar la base de datos", Toast.LENGTH_SHORT).show();
                     }
                 })
@@ -457,4 +451,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
         super.onDestroy();
     }
+
+
 }

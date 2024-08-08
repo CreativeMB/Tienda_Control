@@ -30,21 +30,6 @@
         android:title="@string/once"
         app:showAsAction="never" />
     <item
-        android:id="@+id/exportar_exel"
-        android:orderInCategory="100"
-        android:title="@string/octavo"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/exportar_db"
-        android:orderInCategory="100"
-        android:title="@string/uno"
-        app:showAsAction="never" />
-    <item
-        android:id="@+id/importar_db"
-        android:orderInCategory="100"
-        android:title="@string/Septimo"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/basedatos"
         android:orderInCategory="100"
         android:title="@string/quinto"

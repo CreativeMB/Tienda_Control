@@ -24,12 +24,12 @@ import java.util.Locale;
 public class BdHelper extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
     public static final String TABLE_VENTAS = "Mi_Contabilidad";
-    private static final String DATABASE_NAME = "TiendaControl"; // Nombre base de datos predeterminado
     private static BdHelper instance;
     private SQLiteDatabase database;
 
     public BdHelper(@Nullable Context context, String databaseName) {
         super(context, getDatabasePath(context, databaseName), null, DATABASE_VERSION);
+        Log.d("BdHelper", "Ruta de la base de datos: " + getDatabasePath(context, databaseName));
     }
 
     // Método para obtener la ruta completa de la base de datos
@@ -81,109 +81,38 @@ public class BdHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_VENTAS);
         onCreate(sqLiteDatabase);
     }
-
-    private String obtenerFechaActual() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-        Date date = new Date();
-        return dateFormat.format(date);
-    }
-
-    public List<Items> getResultsByDay(String date) {
-        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE date(fecha_registro) = ?", new String[]{date});
-    }
-
-    public List<Items> getResultsByWeek(String date) {
-        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE strftime('%W', fecha_registro) = strftime('%W', ?)", new String[]{date});
-    }
-
-    public List<Items> getResultsByMonth(String date) {
-        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE strftime('%m', fecha_registro) = strftime('%m', ?)", new String[]{date});
-    }
-
-    public List<Items> getResultsByYear(String date) {
-        return getResults("SELECT * FROM " + TABLE_VENTAS + " WHERE strftime('%Y', fecha_registro) = strftime('%Y', ?)", new String[]{date});
-    }
-
-    private List<Items> getResults(String query, String[] selectionArgs) {
-        List<Items> results = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery(query, selectionArgs);
-            if (cursor.moveToFirst()) {
-                do {
-                    Items result = new Items();
-                    result.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
-                    result.setValor(cursor.getDouble(cursor.getColumnIndex("valor")));
-                    result.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
-                    result.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
-                    result.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
-                    results.add(result);
-                } while (cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return results;
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
     }
 
     public List<Items> getItemsByDates(String startDate, String endDate) {
         List<Items> filteredItems = new ArrayList<>();
         SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        try {
-            String query = "SELECT * FROM " + TABLE_VENTAS +
-                    " WHERE date(fecha_registro) BETWEEN date(?) AND date(?)";
-            cursor = db.rawQuery(query, new String[]{startDate, endDate});
-            if (cursor.moveToFirst()) {
-                do {
-                    Items result = new Items();
-                    result.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
-                    result.setValor(cursor.getDouble(cursor.getColumnIndex("valor")));
-                    result.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
-                    result.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
-                    result.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
-                    filteredItems.add(result);
-                } while (cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
-        }
-        return filteredItems;
-    }
 
-    public List<Items> getAllItems() {
-        List<Items> itemsList = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = null;
-        try {
-            cursor = db.rawQuery("SELECT * FROM " + TABLE_VENTAS, null);
-            if (cursor.moveToFirst()) {
-                do {
-                    Items item = new Items();
-                    item.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
-                    item.setValor(cursor.getDouble(cursor.getColumnIndex("valor")));
-                    item.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
-                    item.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
-                    item.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
-                    itemsList.add(item);
-                } while (cursor.moveToNext());
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null) {
-                cursor.close();
-            }
+        // Consulta SQL para obtener elementos dentro del rango de fechas
+        String query = "SELECT * FROM " + TABLE_VENTAS +
+                " WHERE date(fecha_registro) BETWEEN date(?) AND date(?)"; // Usa date() para comparar fechas
+
+        // Ejecutar la consulta con las fechas de inicio y fin como parámetros
+        Cursor cursor = db.rawQuery(query, new String[]{startDate, endDate});
+
+        if (cursor.moveToFirst()) {
+            do {
+                Items result = new Items();
+                result.setProducto(cursor.getString(cursor.getColumnIndex("producto")));
+                result.setValor(cursor.getDouble(cursor.getColumnIndex("valor")));
+                result.setDetalles(cursor.getString(cursor.getColumnIndex("detalles")));
+                result.setCantidad(cursor.getInt(cursor.getColumnIndex("cantidad")));
+                result.setFechaRegistro(cursor.getString(cursor.getColumnIndex("fecha_registro")));
+                filteredItems.add(result);
+            } while (cursor.moveToNext());
         }
-        return itemsList;
+
+        cursor.close();
+        db.close();
+
+        return filteredItems;
     }
 }

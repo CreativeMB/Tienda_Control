@@ -49,35 +49,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
     private static final String PREFS_NAME = "TiendaControlPrefs"; // Declare PREFS_NAME aquí
     private static final String KEY_CURRENT_DATABASE = "currentDatabase"; // Declare KEY_CURRENT_DATABASE aquí
     private String currentDatabase;
-    private OnStoragePermissionResultListener storagePermissionResultListener; // Listener para permisos
-    private BdHelper bdHelper; // Declarar bdHelper
-    private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                // Aquí manejarías el resultado de la solicitud de permisos MANAGE_EXTERNAL_STORAGE
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (Environment.isExternalStorageManager()) {
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(true);
-                        }
-                    } else {
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(false);
-                        }
-                    }
-                }
-            }
-    );
 
-    private final ActivityResultLauncher<String> requestWritePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            granted -> {
-                // Aquí manejarías el resultado de la solicitud de permisos WRITE_EXTERNAL_STORAGE
-                if (storagePermissionResultListener != null) {
-                    storagePermissionResultListener.onPermissionResult(granted);
-                }
-            }
-    );
 
     public interface MainActivityListener { // Interfaz para la comunicación
         void confirmarEliminarTodo();
@@ -93,9 +65,6 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         this.listener = listener;
     }
 
-    public void setStoragePermissionResultListener(OnStoragePermissionResultListener listener) {
-        this.storagePermissionResultListener = listener;
-    }
 
     @Nullable
     @Override
@@ -178,95 +147,28 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             dialogFragment.show(fragmentManager, "GastoDialogFragment");
 
-
-//        } else if (id == R.id.exportar_exel) {
-//            BaseExporter baseExporter = new BaseExporter(requireContext()); // Utiliza requireContext()
-//            if (baseExporter.isStoragePermissionGranted()) {
-//                ExcelExporter.exportToExcel(requireContext(), bdVentas.obtenerVentas()); // Pasa la lista de ventas a exportar
-//            } else {
-//                requestStoragePermission(granted -> {
-//                    if (granted) {
-//                        ExcelExporter.exportToExcel(requireContext(), bdVentas.obtenerVentas()); // Pasa la lista de ventas a exportar
-//                    } else {
-//                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//            }
-//
-//        } else if (id == R.id.exportar_db) {
-//            // Exportar base de datos
-//            BaseExporter baseExporter = new BaseExporter(requireContext()); // Utiliza requireContext()
-//            // Comprueba si ya se concedió el permiso
-//            if (baseExporter.isStoragePermissionGranted()) {
-//                baseExporter.exportDatabase(BdHelper.DATABASE_NAME);
-//            } else {
-//                // Si no se tiene el permiso, solicita permiso
-//                requestStoragePermission(granted -> {
-//                    if (granted) {
-//                        baseExporter.exportDatabase(BdHelper.DATABASE_NAME); // Ejecuta la exportación si se concede el permiso
-//                    } else {
-//                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//            }
-//        } else if (id == R.id.importar_db) {
-//            // Importar base de datos
-//            BaseExporter baseExporter = new BaseExporter(requireContext()); // Utiliza requireContext()
-//            // Comprueba si ya se concedió el permiso
-//            if (baseExporter.isStoragePermissionGranted()) {
-//                baseExporter.importDatabase(BdHelper.DATABASE_NAME);
-//            } else {
-//                // Si no se tiene el permiso, solicita permiso
-//                requestStoragePermission(granted -> {
-//                    if (granted) {
-//                        baseExporter.importDatabase(BdHelper.DATABASE_NAME); // Ejecuta la importación si se concede el permiso
-//                    } else {
-//                        Toast.makeText(requireContext(), "Permiso de almacenamiento denegado", Toast.LENGTH_SHORT).show();
-//                    }
-//                });
-//            }
         } else if (id == R.id.cerrar_sesion) {
             // Cerrar sesión
             FirebaseAuth.getInstance().signOut();
             Intent intent = new Intent(requireContext(), Login.class);
             startActivity(intent);
-    } else if (id == R.id.borrardados) {
-        showDeleteConfirmationDialog();
+        } else if (id == R.id.borrardados) {
+            showDeleteConfirmationDialog();
+        }
     }
-}
 
-// Método para mostrar el diálogo de confirmación de eliminación de base de datos
-private void showDeleteConfirmationDialog() {
-    // Verificar si el fragmento está adjunto a una actividad antes de continuar
-    if (!isAdded()) {
-        Log.e("MenuDialogFragment", "Fragmento no está adjunto a una actividad");
-        return;
-    }
-    // Verificar si el listener de MainActivity no es nulo antes de llamar al método para eliminar la base de datos
-    if (listener != null) {
-        listener.confirmarEliminarTodo(); // Llamar al método para eliminar la base de datos
-    } else {
-        Log.e("MenuDialogFragment", "El listener de MainActivity es nulo");
-    }
-}
-
-    private void requestStoragePermission(OnStoragePermissionResultListener listener) {
-        this.storagePermissionResultListener = listener;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                if (storagePermissionResultListener != null) {
-                    storagePermissionResultListener.onPermissionResult(true);
-                }
-            } else {
-                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                manageAllFilesPermissionLauncher.launch(intent);
-            }
-        } else if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
-            requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
+    // Método para mostrar el diálogo de confirmación de eliminación de base de datos
+    private void showDeleteConfirmationDialog() {
+        // Verificar si el fragmento está adjunto a una actividad antes de continuar
+        if (!isAdded()) {
+            Log.e("MenuDialogFragment", "Fragmento no está adjunto a una actividad");
+            return;
+        }
+        // Verificar si el listener de MainActivity no es nulo antes de llamar al método para eliminar la base de datos
+        if (listener != null) {
+            listener.confirmarEliminarTodo(); // Llamar al método para eliminar la base de datos
         } else {
-            if (storagePermissionResultListener != null) {
-                storagePermissionResultListener.onPermissionResult(true);
-            }
+            Log.e("MenuDialogFragment", "El listener de MainActivity es nulo");
         }
     }
 }

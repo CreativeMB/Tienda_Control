@@ -160,7 +160,7 @@ public class Database extends AppCompatActivity implements DatabaseAdapter.OnDat
                 showToast("No se encontraron bases de datos");
             }
         } else {
-            showToast("No se encontró el directorio de bases de datos");
+            showToast("Tienes que dar permisos para comenzar");
         }
         adapter.notifyDataSetChanged();
     }
@@ -199,6 +199,9 @@ public class Database extends AppCompatActivity implements DatabaseAdapter.OnDat
                 })
                 .setNeutralButton("Exportar a Excel", (dialog, which) -> {
                     new ExcelExporter(databaseName).exportToExcel(this);
+                })
+                .setItems(new CharSequence[]{"Contabilidad"}, (dialog, which) -> {
+                    editDatabase2(databaseName);
                 });
 
         AlertDialog dialog = builder.create();
@@ -232,6 +235,23 @@ public class Database extends AppCompatActivity implements DatabaseAdapter.OnDat
 
             // Abre la base de datos en la actividad correspondiente
             Intent intent = new Intent(Database.this, MainActivity.class);
+            intent.putExtra("databaseName", databaseName);
+            startActivity(intent);
+        } else {
+            showToast("Nombre de base de datos inválido");
+        }
+    }
+    private void editDatabase2(String databaseName) {
+        if (databaseName != null && !databaseName.isEmpty()) {
+            closeCurrentDatabase();
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(KEY_CURRENT_DATABASE, databaseName);
+            editor.putBoolean("KEY_DATABASE_SELECTED", true);
+            editor.apply();
+            showToast("Base de datos actual: " + databaseName);
+
+            // Abre la base de datos en la actividad correspondiente
+            Intent intent = new Intent(Database.this, FiltroDiaMesAno.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
         } else {
@@ -312,5 +332,10 @@ public class Database extends AppCompatActivity implements DatabaseAdapter.OnDat
                 requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
         }
+    }
+    // Método para abrir la actividad FiltroDiaMesAno
+    private void openFiltroDiaMesAnoActivity() {
+        Intent intent = new Intent(this, FiltroDiaMesAno.class);
+        startActivity(intent);
     }
 }
