@@ -46,7 +46,7 @@ public class ExcelExporter {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            BdHelper dbHelper = new BdHelper(context, databaseName + ".db");
+            BdHelper dbHelper = new BdHelper(context, databaseName);
             SQLiteDatabase db = dbHelper.getReadableDatabase();
 
             // Consulta para obtener todos los datos de la tabla de ventas
@@ -77,8 +77,8 @@ public class ExcelExporter {
                 row.createCell(5).setCellValue(cursor.getString(cursor.getColumnIndex("fecha_registro")));
             }
 
-            cursor.close();
-            db.close();
+//            cursor.close();
+//            db.close();
 
             // Generar un nombre de archivo basado en el nombre de la base de datos y una marca de tiempo
             String fileName = generateFileName(databaseName);

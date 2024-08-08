@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -37,6 +38,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Database extends AppCompatActivity implements DatabaseAdapter.OnDatabaseClickListener {
+
     private static final int PICK_IMAGE_REQUEST = 1;
     private Button buttonCreateDatabase;
     private EditText editTextDatabaseName;
