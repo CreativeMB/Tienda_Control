@@ -2,19 +2,17 @@ package com.example.tiendacontrol.monitor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.BaseDatosAdapter;
+import com.example.tiendacontrol.adapter.DatosAdapter;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
-import com.example.tiendacontrol.helper.BdHelper;
+
+import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.NumberFormat;
@@ -24,11 +22,11 @@ import java.util.Locale;
 
 public class IngresoEgreso extends AppCompatActivity {
     private RecyclerView recyclerPositivos, recyclerNegativos;
-    private BaseDatosAdapter adapterPositivos, adapterNegativos;
+    private DatosAdapter adapterPositivos, adapterNegativos;
     private ArrayList<Items> listaArrayVentas;
     private TextView textVenta, textGasto;
     private FloatingActionButton fabMenu;
-    private BdHelper bdHelper;
+    private BdVentas bdVentas;
     private String currentDatabase; // Variable para almacenar el nombre de la base de datos
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
@@ -46,7 +44,7 @@ public class IngresoEgreso extends AppCompatActivity {
         // Inicializar la base de datos
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "");
-        bdHelper = new BdHelper(this, currentDatabase);
+        bdVentas = new BdVentas(this, currentDatabase);
 
         // Configurar los RecyclerViews
         recyclerPositivos.setLayoutManager(new GridLayoutManager(this, 2));
@@ -68,9 +66,8 @@ public class IngresoEgreso extends AppCompatActivity {
         }
 
         // Configurar los adaptadores
-        adapterPositivos = new BaseDatosAdapter(listaPositivos);
-        adapterNegativos = new BaseDatosAdapter(listaNegativos);
-
+               adapterNegativos = new DatosAdapter(this, listaPositivos, bdVentas);
+        adapterNegativos = new DatosAdapter(this, listaNegativos, bdVentas);
         // Asignar los adaptadores a los RecyclerViews
         recyclerPositivos.setAdapter(adapterPositivos);
         recyclerNegativos.setAdapter(adapterNegativos);
@@ -88,7 +85,7 @@ public class IngresoEgreso extends AppCompatActivity {
 
     private ArrayList<Items> obtenerListaVentas() {
         // Usa el método de BdHelper para obtener todas las ventas
-        List<Items> ventas = bdHelper.getItemsByDates("2023-01-01", "2024-12-31");
+        List<Items> ventas = bdVentas.getItemsByDates("2023-01-01", "2024-12-31");
         return new ArrayList<>(ventas); // Convierte la lista a ArrayList si es necesario
     }
 

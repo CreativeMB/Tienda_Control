@@ -46,11 +46,11 @@ public class ExcelExporter {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            BdHelper dbHelper = new BdHelper(context, databaseName);
-            SQLiteDatabase db = dbHelper.getReadableDatabase();
+            BdVentas bdVentas = new BdVentas(context, databaseName);
+            SQLiteDatabase db = bdVentas.getReadableDatabase();
 
             // Consulta para obtener todos los datos de la tabla de ventas
-            String query = "SELECT * FROM " + BdHelper.TABLE_VENTAS;
+            String query = "SELECT * FROM " + BdVentas.TABLE_VENTAS;
             Cursor cursor = db.rawQuery(query, null);
 
             Workbook workbook = new XSSFWorkbook();

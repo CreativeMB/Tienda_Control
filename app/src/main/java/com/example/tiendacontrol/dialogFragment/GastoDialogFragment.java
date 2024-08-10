@@ -21,7 +21,7 @@ import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.helper.ItemManager;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.example.tiendacontrol.helper.BdHelper;
+
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.example.tiendacontrol.R;
 import java.util.ArrayList;

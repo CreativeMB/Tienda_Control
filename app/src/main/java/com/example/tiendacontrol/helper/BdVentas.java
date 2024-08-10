@@ -1,74 +1,137 @@
 package com.example.tiendacontrol.helper;
-
-import static android.app.PendingIntent.getActivity;
-
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Environment;
 import android.util.Log;
-
 import androidx.annotation.Nullable;
-
 import com.example.tiendacontrol.model.Items;
-import com.example.tiendacontrol.monitor.MainActivity;
-
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
-public class BdVentas  {
-    private Context context;
-    private BdHelper bdHelper; // Instancia de BdHelper
+public class BdVentas extends SQLiteOpenHelper {
+    private static final int DATABASE_VERSION = 2;
+    public static final String TABLE_VENTAS = "Mi_Contabilidad";
+    private static BdVentas instance;
     private SQLiteDatabase database;
-    public BdVentas(Context context, String databaseName) {
-        this.context = context;
-        // Inicializa bdHelper solo una vez
-        if (bdHelper == null) {
-            bdHelper = new BdHelper(context, databaseName);
+    private String currentDatabase;
+
+    public BdVentas(@Nullable Context context, @Nullable String databaseName) {
+        super(context, getDatabasePath(context, databaseName), null, DATABASE_VERSION);
+        if (databaseName == null || databaseName.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de la base de datos no puede ser null o vacío.");
         }
+        this.currentDatabase = databaseName;
+        Log.d("BdVentas", "Ruta de la base de datos: " + getDatabasePath(context, databaseName));
     }
-    // Método para insertar una venta en la base de datos
+    private static String getDatabasePath(Context context, @Nullable String databaseName) {
+        if (databaseName == null || databaseName.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre de la base de datos no puede ser null o vacío.");
+        }
+
+        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
+        if (!documentsFolder.exists()) {
+            boolean result = documentsFolder.mkdirs(); // Crear el directorio si no existe
+            Log.d("BdVentas", "Creando directorio: " + result);
+        }
+        return new File(documentsFolder, databaseName + ".db").getAbsolutePath();
+    }
+
+    @Override
+    public synchronized SQLiteDatabase getWritableDatabase() {
+        if (database == null || !database.isOpen()) {
+            database = super.getWritableDatabase();
+            Log.d("BdVentas", "Base de datos abierta para escritura");
+        }
+        return database;
+    }
+
+//    @Override
+//    public void close() {
+//        super.close();
+//        if (database != null && database.isOpen()) {
+//            database.close();
+//            Log.d("BdVentas", "Base de datos cerrada");
+//        }
+//    }
+
+    public static synchronized BdVentas getInstance(Context context, String databaseName) {
+        if (instance == null) {
+            instance = new BdVentas(context.getApplicationContext(), databaseName);
+        }
+        return instance;
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase sqLiteDatabase) {
+        Log.d("BdVentas", "Creando tabla: " + TABLE_VENTAS);
+        sqLiteDatabase.execSQL("CREATE TABLE " + TABLE_VENTAS + " (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "producto TEXT NOT NULL," +
+                "valor REAL NOT NULL," +
+                "detalles TEXT NOT NULL," +
+                "cantidad INTEGER," +
+                "fecha_registro DATETIME" +
+                ");");
+        Log.d("BdVentas", "Tabla creada: " + TABLE_VENTAS);
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
+        Log.d("BdVentas", "Actualizando tabla de versión " + oldVersion + " a " + newVersion);
+        sqLiteDatabase.execSQL("DROP TABLE IF EXISTS " + TABLE_VENTAS);
+        onCreate(sqLiteDatabase);
+    }
+
+    @Override
+    public void onConfigure(SQLiteDatabase db) {
+        super.onConfigure(db);
+        db.setForeignKeyConstraintsEnabled(true);
+        Log.d("BdVentas", "Configuración de la base de datos: Habilitando claves foráneas");
+    }
+
+    // Métodos de BdVentas
+
     public long insertarVenta(String producto, double total, String detalles, int cantidad) {
         long id = 0;
         SQLiteDatabase db = null;
         try {
-            // Obtener una base de datos de escritura
-            db = bdHelper.getWritableDatabase();
-
-            // Crear un ContentValues para almacenar los datos de la venta
+            db = getWritableDatabase();
             ContentValues values = new ContentValues();
             values.put("producto", producto);
-            values.put("valor", total); // Guarda el total calculado (puede ser positivo o negativo)
+            values.put("valor", total);
             values.put("detalles", detalles);
             values.put("cantidad", cantidad);
-            values.put("fecha_registro", obtenerFechaActual()); // Obtener la fecha actual
-
-            // Insertar los datos en la tabla y obtener el ID de la fila insertada
-            id = db.insert(BdHelper.TABLE_VENTAS, null, values);
+            values.put("fecha_registro", obtenerFechaActual());
+            id = db.insert(TABLE_VENTAS, null, values);
+            Log.d("BdVentas", "Insertado nuevo item con ID: " + id);
         } catch (Exception ex) {
-            ex.printStackTrace(); // Imprimir el error si ocurre una excepción
+            ex.printStackTrace();
+            Log.e("BdVentas", "Error al insertar item: " + ex.getMessage());
         } finally {
             if (db != null && db.isOpen()) {
-                db.close(); // Cerrar la base de datos
+                db.close();
+                Log.d("BdVentas", "Base de datos cerrada después de insertar");
             }
         }
-        return id; // Retornar el ID de la fila insertada
+        return id;
     }
 
-    // Método para mostrar todas las ventas de la base de datos
     public ArrayList<Items> mostrarVentas() {
         ArrayList<Items> listaVentas = new ArrayList<>();
         SQLiteDatabase db = null;
         Cursor cursorVentas = null;
 
         try {
-            db = bdHelper.getReadableDatabase();
-            Log.d("Database", "Abriendo base de datos: " + db.getPath());
-
-            cursorVentas = db.rawQuery("SELECT * FROM " + BdHelper.TABLE_VENTAS + " ORDER BY producto ASC", null);
+            db = getReadableDatabase();
+            cursorVentas = db.rawQuery("SELECT * FROM " + TABLE_VENTAS + " ORDER BY producto ASC", null);
 
             if (cursorVentas.moveToFirst()) {
                 do {
@@ -80,145 +143,144 @@ public class BdVentas  {
                     venta.setCantidad(cursorVentas.getInt(4));
                     venta.setFechaRegistro(cursorVentas.getString(5));
                     listaVentas.add(venta);
+                    Log.d("BdVentas", "Item recuperado: " + venta.getProducto());
                 } while (cursorVentas.moveToNext());
             } else {
-                Log.d("Database", "La base de datos está vacía");
-                listaVentas = new ArrayList<>();
+                Log.d("BdVentas", "La base de datos está vacía");
             }
         } catch (Exception ex) {
             ex.printStackTrace();
+            Log.e("BdVentas", "Error al mostrar ventas: " + ex.getMessage());
         } finally {
             if (cursorVentas != null) {
                 cursorVentas.close();
+                Log.d("BdVentas", "Cursor cerrado después de mostrar ventas");
             }
             if (db != null && db.isOpen()) {
                 db.close();
+                Log.d("BdVentas", "Base de datos cerrada después de mostrar ventas");
             }
         }
 
         return listaVentas;
     }
-    // Cierra la base de datos en el método close()
-    public void close() {
-        if (bdHelper != null) {
-            bdHelper.close();
-        }
-    }
-    // Método para ver una venta específica por ID
-    public Items verVenta(int id) {
-        Items venta = null;
+
+    public boolean eliminarItem(Items item) {
         SQLiteDatabase db = null;
-        Cursor cursorVentas = null;
-
+        boolean eliminado = false;
         try {
-            // Obtener una base de datos de lectura
-            db = bdHelper.getReadableDatabase();
-
-            // Consultar la venta con el ID específico
-            cursorVentas = db.rawQuery("SELECT * FROM " + BdHelper.TABLE_VENTAS + " WHERE id = ? LIMIT 1", new String[]{String.valueOf(id)});
-
-            // Verificar si el cursor contiene al menos un registro
-            if (cursorVentas.moveToFirst()) {
-                venta = new Items();
-                // Obtener los datos de la venta desde el cursor
-                venta.setId(cursorVentas.getInt(cursorVentas.getColumnIndex("id"))); // Usar el nombre de columna si es posible
-                venta.setProducto(cursorVentas.getString(cursorVentas.getColumnIndex("producto")));
-                venta.setValor(cursorVentas.getDouble(cursorVentas.getColumnIndex("valor")));
-                venta.setDetalles(cursorVentas.getString(cursorVentas.getColumnIndex("detalles")));
-                venta.setCantidad(cursorVentas.getInt(cursorVentas.getColumnIndex("cantidad")));
-                venta.setFechaRegistro(cursorVentas.getString(cursorVentas.getColumnIndex("fechaRegistro"))); // Verifica el nombre de columna
-            }
-        } catch (Exception ex) {
-            ex.printStackTrace(); // Imprimir el error si ocurre una excepción
-        } finally {
-            if (cursorVentas != null) {
-                cursorVentas.close(); // Cerrar el cursor
-            }
-            if (db != null && db.isOpen()) {
-                db.close(); // Cerrar la base de datos
-            }
-        }
-
-        return venta; // Retornar la venta
-    }
-
-    // Método para editar una venta existente
-    public boolean editarVenta(int id, String producto, double valor, String detalles, int cantidad) {
-        boolean correcto = false;
-        SQLiteDatabase db = null;
-
-        try {
-            // Obtener una base de datos de escritura
-            db = bdHelper.getWritableDatabase();
-
-            ContentValues values = new ContentValues();
-            values.put("producto", producto);
-            values.put("valor", valor); // Asegúrate de que esta columna puede manejar valores negativos
-            values.put("detalles", detalles);
-            values.put("cantidad", cantidad);
-
-            // Actualizar la venta con el ID específico
-            int rowsAffected = db.update(BdHelper.TABLE_VENTAS, values, "id = ?", new String[]{String.valueOf(id)});
-            correcto = rowsAffected > 0; // Verificar si la actualización fue exitosa
-
-        } catch (SQLException e) {
-            e.printStackTrace(); // Imprimir el error si ocurre una excepción SQL
+            db = getWritableDatabase();
+            String whereClause = "id = ?";
+            String[] whereArgs = new String[]{String.valueOf(item.getId())};
+            int rowsDeleted = db.delete(TABLE_VENTAS, whereClause, whereArgs);
+            eliminado = rowsDeleted > 0;
+            Log.d("BdVentas", "Item eliminado, ID: " + item.getId());
         } catch (Exception e) {
-            e.printStackTrace(); // Imprimir el error si ocurre una excepción general
+            e.printStackTrace();
+            Log.e("BdVentas", "Error al eliminar item: " + e.getMessage());
         } finally {
             if (db != null && db.isOpen()) {
-                db.close(); // Cerrar la base de datos
+                db.close();
+                Log.d("BdVentas", "Base de datos cerrada después de eliminar");
             }
         }
-
-        return correcto; // Retornar si la edición fue exitosa o no
+        return eliminado;
     }
 
-    // Método para eliminar una venta existente
-    public boolean eliminarVenta(int id) {
+    public boolean actualizarItem(Items item) {
         boolean correcto = false;
         SQLiteDatabase db = null;
 
         try {
-            // Obtener una base de datos de escritura
-            db = bdHelper.getWritableDatabase();
+            db = getWritableDatabase();
+            ContentValues values = new ContentValues();
+            values.put("producto", item.getProducto());
+            values.put("valor", item.getValor());
+            values.put("detalles", item.getDetalles());
+            values.put("cantidad", item.getCantidad());
 
-            // Eliminar la venta con el ID específico
-            int rowsAffected = db.delete(BdHelper.TABLE_VENTAS, "id = ?", new String[]{String.valueOf(id)});
-            correcto = rowsAffected > 0; // Verificar si la eliminación fue exitosa
-        } catch (Exception ex) {
-            ex.printStackTrace(); // Imprimir el error si ocurre una excepción
-            correcto = false;
+            int rowsAffected = db.update(TABLE_VENTAS, values, "id = ?", new String[]{String.valueOf(item.getId())});
+            correcto = rowsAffected > 0;
+            Log.d("BdVentas", "Item actualizado, ID: " + item.getId());
+        } catch (SQLException e) {
+            e.printStackTrace();
+            Log.e("BdVentas", "Error SQL al actualizar item: " + e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("BdVentas", "Error al actualizar item: " + e.getMessage());
         } finally {
             if (db != null && db.isOpen()) {
-                db.close(); // Cerrar la base de datos
+                db.close();
+                Log.d("BdVentas", "Base de datos cerrada después de actualizar");
             }
         }
 
-        return correcto; // Retornar si la eliminación fue exitosa o no
+        return correcto;
     }
 
-    // Método para obtener la fecha y hora actual en formato específico
     private String obtenerFechaActual() {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         Date date = new Date();
-        return dateFormat.format(date);
+        String fechaActual = dateFormat.format(date);
+        Log.d("BdVentas", "Fecha actual obtenida: " + fechaActual);
+        return fechaActual;
     }
 
-    // Método para eliminar todas las filas de la tabla de ventas
     public boolean eliminarTodo() {
         SQLiteDatabase db = null;
         try {
-            db = bdHelper.getWritableDatabase();
-            db.execSQL("DELETE FROM " + BdHelper.TABLE_VENTAS);
+            db = getWritableDatabase();
+            db.execSQL("DELETE FROM " + TABLE_VENTAS);
+            Log.d("BdVentas", "Todos los items eliminados");
             return true;
         } catch (Exception e) {
-            Log.e("BdVentas", "Error al eliminar las filas", e);
+            Log.e("BdVentas", "Error al eliminar las filas: " + e.getMessage());
             return false;
         } finally {
             if (db != null && db.isOpen()) {
                 db.close();
+                Log.d("BdVentas", "Base de datos cerrada después de eliminar todos los items");
             }
         }
+    }
+
+    public List<Items> getItemsByDates(String startDate, String endDate) {
+        List<Items> filteredItems = new ArrayList<>();
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = getReadableDatabase();
+            String query = "SELECT * FROM " + TABLE_VENTAS +
+                    " WHERE fecha_registro BETWEEN ? AND ?" +
+                    " ORDER BY fecha_registro ASC";
+            cursor = db.rawQuery(query, new String[]{startDate, endDate});
+
+            if (cursor.moveToFirst()) {
+                do {
+                    Items item = new Items();
+                    item.setId(cursor.getInt(cursor.getColumnIndexOrThrow("id")));
+                    item.setProducto(cursor.getString(cursor.getColumnIndexOrThrow("producto")));
+                    item.setValor(cursor.getDouble(cursor.getColumnIndexOrThrow("valor")));
+                    item.setDetalles(cursor.getString(cursor.getColumnIndexOrThrow("detalles")));
+                    item.setCantidad(cursor.getInt(cursor.getColumnIndexOrThrow("cantidad")));
+                    item.setFechaRegistro(cursor.getString(cursor.getColumnIndexOrThrow("fecha_registro")));
+                    filteredItems.add(item);
+                } while (cursor.moveToNext());
+            } else {
+                Log.d("BdVentas", "No se encontraron items para las fechas proporcionadas.");
+            }
+        } catch (Exception e) {
+            Log.e("BdVentas", "Error al obtener items por fechas: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+                Log.d("BdVentas", "Cursor cerrado después de obtener items por fechas");
+            }
+            if (db != null && db.isOpen()) {
+                db.close();
+                Log.d("BdVentas", "Base de datos cerrada después de obtener items por fechas");
+            }
+        }
+        return filteredItems;
     }
 }

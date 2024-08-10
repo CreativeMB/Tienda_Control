@@ -30,7 +30,7 @@ import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.adapter.MenuCustomAdapter;
 import com.example.tiendacontrol.helper.BaseExporter;
-import com.example.tiendacontrol.helper.BdHelper;
+
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.monitor.FiltroDiaMesAno;
 import com.example.tiendacontrol.monitor.SetCode;

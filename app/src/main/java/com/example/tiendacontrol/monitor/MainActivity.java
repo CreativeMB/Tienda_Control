@@ -18,18 +18,17 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tiendacontrol.adapter.DatosAdapter;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.example.tiendacontrol.helper.BaseExporter;
-import com.example.tiendacontrol.helper.BdHelper;
+
 import com.example.tiendacontrol.helper.BdVentas;
 import java.text.NumberFormat;
 import java.util.Locale;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.model.Items;
 import com.example.tiendacontrol.login.PerfilUsuario;
@@ -42,41 +41,39 @@ import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, MenuDialogFragment.MainActivityListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener {
-    // Declaración de variables
+    // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     public static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
 
+    // Variables
+    private DatosAdapter adapter;
+    private BdVentas bdVentas;
     private SharedPreferences sharedPreferences;
-
     private SearchView txtBuscar;
     private RecyclerView listaVentas;
     private ArrayList<Items> listaArrayVentas;
-    private BaseDatosAdapter adapter;
     private FloatingActionButton fabNuevo, fabGasto, fabMenu;
     private TextView textVenta, textGanacia, textGasto;
     private ImageView imageViewProfile;
     private FirebaseAuth mAuth;
     private FirebaseFirestore db;
     private String userId;
-    private BdHelper bdHelper;
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
-    private String currentDatabase; // Variable para almacenar el nombre de la base de datos
-    private boolean userLoggedIn; // Flag para indicar si el usuario está autenticado
-    private BdVentas bdVentas; // Declaración de la variable BdVentas
+    private String currentDatabase;
+    private boolean userLoggedIn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
-        // Inicializar SharedPreferences (dentro del método onCreate)
+
+        // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         currentDatabase = getCurrentDatabaseName();
-        // 1. Obtén el nombre de la base de datos actual de SharedPreferences
-        currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, null);
 
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
@@ -91,10 +88,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Configuración del RecyclerView
         listaVentas.setLayoutManager(new GridLayoutManager(this, 2));
-
-        // Inicializar el adaptador AQUÍ, solo una vez
         listaArrayVentas = new ArrayList<>();
-        adapter = new BaseDatosAdapter(listaArrayVentas); // Pasar la lista vacía al adaptador
+//        adapter = new DatosAdapter(this, listaArrayVentas, bdVentas);
+//        listaVentas.setAdapter(adapter);
+
+        // Inicializar BdVentas
+        bdVentas = new BdVentas(this, currentDatabase);
+        adapter = new DatosAdapter(this, listaArrayVentas, bdVentas); // Pasa la instancia
         listaVentas.setAdapter(adapter);
 
         // Verificar si el Intent contiene un nombre de base de datos
@@ -105,20 +105,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
         }
 
-        // Crea una instancia de BdHelper (solo una vez)
-        bdHelper = new BdHelper(this, currentDatabase);
-        bdVentas = new BdVentas(this, currentDatabase);
-
         // Crear una instancia de BaseExporter
         BaseExporter exporter = new BaseExporter(this, this, currentDatabase);
 
-
         // Cargar la imagen de perfil del usuario si ya está autenticado
         cargarimperfil();
-
-// Inicializar SearchView
+        // Inicializar SearchView
         txtBuscar.setOnQueryTextListener(this);
-        // Configuración de los botones flotantes
+
+        onDataChanged();
 
         fabGasto.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
@@ -215,12 +210,11 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             Log.d(TAG, "onNewIntent: Cambiando base de datos de " + currentDatabase + " a " + newDatabase);
             setCurrentDatabaseName(newDatabase);
 
-            if (bdHelper != null) {
+            if (bdVentas != null) {
                 Log.d(TAG, "onNewIntent: Cerrando bdHelper existente");
-                bdHelper.close();
+                bdVentas.close();
             }
 
-            bdHelper = new BdHelper(this, currentDatabase);
             bdVentas = new BdVentas(this, currentDatabase);
 
             Log.d(TAG, "onNewIntent: Nueva instancia de BdHelper y BdVentas creada para " + currentDatabase);
@@ -237,13 +231,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         Log.d(TAG, "onResume: Re-inicializando BdHelper y BdVentas para " + currentDatabase);
 
-        bdHelper = new BdHelper(this, currentDatabase);
+
         bdVentas = new BdVentas(this, currentDatabase);
 
         if (adapter == null) {
             Log.d(TAG, "onResume: Creando nuevo adaptador y lista");
             listaArrayVentas = new ArrayList<>();
-            adapter = new BaseDatosAdapter(listaArrayVentas);
+            adapter = new DatosAdapter(this, listaArrayVentas, bdVentas);
             listaVentas.setAdapter(adapter);
         } else {
             Log.d(TAG, "onResume: Adaptador ya existe");
@@ -258,7 +252,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             listaArrayVentas.addAll(bdVentas.mostrarVentas());
             // ¡Aquí debes llamar al método de ordenación!
             adapter.ordenarPorFecha();
-
+            adapter.setItems(listaArrayVentas);
+            adapter.setBdVentas(bdVentas);
             adapter.notifyDataSetChanged(); // Notifica al adaptador sobre el cambio
             Log.d("MainActivity", "RecyclerView actualizado, tamaño de la lista: " + listaArrayVentas.size());
             calcularSumaGanancias();
@@ -445,9 +440,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     protected void onDestroy() {
-        if (bdHelper != null) {
-            bdHelper.close(); // Cierra la base de datos
-            bdHelper = null; // Establece bdHelper a null
+        if (bdVentas != null) {
+            bdVentas.close(); // Cierra la base de datos
+            bdVentas = null; // Establece bdHelper a null
         }
         super.onDestroy();
     }

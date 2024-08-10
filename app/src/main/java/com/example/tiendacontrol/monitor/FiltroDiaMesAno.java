@@ -8,7 +8,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
-import android.os.Environment;
 import android.util.Log;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -18,28 +17,23 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.BaseDatosAdapter;
 import com.example.tiendacontrol.adapter.ItemAdapter;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
-import com.example.tiendacontrol.helper.BdHelper;
+
 import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
-import java.io.File;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 
-import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
 import java.util.List;
-import java.util.Locale;
 
 
 public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQueryTextListener {
@@ -52,7 +46,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     private Calendar calendar;
     private String startDate, endDate;
     private String currentDatabase;
-    private BdHelper bdHelper; // Instancia de BdHelper
+
     private TextView textViewPositiveSum, textViewNegativeSum, textViewDifference;
     private SearchView txtBuscar;
     private static final String PREFS_NAME = "TiendaControlPrefs";
@@ -90,7 +84,6 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         }
 
         // Crea una instancia de BdHelper (solo una vez)
-        bdHelper = new BdHelper(this, currentDatabase);
         bdVentas = new BdVentas(this, currentDatabase);
 
         // Inicializar SearchView
@@ -121,12 +114,12 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
             Log.d(TAG, "onNewIntent: Cambiando base de datos de " + currentDatabase + " a " + newDatabase);
             setCurrentDatabaseName(newDatabase);
 
-            if (bdHelper != null) {
+            if (bdVentas != null) {
                 Log.d(TAG, "onNewIntent: Cerrando bdHelper existente");
-                bdHelper.close();
+                bdVentas.close();
             }
 
-            bdHelper = new BdHelper(this, currentDatabase);
+
             bdVentas = new BdVentas(this, currentDatabase);
 
             Log.d(TAG, "onNewIntent: Nueva instancia de BdHelper y BdVentas creada para " + currentDatabase);
@@ -143,7 +136,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
 
         Log.d(TAG, "onResume: Re-inicializando BdHelper y BdVentas para " + currentDatabase);
 
-        bdHelper = new BdHelper(this, currentDatabase);
+
         bdVentas = new BdVentas(this, currentDatabase);
 
     }
@@ -202,7 +195,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     }
 
     private void filterDates(String startDate, String endDate) {
-        List<Items> filteredItems = bdHelper.getItemsByDates(startDate, endDate);
+        List<Items> filteredItems = bdVentas.getItemsByDates(startDate, endDate);
         itemAdapter.updateItems(new ArrayList<>()); // Limpia la lista del adaptador
         // Actualiza el adaptador con los datos filtrados
         itemAdapter.updateItems(filteredItems);

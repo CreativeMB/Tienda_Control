@@ -5,13 +5,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.provider.MediaStore;
 import android.provider.Settings;
 import android.util.Log;
 import android.widget.Button;
@@ -24,11 +20,10 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.DatabaseAdapter;
+import com.example.tiendacontrol.adapter.basesAdapter;
 import com.example.tiendacontrol.helper.ExcelExporter;
 
 import java.io.File;
@@ -37,7 +32,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Database extends AppCompatActivity implements DatabaseAdapter.OnDatabaseClickListener {
+public class Database extends AppCompatActivity implements basesAdapter.OnDatabaseClickListener {
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Button buttonCreateDatabase;
@@ -47,7 +42,7 @@ public class Database extends AppCompatActivity implements DatabaseAdapter.OnDat
     private static final String PREFS_NAME = "MyPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     private List<String> databaseList;
-    private DatabaseAdapter adapter;
+    private basesAdapter adapter;
     private OnStoragePermissionResultListener storagePermissionResultListener;
 
     private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
@@ -95,7 +90,7 @@ public class Database extends AppCompatActivity implements DatabaseAdapter.OnDat
         // Inicializa el RecyclerView con GridLayoutManager
         recyclerViewDatabases.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columnas
         databaseList = new ArrayList<>();
-        adapter = new DatabaseAdapter(this, databaseList, this);
+        adapter = new basesAdapter(this, databaseList, this);
         recyclerViewDatabases.setAdapter(adapter);
 
         buttonCreateDatabase.setOnClickListener(v -> {

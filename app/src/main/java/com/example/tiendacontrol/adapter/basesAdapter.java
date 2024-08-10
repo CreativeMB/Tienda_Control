@@ -1,24 +1,20 @@
 package com.example.tiendacontrol.adapter;
 
 import android.content.Context;
-import android.net.Uri;
-import android.os.Environment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
 
-import java.io.File;
 import java.util.List;
 
-public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.DatabaseViewHolder> {
+public class basesAdapter extends RecyclerView.Adapter<basesAdapter.DatabaseViewHolder> {
     public interface OnDatabaseClickListener {
         void onDatabaseClick(String databaseName);
     }
@@ -27,7 +23,7 @@ public class DatabaseAdapter extends RecyclerView.Adapter<DatabaseAdapter.Databa
     private List<String> databaseList;
     private OnDatabaseClickListener listener;
 
-    public DatabaseAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
+    public basesAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
         this.context = context;
         this.databaseList = databaseList;
         this.listener = listener;

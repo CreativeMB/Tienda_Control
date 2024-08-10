@@ -2,19 +2,17 @@ package com.example.tiendacontrol.monitor;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
-import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.BaseDatosAdapter;
+import com.example.tiendacontrol.adapter.DatosAdapter;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
-import com.example.tiendacontrol.helper.BdHelper;
+
+import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import java.text.NumberFormat;
@@ -22,9 +20,9 @@ import java.util.ArrayList;
 import java.util.Locale;
 
 public class IngresoTotal extends AppCompatActivity {
-    private BdHelper bdHelper;
+    private BdVentas bdVentas;
     private RecyclerView recyclerPositivos;
-    private BaseDatosAdapter adapterPositivos;
+    private DatosAdapter adapterPositivos;
     private ArrayList<Items> listaArrayVentas;
     private TextView textVenta;
     private FloatingActionButton fabMenu;
@@ -46,10 +44,10 @@ public class IngresoTotal extends AppCompatActivity {
         // Inicializar la base de datos
         SharedPreferences sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "");
-        bdHelper = new BdHelper(this, currentDatabase);
+        bdVentas = new BdVentas(this, currentDatabase);
 
         // Obtener la lista original de ventas
-        listaArrayVentas = obtenerListaVentas(bdHelper);
+        listaArrayVentas = obtenerListaVentas(bdVentas);
 
         // Filtrar elementos positivos
         ArrayList<Items> listaPositivos = new ArrayList<>();
@@ -60,7 +58,7 @@ public class IngresoTotal extends AppCompatActivity {
         }
 
         // Configurar el adaptador
-        adapterPositivos = new BaseDatosAdapter(listaPositivos);
+        adapterPositivos = new DatosAdapter(this, listaPositivos, bdVentas);
         recyclerPositivos.setAdapter(adapterPositivos);
 
         fabMenu.setOnClickListener(view -> {
@@ -73,14 +71,14 @@ public class IngresoTotal extends AppCompatActivity {
         calcularSumaTotalVenta();
     }
 
-    private ArrayList<Items> obtenerListaVentas(BdHelper bdHelper) {
+    private ArrayList<Items> obtenerListaVentas(BdVentas bdVentas) {
         ArrayList<Items> listaVentas = new ArrayList<>();
         // Obtener la fecha de inicio y fin para la consulta (puedes ajustar esto según tus necesidades)
         String startDate = "2024-01-01"; // Ejemplo de fecha de inicio
         String endDate = "2024-12-31";   // Ejemplo de fecha de fin
 
         // Obtener los resultados filtrados por fechas
-        listaVentas = (ArrayList<Items>) bdHelper.getItemsByDates(startDate, endDate);
+        listaVentas = (ArrayList<Items>) bdVentas.getItemsByDates(startDate, endDate);
 
         return listaVentas;
     }
