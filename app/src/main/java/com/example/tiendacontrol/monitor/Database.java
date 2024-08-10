@@ -113,8 +113,8 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 showToast("Permiso de almacenamiento denegado");
             }
         });
-
-
+        // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
+        loadDatabases();
     }
 
     private void checkAndCreateDatabase(String databaseName) {

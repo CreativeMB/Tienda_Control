@@ -92,11 +92,11 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
 
 
 
-        fabMenu.setOnClickListener(view -> {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
-            menuDialogFragment.show(fragmentManager, "servicios_dialog");
-        });
+//        fabMenu.setOnClickListener(view -> {
+//            FragmentManager fragmentManager = getSupportFragmentManager();
+//            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
+//            menuDialogFragment.show(fragmentManager, "servicios_dialog");
+//        });
 
         // Seleccionar la fecha de inicio
         selectStartDate();

@@ -31,12 +31,12 @@ public class SetCode extends AppCompatActivity {
         buttonSaveCode = findViewById(R.id.buttonSaveCode);
         fabMenu = findViewById(R.id.fabMenu);
 
-        // Configura el botón flotante para mostrar el menú cuando se hace clic
-        fabMenu.setOnClickListener(view -> {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
-            menuDialogFragment.show(fragmentManager, "servicios_dialog");
-        });
+//        // Configura el botón flotante para mostrar el menú cuando se hace clic
+//        fabMenu.setOnClickListener(view -> {
+//            FragmentManager fragmentManager = getSupportFragmentManager();
+//            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
+//            menuDialogFragment.show(fragmentManager, "servicios_dialog");
+//        });
 
         // Configura el botón "Guardar código" para guardar el nuevo código ingresado
         buttonSaveCode.setOnClickListener(new View.OnClickListener() {
