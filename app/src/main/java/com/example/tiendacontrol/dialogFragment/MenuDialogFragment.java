@@ -136,12 +136,6 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             // Ir a la pantalla de configuración de código
             Intent intent = new Intent(requireContext(), SetCode.class);
             startActivity(intent);
-        } else if (id == R.id.basedatos) {
-            // Simplemente inicia Database
-            Log.d("ActivityLifecycle", "Starting Database");
-            Intent intent = new Intent(requireContext(), Database.class);
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-            startActivity(intent);
         } else if (id == R.id.cerrar_sesion) {
             // Cerrar sesión
             FirebaseAuth.getInstance().signOut();
