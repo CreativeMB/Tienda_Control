@@ -29,7 +29,7 @@ import androidx.fragment.app.FragmentManager;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.adapter.MenuCustomAdapter;
-import com.example.tiendacontrol.helper.BaseExporter;
+
 
 import com.example.tiendacontrol.login.Login;
 import com.example.tiendacontrol.monitor.FiltroDiaMesAno;
@@ -44,7 +44,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
     private ListView menuListView; // Vista para mostrar los elementos del menú
     private MenuCustomAdapter menuAdapter; // Adaptador para los elementos del menú
     private List<MenuItemImpl> menuItems = new ArrayList<>(); // Lista de elementos del menú
-    private BaseExporter baseExporter; // Exportador de base de datos
+
     private FragmentActivity activity; // Variable para la Activity
     private static final String PREFS_NAME = "TiendaControlPrefs"; // Declare PREFS_NAME aquí
     private static final String KEY_CURRENT_DATABASE = "currentDatabase"; // Declare KEY_CURRENT_DATABASE aquí
@@ -118,12 +118,17 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
     private void handleMenuItemClick(MenuItemImpl menuItem) {
         int id = menuItem.getItemId(); // Obtener el ID del elemento del menú
 
-        if (id == R.id.nueva_venta) {
+        if (id == R.id.nuevo_Ingreso) {
             // Mostrar el diálogo de nueva venta
             FragmentManager fragmentManager = getParentFragmentManager();
             // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
             IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase);
-            ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
+            ingresoDialogFragment.show(fragmentManager, "nuevo_Ingreso");
+        } else if (id == R.id.nuevo_Egreso) {
+            // Mostrar el diálogo de nuevo gasto
+            FragmentManager fragmentManager = getParentFragmentManager();
+            GastoDialogFragment dialogFragment = new GastoDialogFragment();
+            dialogFragment.show(fragmentManager, "nuevo_Egreso");
         } else if (id == R.id.inicio) {
             // Regresar a la actividad anterior
             getActivity().finish();
@@ -131,22 +136,12 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
             // Ir a la pantalla de configuración de código
             Intent intent = new Intent(requireContext(), SetCode.class);
             startActivity(intent);
-        } else if (id == R.id.FilBase) {
-            // Ir a la pantalla de filtro por día, mes o año
-            Intent intent = new Intent(requireContext(), FiltroDiaMesAno.class);
-            startActivity(intent);
         } else if (id == R.id.basedatos) {
             // Simplemente inicia Database
             Log.d("ActivityLifecycle", "Starting Database");
             Intent intent = new Intent(requireContext(), Database.class);
             intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
             startActivity(intent);
-        } else if (id == R.id.nuevo_gasto) {
-            // Mostrar el diálogo de nuevo gasto
-            FragmentManager fragmentManager = getParentFragmentManager();
-            GastoDialogFragment dialogFragment = new GastoDialogFragment();
-            dialogFragment.show(fragmentManager, "GastoDialogFragment");
-
         } else if (id == R.id.cerrar_sesion) {
             // Cerrar sesión
             FirebaseAuth.getInstance().signOut();

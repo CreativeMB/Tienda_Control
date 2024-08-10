@@ -23,7 +23,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.adapter.DatosAdapter;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
-import com.example.tiendacontrol.helper.BaseExporter;
+
 
 import com.example.tiendacontrol.helper.BdVentas;
 import java.text.NumberFormat;
@@ -105,9 +105,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
         }
 
-        // Crear una instancia de BaseExporter
-        BaseExporter exporter = new BaseExporter(this, this, currentDatabase);
-
         // Cargar la imagen de perfil del usuario si ya está autenticado
         cargarimperfil();
         // Inicializar SearchView
@@ -154,34 +151,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     }
                 }
         );
-
-
-        // Configurar OnClickListener para abrir Negativo
-        textGasto.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, EgresoTotal.class);
-                startActivity(intent);
-            }
-        });
-
-        // Configurar OnClickListener para abrir Positivo
-        textVenta.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, IngresoTotal.class);
-                startActivity(intent);
-            }
-        });
-
-        // Configurar OnClickListener para abrir Ganancia
-        textGanacia.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, IngresoEgreso.class);
-                startActivity(intent);
-            }
-        });
 
         // Configurar OnClickListener para el ImageView de perfil
         imageViewProfile.setOnClickListener(new View.OnClickListener() {

@@ -8,13 +8,13 @@
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/nueva_venta"
+        android:id="@+id/nuevo_Ingreso"
         android:orderInCategory="100"
         android:title="@string/dos"
         app:showAsAction="never" />
 
     <item
-        android:id="@+id/nuevo_gasto"
+        android:id="@+id/nuevo_Egreso"
         android:orderInCategory="100"
         android:title="@string/tres"
         app:showAsAction="never" />
