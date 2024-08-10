@@ -54,7 +54,7 @@ public class AccessCode extends AppCompatActivity {
                 } else {
                     // Si hay un código configurado, valida el código ingresado
                     if (validateCode(inputCode)) {
-                        Intent intent = new Intent(AccessCode.this, MainActivity.class);
+                        Intent intent = new Intent(AccessCode.this, Database.class);
                         startActivity(intent); // Inicia la actividad principal
                         finish(); // Cierra la actividad después de acceder al MainActivity
                     } else {
