@@ -52,6 +52,8 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                     if (Environment.isExternalStorageManager()) {
                         if (storagePermissionResultListener != null) {
                             storagePermissionResultListener.onPermissionResult(true);
+                            // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
+                            loadDatabases();
                         }
                     } else {
                         if (storagePermissionResultListener != null) {
@@ -106,13 +108,13 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         requestStoragePermission(granted -> {
             if (granted) {
                 // Permiso concedido, puedes proceder con otras acciones si es necesario
+
             } else {
                 showToast("Permiso de almacenamiento denegado");
             }
         });
 
-        // Load databases when the activity is created
-        loadDatabases();
+
     }
 
     private void checkAndCreateDatabase(String databaseName) {
@@ -316,6 +318,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()) {
                 listener.onPermissionResult(true);
+
             } else {
                 Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                 manageAllFilesPermissionLauncher.launch(intent);
