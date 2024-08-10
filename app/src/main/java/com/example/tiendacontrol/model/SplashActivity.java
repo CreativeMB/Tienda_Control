@@ -53,7 +53,7 @@ public class SplashActivity extends AppCompatActivity {
         FirebaseUser currentUser = mAuth.getCurrentUser();
         if (currentUser == null) {
             // Si no hay usuario logueado, redirigir a la actividad de login
-            Intent intent = new Intent(SplashActivity.this, Database.class);
+            Intent intent = new Intent(SplashActivity.this, Login.class);
             startActivity(intent);
             finish();
         } else {
