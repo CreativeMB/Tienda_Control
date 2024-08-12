@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
-    public static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
-
     // Variables
     private DatosAdapter adapter;
     private BdVentas bdVentas;

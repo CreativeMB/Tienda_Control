@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -57,9 +58,6 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                     if (Environment.isExternalStorageManager()) {
                         if (storagePermissionResultListener != null) {
                             storagePermissionResultListener.onPermissionResult(true);
-                            // El usuario otorgó el permiso, ahora podemos mover los archivos
-                            File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-                            manageJournalFiles(documentsFolder);
                             // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
                             loadDatabases();
 
@@ -152,60 +150,15 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 out.write(new byte[0]);
                 showToast("Guardada en: " + dbFile.getAbsolutePath());
                 loadDatabases();
-                // Crear y mover archivos .journal a una subcarpeta oculta
-                manageJournalFiles(documentsFolder);
+
             } catch (IOException e) {
                 showToast("Error al crear la base de datos: " + e.getMessage());
+                Log.e("Database", "Error al crear la base de datos: " + e.getMessage());
             }
         }
     }
-    private void manageJournalFiles(File documentsFolder) {
-        // Crear la subcarpeta para archivos .journal
-        File journalFolder = new File(documentsFolder, "journal_files");
-        if (!journalFolder.exists()) {
-            if (!journalFolder.mkdirs()) {
-                showToast("Error al crear la carpeta para archivos .journal");
-                return;
-            }
-        }
 
-        // Mover archivos .journal a la carpeta journal_files
-        File[] journalFiles = documentsFolder.listFiles((dir, name) -> name.endsWith(".journal"));
-        if (journalFiles != null) {
-            for (File journalFile : journalFiles) {
-                File newFileLocation = new File(journalFolder, journalFile.getName());
-                boolean moved = journalFile.renameTo(newFileLocation);
-                if (moved) {
-                    Log.d("MoveFiles", "Archivo movido: " + journalFile.getName());
-                    showToast("Archivo movido: " + journalFile.getName());
-                } else {
-                    Log.e("MoveFiles", "Error al mover: " + journalFile.getName());
-                    showToast("Error al mover: " + journalFile.getName());
-                }
-            }
-        } else {
-            showToast("No se encontraron archivos .journal");
-        }
-
-        // Crear el archivo .nomedia para ocultar la carpeta journal_files
-        File nomediaFile = new File(journalFolder, ".nomedia");
-        try {
-            if (!nomediaFile.exists()) {
-                if (nomediaFile.createNewFile()) {
-                    showToast("Archivo .nomedia creado");
-                }
-            }
-        } catch (IOException e) {
-            showToast("Error al crear .nomedia: " + e.getMessage());
-        }
-        MediaScannerConnection.scanFile(this, new String[] {nomediaFile.getAbsolutePath()}, null, null);
-        // Forzar la reindexación
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(nomediaFile)));
-        showToast("Reindexación forzada");
-    }
-
-
-    private void loadDatabases() {
+       private void loadDatabases() {
         databaseList.clear();
         File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
         Log.d("Database", "Directorio de documentos: " + documentsFolder.getAbsolutePath());
@@ -386,10 +339,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
     private void requestStoragePermission(OnStoragePermissionResultListener listener) {
         this.storagePermissionResultListener = listener;
-        // El usuario otorgó el permiso, ahora podemos mover los archivos
-        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-        manageJournalFiles(documentsFolder);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()) {
                 listener.onPermissionResult(true);
 
@@ -400,9 +350,11 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         } else {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 listener.onPermissionResult(true);
+
             } else {
                 requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
         }
     }
+
 }
