@@ -198,7 +198,6 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
 
     private void filterDates(String startDate, String endDate) {
         List<Items> filteredItems = bdVentas.getItemsByDates(startDate, endDate);
-        itemAdapter.updateItems(new ArrayList<>()); // Limpia la lista del adaptador
         // Actualiza el adaptador con los datos filtrados
         itemAdapter.updateItems(filteredItems);
 

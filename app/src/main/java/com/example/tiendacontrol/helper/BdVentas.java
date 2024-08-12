@@ -242,10 +242,11 @@ public class BdVentas extends SQLiteOpenHelper {
         Cursor cursor = null;
         try {
             db = getReadableDatabase();
+            String adjustedEndDate = endDate + " 23:59:59";
             String query = "SELECT * FROM " + TABLE_VENTAS +
                     " WHERE fecha_registro BETWEEN ? AND ?" +
                     " ORDER BY fecha_registro ASC";
-            cursor = db.rawQuery(query, new String[]{startDate, endDate});
+            cursor = db.rawQuery(query, new String[]{startDate, adjustedEndDate});
 
             if (cursor.moveToFirst()) {
                 do {
