@@ -56,8 +56,12 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                     if (Environment.isExternalStorageManager()) {
                         if (storagePermissionResultListener != null) {
                             storagePermissionResultListener.onPermissionResult(true);
+                            // El usuario otorgó el permiso, ahora podemos mover los archivos
+                            File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
+                            manageJournalFiles(documentsFolder);
                             // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
                             loadDatabases();
+
                         }
                     } else {
                         if (storagePermissionResultListener != null) {
