@@ -53,14 +53,6 @@ public class BdVentas extends SQLiteOpenHelper {
         return database;
     }
 
-//    @Override
-//    public void close() {
-//        super.close();
-//        if (database != null && database.isOpen()) {
-//            database.close();
-//            Log.d("BdVentas", "Base de datos cerrada");
-//        }
-//    }
 
     public static synchronized BdVentas getInstance(Context context, String databaseName) {
         if (instance == null) {

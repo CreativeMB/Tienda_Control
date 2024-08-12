@@ -89,8 +89,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Configuración del RecyclerView
         listaVentas.setLayoutManager(new GridLayoutManager(this, 2));
         listaArrayVentas = new ArrayList<>();
-//        adapter = new DatosAdapter(this, listaArrayVentas, bdVentas);
-//        listaVentas.setAdapter(adapter);
+
 
         // Inicializar BdVentas
         bdVentas = new BdVentas(this, currentDatabase);
@@ -102,7 +101,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         if (intent.hasExtra("databaseName")) {
             currentDatabase = intent.getStringExtra("databaseName");
         } else {
-            currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
+            currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "Ejemplo");
         }
 
         // Cargar la imagen de perfil del usuario si ya está autenticado
@@ -147,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         // Puedes mostrar un mensaje al usuario y/o solicitar el permiso nuevamente
                     } else {
                         // Permiso concedido
-                        // Realiza la operación que requería el permiso
                     }
                 }
         );
@@ -247,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     // Método para obtener el nombre de la base de datos desde SharedPreferences
     private String getCurrentDatabaseName() {
-        return sharedPreferences.getString(KEY_CURRENT_DATABASE, "nombre_por_defecto.db");
+        return sharedPreferences.getString(KEY_CURRENT_DATABASE, "Ejemplo");
     }
 
     // Método para actualizar la base de datos actual

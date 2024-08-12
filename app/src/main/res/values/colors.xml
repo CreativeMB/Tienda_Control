@@ -3,7 +3,7 @@
     <!-- Colores de fondo y superficie -->
     <color name="colorBackground">#F2F1F1</color> <!-- Fondo principal -->
     <color name="colorSurface">#F5F5F5</color> <!-- Superficie de los elementos -->
-
+    <color name="colorFondoPredeterminado">#FFFFFF</color>
     <!-- Colores de texto -->
     <color name="colorOnBackground">#000000</color> <!-- Texto sobre el fondo -->
     <color name="colorOnSurface">#000000</color> <!-- Texto sobre la superficie -->
@@ -14,12 +14,12 @@
     <color name="colorSecondary">#00B8D4</color> <!-- Color secundario -->
     <color name="colorOnSecondary">#000000</color> <!-- Texto sobre el color secundario -->
 
-    <color name="toolbarBackground">#2196F3</color>
+    <color name="fondoCAr">#00AAFC</color>
     <color name="texcolor">#8C4A1D</color>
     <color name="colorNegativo">#4B0000</color>
     <color name="colorPositivo">#4CAF50</color>
-    <color name="colorFondoNegativo">#93F44336</color>
-    <color name="colorFondoPositivo">#4CAF50</color>
+    <color name="colorFondoNegativo">#80FF0000</color>
+    <color name="colorFondoPositivo">#4300FF37</color>
 
     <color name="startColor">#2196F3</color> <!-- Ajusta el color de inicio del degradado -->
     <color name="endColor">#009688</color> <!-- Ajusta el color final del degradado -->

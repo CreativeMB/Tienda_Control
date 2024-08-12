@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.cardview.widget.CardView;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
@@ -45,6 +47,9 @@ public class basesAdapter extends RecyclerView.Adapter<basesAdapter.DatabaseView
         holder.imageViewDatabaseIcon.setImageResource(R.drawable.gastos);
 
         holder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
+        int colorFondo = R.color.fondoCAr; // Usar el color definido en colors.xml
+        holder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), colorFondo));
+
     }
 
     @Override
@@ -54,12 +59,14 @@ public class basesAdapter extends RecyclerView.Adapter<basesAdapter.DatabaseView
 
     public static class DatabaseViewHolder extends RecyclerView.ViewHolder {
         TextView textViewDatabaseName;
+        CardView cardView;
         ImageView imageViewDatabaseIcon;
 
         public DatabaseViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewDatabaseName = itemView.findViewById(R.id.textViewDatabaseName);
             imageViewDatabaseIcon = itemView.findViewById(R.id.imageViewDatabase);
+            cardView = itemView.findViewById(R.id.cardView);
         }
     }
 }

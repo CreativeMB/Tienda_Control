@@ -7,6 +7,7 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.TextView;
 
+import androidx.cardview.widget.CardView;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -44,16 +45,18 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         Items item = itemList.get(position);
         holder.viewProducto.setText(item.getProducto());
         holder.viewValor.setText(formatoNumerico(Math.abs(item.getValorAsDouble())));
-        holder.viewValor.setTextColor(ContextCompat.getColor(holder.itemView.getContext(),
-                item.getValorAsDouble() < 0 ? R.color.colorNegativo : R.color.colorPositivo));
+
+//        holder.viewValor.setTextColor(ContextCompat.getColor(holder.itemView.getContext(),
+//                item.getValorAsDouble() < 0 ? R.color.colorNegativo : R.color.colorPositivo));
         holder.viewFecha.setText(item.getFechaRegistro());
         holder.viewDetalles.setText(item.getDetalles());
         holder.viewCantidad.setText(String.valueOf(item.getCantidad()));
 
-        // Cambiar el color de fondo del item según el valor
-        holder.itemView.setBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(),
-                item.getValorAsDouble() < 0 ? R.color.colorFondoNegativo : R.color.colorFondoPositivo));
+        // Cambiar el color de fondo del CardView
+        int colorFondo = item.getValorAsDouble() < 0 ? R.color.colorFondoNegativo : R.color.colorFondoPositivo;
+        holder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), colorFondo));
     }
+
 
     @Override
     public int getItemCount() {
@@ -99,7 +102,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView viewProducto, viewValor, viewDetalles, viewCantidad, viewFecha;
-
+        CardView cardView;
         public ViewHolder(View itemView) {
             super(itemView);
             viewProducto = itemView.findViewById(R.id.viewProducto);
@@ -107,6 +110,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             viewDetalles = itemView.findViewById(R.id.viewDetalles);
             viewCantidad = itemView.findViewById(R.id.viewCantidad);
             viewFecha = itemView.findViewById(R.id.viewFecha);
+            cardView = itemView.findViewById(R.id.cardView);
         }
     }
 

@@ -5,13 +5,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -36,7 +40,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
     private static final int PICK_IMAGE_REQUEST = 1;
     private Button buttonCreateDatabase;
-    private EditText editTextDatabaseName;
+
     private RecyclerView recyclerViewDatabases;
     private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "MyPrefs";
@@ -84,7 +88,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.database);
 
-        editTextDatabaseName = findViewById(R.id.editTextDatabaseName);
+
         buttonCreateDatabase = findViewById(R.id.buttonCreateDatabase);
         recyclerViewDatabases = findViewById(R.id.recyclerViewDatabases);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -94,15 +98,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         databaseList = new ArrayList<>();
         adapter = new basesAdapter(this, databaseList, this);
         recyclerViewDatabases.setAdapter(adapter);
-
-        buttonCreateDatabase.setOnClickListener(v -> {
-            String databaseName = editTextDatabaseName.getText().toString().trim();
-            if (!databaseName.isEmpty()) {
-                checkAndCreateDatabase(databaseName);
-            } else {
-                showToast("Ingrese un nombre de base de datos");
-            }
-        });
+        buttonCreateDatabase.setOnClickListener(v -> showDatabaseNameDialog());
 
         // Solicita permisos cuando se inicia la actividad
         requestStoragePermission(granted -> {
@@ -115,6 +111,25 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         });
         // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
         loadDatabases();
+    }
+    private void showDatabaseNameDialog() {
+        final EditText input = new EditText(this);
+        input.setHint("Nombre de la base de datos");
+
+        new AlertDialog.Builder(this)
+                .setTitle("Crear Base de Datos")
+                .setMessage("Ingrese el nombre para la nueva base de datos:")
+                .setView(input)
+                .setPositiveButton("Crear", (dialog, which) -> {
+                    String databaseName = input.getText().toString().trim();
+                    if (!databaseName.isEmpty()) {
+                        checkAndCreateDatabase(databaseName);
+                    } else {
+                        showToast("Ingrese un nombre de base de datos");
+                    }
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 
     private void checkAndCreateDatabase(String databaseName) {
@@ -131,13 +146,57 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             try (FileOutputStream out = new FileOutputStream(dbFile)) {
                 out.write(new byte[0]);
                 showToast("Guardada en: " + dbFile.getAbsolutePath());
-                editTextDatabaseName.setText("");
                 loadDatabases();
+                // Crear y mover archivos .journal a una subcarpeta oculta
+                manageJournalFiles(documentsFolder);
             } catch (IOException e) {
                 showToast("Error al crear la base de datos: " + e.getMessage());
             }
         }
     }
+    private void manageJournalFiles(File documentsFolder) {
+        // Crear la subcarpeta para archivos .journal
+        File journalFolder = new File(documentsFolder, "journal_files");
+        if (!journalFolder.exists()) {
+            if (!journalFolder.mkdirs()) {
+                showToast("Error al crear la carpeta para archivos .journal");
+                return;
+            }
+        }
+
+        // Mover archivos .journal a la carpeta journal_files
+        File[] journalFiles = documentsFolder.listFiles((dir, name) -> name.endsWith(".journal"));
+        if (journalFiles != null) {
+            for (File journalFile : journalFiles) {
+                File newFileLocation = new File(journalFolder, journalFile.getName());
+                boolean moved = journalFile.renameTo(newFileLocation);
+                if (moved) {
+                    showToast("Archivo movido: " + journalFile.getName());
+                } else {
+                    showToast("Error al mover: " + journalFile.getName());
+                }
+            }
+        } else {
+            showToast("No se encontraron archivos .journal");
+        }
+
+        // Crear el archivo .nomedia para ocultar la carpeta journal_files
+        File nomediaFile = new File(journalFolder, ".nomedia");
+        try {
+            if (!nomediaFile.exists()) {
+                if (nomediaFile.createNewFile()) {
+                    showToast("Archivo .nomedia creado");
+                }
+            }
+        } catch (IOException e) {
+            showToast("Error al crear .nomedia: " + e.getMessage());
+        }
+
+        // Forzar la reindexación
+        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(nomediaFile)));
+        showToast("Reindexación forzada");
+    }
+
 
     private void loadDatabases() {
         databaseList.clear();
@@ -185,40 +244,44 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     }
 
     private void showDatabaseOptionsDialog(String databaseName) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Seleccionar opción")
-                .setIcon(R.drawable.baseline_dataset_linked_24)
-                .setPositiveButton("Editar", (dialog, which) -> {
-                    editDatabase(databaseName);
-                })
-                .setNegativeButton("Eliminar", (dialog, which) -> {
-                    confirmDeleteDatabase(databaseName);
-                })
-                .setNeutralButton("Exportar a Excel", (dialog, which) -> {
-                    new ExcelExporter(databaseName).exportToExcel(this);
-                })
-                .setItems(new CharSequence[]{"Contabilidad"}, (dialog, which) -> {
-                    editDatabase2(databaseName);
-                });
+        // Inflar el diseño personalizado
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.menudatabase, null);
 
-        AlertDialog dialog = builder.create();
+        // Encontrar los botones y elementos en el diseño inflado
+        Button btnEditar = dialogView.findViewById(R.id.btnEditar);
+        Button btnEliminar = dialogView.findViewById(R.id.btnEliminar);
+        Button btnExportar = dialogView.findViewById(R.id.btnExportar);
+        TextView tvContabilidad = dialogView.findViewById(R.id.btnContabilidad);
+
+        // Crear el AlertDialog con el diseño inflado
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(dialogView)
+                .create();
+
+        // Configurar los eventos de clic
+        btnEditar.setOnClickListener(v -> {
+            editDatabase(databaseName);
+            dialog.dismiss();
+        });
+
+        btnEliminar.setOnClickListener(v -> {
+            confirmDeleteDatabase(databaseName);
+            dialog.dismiss();
+        });
+
+        btnExportar.setOnClickListener(v -> {
+            new ExcelExporter(databaseName).exportToExcel(this);
+            dialog.dismiss();
+        });
+
+        tvContabilidad.setOnClickListener(v -> {
+            editDatabase2(databaseName);
+            dialog.dismiss();
+        });
+
+        // Mostrar el diálogo
         dialog.show();
-
-        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-        Button neutralButton = dialog.getButton(AlertDialog.BUTTON_NEUTRAL);
-
-        if (positiveButton != null) {
-            positiveButton.setTextColor(getResources().getColor(R.color.colorPositivo));
-        }
-
-        if (negativeButton != null) {
-            negativeButton.setTextColor(getResources().getColor(R.color.colorNegativo));
-        }
-
-        if (neutralButton != null) {
-            neutralButton.setTextColor(getResources().getColor(R.color.colorPositivo));
-        }
     }
 
     private void editDatabase(String databaseName) {
@@ -330,10 +393,5 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
         }
-    }
-    // Método para abrir la actividad FiltroDiaMesAno
-    private void openFiltroDiaMesAnoActivity() {
-        Intent intent = new Intent(this, FiltroDiaMesAno.class);
-        startActivity(intent);
     }
 }

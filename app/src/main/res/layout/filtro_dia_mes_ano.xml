@@ -13,7 +13,7 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/baseline_density_medium_24"
+        android:src="@drawable/baseline_dataset_linked_24"
         app:backgroundTint="@color/Buton"
         app:maxImageSize="35dp"
         app:tint="@color/black" />

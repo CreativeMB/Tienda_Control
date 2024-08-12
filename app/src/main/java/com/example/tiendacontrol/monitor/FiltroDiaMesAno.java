@@ -1,6 +1,11 @@
 package com.example.tiendacontrol.monitor;
 
+import static android.app.PendingIntent.getActivity;
 import static android.content.ContentValues.TAG;
+
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
+import static java.security.AccessController.getContext;
 
 import android.app.DatePickerDialog;
 import android.content.Context;
@@ -67,7 +72,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         textViewPositiveSum = findViewById(R.id.text_view_positive_sum);
         textViewNegativeSum = findViewById(R.id.text_view_negative_sum);
         textViewDifference = findViewById(R.id.text_view_difference);
-        fabMenu = findViewById(R.id.fabMenu);
+        FloatingActionButton fabMenu = findViewById(R.id.fabMenu);
         calendar = Calendar.getInstance();
 
 //        // Configuración del RecyclerView
@@ -90,13 +95,10 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         txtBuscar = findViewById(R.id.txtBuscar);
         txtBuscar.setOnQueryTextListener(this);
 
-
-
-//        fabMenu.setOnClickListener(view -> {
-//            FragmentManager fragmentManager = getSupportFragmentManager();
-//            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
-//            menuDialogFragment.show(fragmentManager, "servicios_dialog");
-//        });
+        fabMenu.setOnClickListener(view -> {
+            Intent databaseIntent = new Intent(this, Database.class);
+            startActivity(databaseIntent);
+        });
 
         // Seleccionar la fecha de inicio
         selectStartDate();

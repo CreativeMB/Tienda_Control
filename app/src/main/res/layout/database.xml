@@ -6,12 +6,19 @@
     android:gravity="center"
     android:padding="16dp">
 
-    <EditText
-        android:id="@+id/editTextDatabaseName"
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewDatabases"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:gravity="center"
-        android:hint="Ingrese el nombre de la base de datos" />
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="16dp" />
+
+<!--    <EditText-->
+<!--        android:id="@+id/editTextDatabaseName"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:gravity="center"-->
+<!--        android:hint="Ingrese el nombre de la base de datos" />-->
 
     <LinearLayout
        android:layout_width="match_parent"
@@ -34,12 +41,6 @@
 
 
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerViewDatabases"
-            android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:paddingTop="16dp" />
 
 
 </LinearLayout>
