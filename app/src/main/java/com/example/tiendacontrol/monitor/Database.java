@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.media.MediaScannerConnection;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -175,8 +176,10 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 File newFileLocation = new File(journalFolder, journalFile.getName());
                 boolean moved = journalFile.renameTo(newFileLocation);
                 if (moved) {
+                    Log.d("MoveFiles", "Archivo movido: " + journalFile.getName());
                     showToast("Archivo movido: " + journalFile.getName());
                 } else {
+                    Log.e("MoveFiles", "Error al mover: " + journalFile.getName());
                     showToast("Error al mover: " + journalFile.getName());
                 }
             }
@@ -195,7 +198,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         } catch (IOException e) {
             showToast("Error al crear .nomedia: " + e.getMessage());
         }
-
+        MediaScannerConnection.scanFile(this, new String[] {nomediaFile.getAbsolutePath()}, null, null);
         // Forzar la reindexación
         sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(nomediaFile)));
         showToast("Reindexación forzada");
@@ -289,12 +292,14 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     }
 
     private void editDatabase(String databaseName) {
+        Log.d("Database", "editDatabase() ejecutado con databaseName: " + databaseName);
         if (databaseName != null && !databaseName.isEmpty()) {
             closeCurrentDatabase();
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(KEY_CURRENT_DATABASE, databaseName);
             editor.putBoolean("KEY_DATABASE_SELECTED", true);
             editor.apply();
+            Log.d("Database", "Nombre de la base de datos guardado en SharedPreferences: " + databaseName);
             showToast("Base de datos actual: " + databaseName);
 
             // Abre la base de datos en la actividad correspondiente
@@ -381,7 +386,9 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
     private void requestStoragePermission(OnStoragePermissionResultListener listener) {
         this.storagePermissionResultListener = listener;
-
+        // El usuario otorgó el permiso, ahora podemos mover los archivos
+        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
+        manageJournalFiles(documentsFolder);
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()) {
                 listener.onPermissionResult(true);

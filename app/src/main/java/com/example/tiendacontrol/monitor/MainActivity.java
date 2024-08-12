@@ -71,10 +71,20 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Inicializar SharedPreferences
+        // *** Inicializar SharedPreferences ***
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        currentDatabase = getCurrentDatabaseName();
 
+        // Obtener nombre de la base de datos del Intent
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("databaseName")) {
+            currentDatabase = intent.getStringExtra("databaseName");
+            // Guardar en SharedPreferences para uso futuro
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(KEY_CURRENT_DATABASE, currentDatabase);
+            editor.apply();
+        } else {
+            currentDatabase = getCurrentDatabaseName();
+        }
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
         listaVentas = findViewById(R.id.listaVentas);
@@ -95,14 +105,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         bdVentas = new BdVentas(this, currentDatabase);
         adapter = new DatosAdapter(this, listaArrayVentas, bdVentas); // Pasa la instancia
         listaVentas.setAdapter(adapter);
-
-        // Verificar si el Intent contiene un nombre de base de datos
-        Intent intent = getIntent();
-        if (intent.hasExtra("databaseName")) {
-            currentDatabase = intent.getStringExtra("databaseName");
-        } else {
-            currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "Ejemplo");
-        }
 
         // Cargar la imagen de perfil del usuario si ya está autenticado
         cargarimperfil();
@@ -245,7 +247,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     // Método para obtener el nombre de la base de datos desde SharedPreferences
     private String getCurrentDatabaseName() {
-        return sharedPreferences.getString(KEY_CURRENT_DATABASE, "Ejemplo");
+        return sharedPreferences.getString(KEY_CURRENT_DATABASE, null);
     }
 
     // Método para actualizar la base de datos actual
