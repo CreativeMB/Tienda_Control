@@ -1,46 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:gravity="center"
-    android:padding="16dp">
+    android:fitsSystemWindows="true">
 
+    <!-- RecyclerView ocupa todo el espacio -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewDatabases"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
+        android:layout_height="match_parent"
         android:paddingTop="16dp" />
 
-<!--    <EditText-->
-<!--        android:id="@+id/editTextDatabaseName"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:gravity="center"-->
-<!--        android:hint="Ingrese el nombre de la base de datos" />-->
+    <!-- Icono flotante para Recordatorio -->
+    <ImageView
+        android:id="@+id/recordatorio"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/recordatorio"
+        android:elevation="8dp"/>
 
-    <LinearLayout
-       android:layout_width="match_parent"
+    <!-- Icono flotante para Database -->
+    <ImageView
+        android:id="@+id/database"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="100dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/database"
+        android:elevation="8dp"/>
+
+    <!-- Icono flotante para Donaciones -->
+    <ImageView
+        android:id="@+id/donacion"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="30dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/donacion"
+        android:elevation="8dp"/>
+
+    <!-- Texto para Donaciones (puedes ajustar el layout si es necesario) -->
+    <TextView
+        android:id="@+id/textDonaciones"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
-        <Button
-            android:id="@+id/buttonCreateDatabase"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:gravity="center"
-            style="@style/Widget.AppTheme.Button"
-            android:text="Crear Base de Datos" />
-
-    </LinearLayout>
-
-
-
-
-
-
-</LinearLayout>
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="2dp"
+        android:layout_marginBottom="80dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:text="¡Tu apoyo nos impulsa! 🙌"
+        android:textSize="10sp"
+        android:elevation="8dp"/>
+</FrameLayout>

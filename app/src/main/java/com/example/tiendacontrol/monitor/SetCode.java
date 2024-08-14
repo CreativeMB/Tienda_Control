@@ -1,16 +1,17 @@
 package com.example.tiendacontrol.monitor;
 
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
+
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class SetCode extends AppCompatActivity {
@@ -18,26 +19,23 @@ public class SetCode extends AppCompatActivity {
     private EditText editTextCode; // Campo para ingresar el nuevo código de acceso
     private Button buttonSaveCode; // Botón para guardar el nuevo código de acceso
     private static final String PREFS_NAME = "CodePrefs"; // Nombre del archivo de preferencias para guardar el código
-    private static final String CODE_KEY = "access_code"; // Clave para almacenar el código de acceso
+    private static final String CODE_KEY = "accesscode"; // Clave para almacenar el código de acceso
     private static final String TAG = "SetCode"; // Etiqueta para los mensajes de log
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.set_code); // Establece el diseño de la actividad
+        setContentView(R.layout.setcode); // Establece el diseño de la actividad
 
         // Inicializa las vistas
         editTextCode = findViewById(R.id.editTextCode);
         buttonSaveCode = findViewById(R.id.buttonSaveCode);
-        fabMenu = findViewById(R.id.fabMenu);
+        ImageView iconDatabase = findViewById(R.id.database);
 
-//        // Configura el botón flotante para mostrar el menú cuando se hace clic
-//        fabMenu.setOnClickListener(view -> {
-//            FragmentManager fragmentManager = getSupportFragmentManager();
-//            MenuDialogFragment menuDialogFragment = MenuDialogFragment.newInstance();
-//            menuDialogFragment.show(fragmentManager, "servicios_dialog");
-//        });
-
+        iconDatabase.setOnClickListener(view -> {
+            Intent databaseIntent = new Intent(this, Database.class);
+            startActivity(databaseIntent);
+        });
         // Configura el botón "Guardar código" para guardar el nuevo código ingresado
         buttonSaveCode.setOnClickListener(new View.OnClickListener() {
             @Override

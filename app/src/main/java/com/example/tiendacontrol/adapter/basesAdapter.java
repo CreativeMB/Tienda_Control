@@ -34,7 +34,7 @@ public class basesAdapter extends RecyclerView.Adapter<basesAdapter.DatabaseView
     @NonNull
     @Override
     public DatabaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_database, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.itemdatabase, parent, false);
         return new DatabaseViewHolder(view);
     }
 
@@ -44,7 +44,7 @@ public class basesAdapter extends RecyclerView.Adapter<basesAdapter.DatabaseView
         holder.textViewDatabaseName.setText(databaseName);
 
         // Usa una imagen por defecto para los ítems
-        holder.imageViewDatabaseIcon.setImageResource(R.drawable.gastos);
+        holder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
 
         holder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
         int colorFondo = R.color.fondoCAr; // Usar el color definido en colors.xml

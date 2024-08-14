@@ -1,11 +1,13 @@
 package com.example.tiendacontrol.monitor;
 
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -15,6 +17,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,10 +37,11 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class Database extends AppCompatActivity implements basesAdapter.OnDatabaseClickListener {
-
+    private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Button buttonCreateDatabase;
 
@@ -56,9 +60,6 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                     if (Environment.isExternalStorageManager()) {
                         if (storagePermissionResultListener != null) {
                             storagePermissionResultListener.onPermissionResult(true);
-                            // El usuario otorgó el permiso, ahora podemos mover los archivos
-                            File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-                            manageJournalFiles(documentsFolder);
                             // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
                             loadDatabases();
 
@@ -92,8 +93,14 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.database);
 
+        ImageView iconRecordatorio = findViewById(R.id.recordatorio);
+        iconRecordatorio.setOnClickListener(view -> showTimePickerDialog());
 
-        buttonCreateDatabase = findViewById(R.id.buttonCreateDatabase);
+        ImageView iconCreateDatabase = findViewById(R.id.database);
+        iconCreateDatabase.setOnClickListener(v -> showDatabaseNameDialog());
+
+        ImageView iconDonacion = findViewById(R.id.donacion);
+
         recyclerViewDatabases = findViewById(R.id.recyclerViewDatabases);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -102,7 +109,13 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         databaseList = new ArrayList<>();
         adapter = new basesAdapter(this, databaseList, this);
         recyclerViewDatabases.setAdapter(adapter);
-        buttonCreateDatabase.setOnClickListener(v -> showDatabaseNameDialog());
+
+
+        iconDonacion.setOnClickListener(view -> {
+            Intent databaseIntent = new Intent(this, Donar.class);
+            startActivity(databaseIntent);
+        });
+
 
         // Solicita permisos cuando se inicia la actividad
         requestStoragePermission(granted -> {
@@ -116,6 +129,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
         loadDatabases();
     }
+
     private void showDatabaseNameDialog() {
         final EditText input = new EditText(this);
         input.setHint("Nombre de la base de datos");
@@ -151,56 +165,13 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 out.write(new byte[0]);
                 showToast("Guardada en: " + dbFile.getAbsolutePath());
                 loadDatabases();
-                // Crear y mover archivos .journal a una subcarpeta oculta
-                manageJournalFiles(documentsFolder);
+
             } catch (IOException e) {
                 showToast("Error al crear la base de datos: " + e.getMessage());
+                Log.e("Database", "Error al crear la base de datos: " + e.getMessage());
             }
         }
     }
-    private void manageJournalFiles(File documentsFolder) {
-        // Crear la subcarpeta para archivos .journal
-        File journalFolder = new File(documentsFolder, "journal_files");
-        if (!journalFolder.exists()) {
-            if (!journalFolder.mkdirs()) {
-                showToast("Error al crear la carpeta para archivos .journal");
-                return;
-            }
-        }
-
-        // Mover archivos .journal a la carpeta journal_files
-        File[] journalFiles = documentsFolder.listFiles((dir, name) -> name.endsWith(".journal"));
-        if (journalFiles != null) {
-            for (File journalFile : journalFiles) {
-                File newFileLocation = new File(journalFolder, journalFile.getName());
-                boolean moved = journalFile.renameTo(newFileLocation);
-                if (moved) {
-                    showToast("Archivo movido: " + journalFile.getName());
-                } else {
-                    showToast("Error al mover: " + journalFile.getName());
-                }
-            }
-        } else {
-            showToast("No se encontraron archivos .journal");
-        }
-
-        // Crear el archivo .nomedia para ocultar la carpeta journal_files
-        File nomediaFile = new File(journalFolder, ".nomedia");
-        try {
-            if (!nomediaFile.exists()) {
-                if (nomediaFile.createNewFile()) {
-                    showToast("Archivo .nomedia creado");
-                }
-            }
-        } catch (IOException e) {
-            showToast("Error al crear .nomedia: " + e.getMessage());
-        }
-
-        // Forzar la reindexación
-        sendBroadcast(new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE, Uri.fromFile(nomediaFile)));
-        showToast("Reindexación forzada");
-    }
-
 
     private void loadDatabases() {
         databaseList.clear();
@@ -263,6 +234,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 .setView(dialogView)
                 .create();
 
+
         // Configurar los eventos de clic
         btnEditar.setOnClickListener(v -> {
             editDatabase(databaseName);
@@ -289,12 +261,14 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     }
 
     private void editDatabase(String databaseName) {
+        Log.d("Database", "editDatabase() ejecutado con databaseName: " + databaseName);
         if (databaseName != null && !databaseName.isEmpty()) {
             closeCurrentDatabase();
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(KEY_CURRENT_DATABASE, databaseName);
             editor.putBoolean("KEY_DATABASE_SELECTED", true);
             editor.apply();
+            Log.d("Database", "Nombre de la base de datos guardado en SharedPreferences: " + databaseName);
             showToast("Base de datos actual: " + databaseName);
 
             // Abre la base de datos en la actividad correspondiente
@@ -305,6 +279,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             showToast("Nombre de base de datos inválido");
         }
     }
+
     private void editDatabase2(String databaseName) {
         if (databaseName != null && !databaseName.isEmpty()) {
             closeCurrentDatabase();
@@ -381,7 +356,6 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
     private void requestStoragePermission(OnStoragePermissionResultListener listener) {
         this.storagePermissionResultListener = listener;
-
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()) {
                 listener.onPermissionResult(true);
@@ -393,9 +367,83 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         } else {
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
                 listener.onPermissionResult(true);
+
             } else {
                 requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
             }
         }
+    }
+
+    private void showTimePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                (view, hourOfDay, minuteOfHour) -> {
+                    // Guardar la hora seleccionada
+                    Calendar selectedTime = Calendar.getInstance();
+                    selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    selectedTime.set(Calendar.MINUTE, minuteOfHour);
+                    selectedTime.set(Calendar.SECOND, 0);
+
+                    // Programar la notificación
+                    scheduleNotification(selectedTime);
+                }, hour, minute, true);
+
+        timePickerDialog.show();
+    }
+
+    private void scheduleNotification(Calendar selectedTime) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        Intent intent = new Intent(this, Recordatorio.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager != null && canScheduleExactAlarms()) {
+                alarmManager.setRepeating(
+                        AlarmManager.RTC_WAKEUP,
+                        selectedTime.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY,  // Intervalo de un día
+                        pendingIntent
+                );
+
+                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+            } else {
+                // Solicitar permiso para alarmas exactas
+                Intent permissionIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(permissionIntent);
+
+                Toast.makeText(this, "Debes conceder permiso para guardar el recordatorio diario", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            if (alarmManager != null) {
+                alarmManager.setRepeating(
+                        AlarmManager.RTC_WAKEUP,
+                        selectedTime.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY,  // Intervalo de un día
+                        pendingIntent
+                );
+
+                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
+
+    private boolean canScheduleExactAlarms() {
+        // Para API 31 y superior, se utiliza el método canScheduleExactAlarms
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            return alarmManager != null && alarmManager.canScheduleExactAlarms();
+        }
+        // Para versiones anteriores, siempre devolver verdadero
+        return true;
     }
 }

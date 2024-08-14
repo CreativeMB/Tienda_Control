@@ -48,7 +48,7 @@ public class PerfilUsuario extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.perfil_usuario);
+        setContentView(R.layout.perfilusuario);
 
         // Inicializar componentes de la interfaz de usuario
         textViewName = findViewById(R.id.textViewName);

@@ -44,8 +44,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
-    public static final int REQUEST_CODE_STORAGE_PERMISSION = 100;
-
     // Variables
     private DatosAdapter adapter;
     private BdVentas bdVentas;
@@ -66,21 +64,31 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.activitymain);
         // Inicialización de Firebase
         mAuth = FirebaseAuth.getInstance();
         db = FirebaseFirestore.getInstance();
 
-        // Inicializar SharedPreferences
+        // *** Inicializar SharedPreferences ***
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        currentDatabase = getCurrentDatabaseName();
 
+        // Obtener nombre de la base de datos del Intent
+        Intent intent = getIntent();
+        if (intent != null && intent.hasExtra("databaseName")) {
+            currentDatabase = intent.getStringExtra("databaseName");
+            // Guardar en SharedPreferences para uso futuro
+            SharedPreferences.Editor editor = sharedPreferences.edit();
+            editor.putString(KEY_CURRENT_DATABASE, currentDatabase);
+            editor.apply();
+        } else {
+            currentDatabase = getCurrentDatabaseName();
+        }
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
         listaVentas = findViewById(R.id.listaVentas);
-        fabNuevo = findViewById(R.id.favNuevo);
         fabMenu = findViewById(R.id.fabMenu);
-        fabGasto = findViewById(R.id.favGasto);
+        ImageView iconIngreso = findViewById(R.id.ingreso);
+        ImageView iconEgreso = findViewById(R.id.egreso);
         textVenta = findViewById(R.id.textVenta);
         textGanacia = findViewById(R.id.textGanacia);
         textGasto = findViewById(R.id.textGasto);
@@ -96,14 +104,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new DatosAdapter(this, listaArrayVentas, bdVentas); // Pasa la instancia
         listaVentas.setAdapter(adapter);
 
-        // Verificar si el Intent contiene un nombre de base de datos
-        Intent intent = getIntent();
-        if (intent.hasExtra("databaseName")) {
-            currentDatabase = intent.getStringExtra("databaseName");
-        } else {
-            currentDatabase = sharedPreferences.getString(KEY_CURRENT_DATABASE, "Ejemplo");
-        }
-
         // Cargar la imagen de perfil del usuario si ya está autenticado
         cargarimperfil();
         // Inicializar SearchView
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         onDataChanged();
 
-        fabGasto.setOnClickListener(view -> {
+        iconEgreso.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
             GastoDialogFragment gastoDialogFragment = GastoDialogFragment.newInstance(currentDatabase);
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             gastoDialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
         });
 
-        fabNuevo.setOnClickListener(view -> {
+        iconIngreso.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
             IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase);
@@ -245,7 +245,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     // Método para obtener el nombre de la base de datos desde SharedPreferences
     private String getCurrentDatabaseName() {
-        return sharedPreferences.getString(KEY_CURRENT_DATABASE, "Ejemplo");
+        return sharedPreferences.getString(KEY_CURRENT_DATABASE, null);
     }
 
     // Método para actualizar la base de datos actual
@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textVenta.setText(sumaFormateadaStr);
     }
 
-    // Método para calcular y mostrar la suma total de gastos sin decimales
+    // Método para calcular y mostrar la suma total de icono sin decimales
     private void calcularSumaTotalGasto() {
         double suma = 0.0;
         for (Items venta : listaArrayVentas) {
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     }
                 })
                 .setNegativeButton("No", null)
-                .setIcon(R.drawable.baseline_delete_forever_24)
+                .setIcon(R.drawable.eliminar)
                 .show();
     }
 

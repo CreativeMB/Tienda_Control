@@ -15,14 +15,14 @@
             android:layout_width="250dp"
             android:layout_height="30dp"
             android:layout_margin="0dp"
-            android:background="@drawable/searchview_backgroun" />
+            android:background="@drawable/buscador" />
+
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaVentas"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1" />
-
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -112,38 +112,31 @@
         android:layout_marginTop="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/baseline_density_medium_24"
+        android:src="@drawable/menu"
         app:backgroundTint="@color/Buton"
-        app:maxImageSize="25dp"
-        app:tint="@color/black" />
+        app:maxImageSize="25dp"/>
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/favNuevo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/ingreso"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="180dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/baseline_person_add_alt_1_24"
-        app:backgroundTint="@color/Buton"
-        app:maxImageSize="38dp"
-        app:tint="#0C550F" />
+        android:src="@drawable/ingreso" />
 
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/favGasto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/egreso"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="100dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/baseline_person_remove_24"
-        app:backgroundTint="@color/Buton"
-        app:maxImageSize="40dp"
-        app:tint="@color/colorNegativo" />
+        android:src="@drawable/egreso"/>
 
     <ImageView
         android:id="@+id/imageViewProfile"
@@ -155,6 +148,6 @@
         android:clickable="true"
         android:focusable="true"
         android:layout_marginStart="-155dp"
-        android:src="@drawable/gastos" />
+        android:src="@drawable/icono" />
 
 </FrameLayout>

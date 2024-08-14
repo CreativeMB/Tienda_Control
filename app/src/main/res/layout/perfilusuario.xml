@@ -27,7 +27,7 @@
                 android:layout_width="150dp"
                 android:layout_height="150dp"
                 android:layout_gravity="center_horizontal"
-                android:src="@drawable/gastos" />
+                android:src="@drawable/icono" />
 
             <TextView
                 android:id="@+id/textViewEmail"
@@ -107,7 +107,7 @@
         android:layout_marginTop="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/baseline_density_medium_24"
+        android:src="@drawable/menu"
         app:backgroundTint="@color/Buton"
         app:maxImageSize="35dp"
         app:tint="@color/black" />

@@ -4,21 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
-
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/baseline_dataset_linked_24"
-        app:backgroundTint="@color/Buton"
-        app:maxImageSize="35dp"
-        app:tint="@color/black" />
-
-    <LinearLayout
+        <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
@@ -29,7 +15,7 @@
             android:layout_width="250dp"
             android:layout_height="30dp"
             android:layout_margin="0dp"
-            android:background="@drawable/searchview_backgroun" />
+            android:background="@drawable/buscador" />
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaFiltro"
@@ -107,5 +93,15 @@
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
+
+    <ImageView
+        android:id="@+id/database"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="top|end"
+        android:layout_margin="16dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/inicio"/>
 
 </FrameLayout>

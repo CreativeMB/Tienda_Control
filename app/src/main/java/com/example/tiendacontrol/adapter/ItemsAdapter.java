@@ -5,6 +5,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Filter;
 import android.widget.Filterable;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.cardview.widget.CardView;
@@ -19,11 +20,11 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> implements Filterable {
+public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> implements Filterable {
     private List<Items> itemList;
     private List<Items> itemListFull;
 
-    public ItemAdapter(List<Items> itemList) {
+    public ItemsAdapter(List<Items> itemList) {
         this.itemList = itemList;
         this.itemListFull = new ArrayList<>(itemList); // Inicializa la lista completa para el filtrado
     }
@@ -55,6 +56,10 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
         // Cambiar el color de fondo del CardView
         int colorFondo = item.getValorAsDouble() < 0 ? R.color.colorFondoNegativo : R.color.colorFondoPositivo;
         holder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), colorFondo));
+        // Asignar la imagen en función del valor
+        int iconoFondo = item.getValorAsDouble() < 0 ? R.drawable.egreso : R.drawable.ingreso;
+        holder. imageItems.setImageResource(iconoFondo);
+
     }
 
 
@@ -102,6 +107,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
 
     public class ViewHolder extends RecyclerView.ViewHolder {
         TextView viewProducto, viewValor, viewDetalles, viewCantidad, viewFecha;
+        ImageView imageItems;
         CardView cardView;
         public ViewHolder(View itemView) {
             super(itemView);
@@ -111,6 +117,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> im
             viewCantidad = itemView.findViewById(R.id.viewCantidad);
             viewFecha = itemView.findViewById(R.id.viewFecha);
             cardView = itemView.findViewById(R.id.cardView);
+            imageItems = itemView.findViewById(R.id. imageItems);
         }
     }
 
