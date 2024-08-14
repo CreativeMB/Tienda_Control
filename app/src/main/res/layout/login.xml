@@ -50,7 +50,6 @@
             app:layout_constraintHorizontal_bias="0.5"
             app:layout_constraintWidth_percent="0.9"
             app:cardBackgroundColor="#FDF2E2">
-
             <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
