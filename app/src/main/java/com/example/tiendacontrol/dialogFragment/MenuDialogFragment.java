@@ -2,13 +2,8 @@ package com.example.tiendacontrol.dialogFragment;
 
 import static com.google.common.reflect.Reflection.getPackageName;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
@@ -16,23 +11,19 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListView;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuItemImpl;
-import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.monitor.Database;
-import com.example.tiendacontrol.adapter.MenuCustomAdapter;
+import com.example.tiendacontrol.adapter.MenuAdapter;
 
 
 import com.example.tiendacontrol.login.Login;
-import com.example.tiendacontrol.monitor.FiltroDiaMesAno;
 import com.example.tiendacontrol.monitor.SetCode;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.google.firebase.auth.FirebaseAuth;
@@ -42,7 +33,7 @@ import java.util.List;
 
 public class MenuDialogFragment extends BottomSheetDialogFragment {
     private ListView menuListView; // Vista para mostrar los elementos del menú
-    private MenuCustomAdapter menuAdapter; // Adaptador para los elementos del menú
+    private MenuAdapter menuAdapter; // Adaptador para los elementos del menú
     private List<MenuItemImpl> menuItems = new ArrayList<>(); // Lista de elementos del menú
 
     private FragmentActivity activity; // Variable para la Activity
@@ -82,7 +73,7 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
         menuItems = getMenuItemsFromMenuBuilder(menuBuilder);
 
         // Crear el adaptador de menú personalizado
-        menuAdapter = new MenuCustomAdapter(requireContext(), menuItems);
+        menuAdapter = new MenuAdapter(requireContext(), menuItems);
         menuListView.setAdapter(menuAdapter);
 
         // Manejar clics en los elementos del menú

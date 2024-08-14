@@ -10,9 +10,8 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
+
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 public class SetCode extends AppCompatActivity {
@@ -20,13 +19,13 @@ public class SetCode extends AppCompatActivity {
     private EditText editTextCode; // Campo para ingresar el nuevo código de acceso
     private Button buttonSaveCode; // Botón para guardar el nuevo código de acceso
     private static final String PREFS_NAME = "CodePrefs"; // Nombre del archivo de preferencias para guardar el código
-    private static final String CODE_KEY = "access_code"; // Clave para almacenar el código de acceso
+    private static final String CODE_KEY = "accesscode"; // Clave para almacenar el código de acceso
     private static final String TAG = "SetCode"; // Etiqueta para los mensajes de log
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.set_code); // Establece el diseño de la actividad
+        setContentView(R.layout.setcode); // Establece el diseño de la actividad
 
         // Inicializa las vistas
         editTextCode = findViewById(R.id.editTextCode);

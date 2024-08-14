@@ -15,7 +15,7 @@
             android:layout_width="250dp"
             android:layout_height="30dp"
             android:layout_margin="0dp"
-            android:background="@drawable/searchview_backgroun" />
+            android:background="@drawable/buscador" />
 
 
         <androidx.recyclerview.widget.RecyclerView
@@ -112,10 +112,9 @@
         android:layout_marginTop="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/baseline_density_medium_24"
+        android:src="@drawable/menu"
         app:backgroundTint="@color/Buton"
-        app:maxImageSize="25dp"
-        app:tint="@color/black" />
+        app:maxImageSize="25dp"/>
 
     <ImageView
         android:id="@+id/ingreso"

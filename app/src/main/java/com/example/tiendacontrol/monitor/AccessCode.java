@@ -16,12 +16,12 @@ public class AccessCode extends AppCompatActivity {
     private Button buttonAccess; // Botón para validar el código de acceso
     private Button btnLogin; // Botón para redirigir a la pantalla de inicio de sesión
     private static final String PREFS_NAME = "CodePrefs"; // Nombre del archivo de preferencias
-    private static final String CODE_KEY = "access_code"; // Clave para almacenar el código de acceso
+    private static final String CODE_KEY = "accesscode"; // Clave para almacenar el código de acceso
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.access_code); // Establece el diseño de la actividad
+        setContentView(R.layout.accesscode); // Establece el diseño de la actividad
 
         // Inicializa las vistas
         editTextAccessCode = findViewById(R.id.editTextAccessCode);

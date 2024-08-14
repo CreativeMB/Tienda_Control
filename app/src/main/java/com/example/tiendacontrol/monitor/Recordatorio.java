@@ -37,8 +37,9 @@ public class Recordatorio extends BroadcastReceiver {
             channel.setDescription("Canal para recordatorios diarios");
             notificationManager.createNotificationChannel(channel);
         }
+
         // Crear un Intent que se ejecutará cuando se toque la notificación
-        Intent notificationIntent = new Intent(context, Database.class);  // Cambia MainActivity por la actividad que deseas abrir
+        Intent notificationIntent = new Intent(context, Database.class);  // Cambia Database por la actividad que deseas abrir
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
@@ -47,16 +48,18 @@ public class Recordatorio extends BroadcastReceiver {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
+        // Crear la notificación y asociar el PendingIntent
         Notification notification = new NotificationCompat.Builder(context, "your_channel_id")
                 .setContentTitle("Mi Contabilidad")
                 .setContentText("No Olvides Realizar Las Cuentas Hoy.")
                 .setSmallIcon(R.drawable.contabilidad)
                 .setAutoCancel(true)
+                .setContentIntent(pendingIntent)  // Asociar el PendingIntent aquí
                 .build();
 
+        // Mostrar la notificación
         notificationManager.notify(1, notification);
     }
-
     private void reScheduleAlarm(Context context) {
         AlarmManager alarmManager = (AlarmManager) context.getSystemService(Context.ALARM_SERVICE);
         Intent intent = new Intent(context, Recordatorio.class);

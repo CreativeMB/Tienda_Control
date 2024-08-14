@@ -34,7 +34,7 @@ public class basesAdapter extends RecyclerView.Adapter<basesAdapter.DatabaseView
     @NonNull
     @Override
     public DatabaseViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_database, parent, false);
+        View view = LayoutInflater.from(context).inflate(R.layout.itemdatabase, parent, false);
         return new DatabaseViewHolder(view);
     }
 

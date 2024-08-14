@@ -3,10 +3,6 @@ package com.example.tiendacontrol.monitor;
 import static android.app.PendingIntent.getActivity;
 import static android.content.ContentValues.TAG;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
-import static java.security.AccessController.getContext;
-
 import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -21,13 +17,11 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.ItemAdapter;
-import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
+import com.example.tiendacontrol.adapter.ItemsAdapter;
 
 import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.model.Items;
@@ -48,7 +42,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     private FloatingActionButton fabMenu;
     private TextView textViewSelectedDateRange;
     private RecyclerView listaFiltro, recyclerView;
-    private ItemAdapter itemAdapter; // Usa solo itemAdapter
+    private ItemsAdapter itemsAdapter; // Usa solo itemsAdapter
     private Calendar calendar;
     private String startDate, endDate;
     private String currentDatabase;
@@ -62,7 +56,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.filtro_dia_mes_ano);
+        setContentView(R.layout.filtrodiamesano);
         // Inicializar SharedPreferences (dentro del método onCreate)
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         currentDatabase = getCurrentDatabaseName();
@@ -78,9 +72,9 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         calendar = Calendar.getInstance();
 
 //        // Configuración del RecyclerView
-        itemAdapter = new ItemAdapter(new ArrayList<>()); // Inicializa con una lista vacía
+        itemsAdapter = new ItemsAdapter(new ArrayList<>()); // Inicializa con una lista vacía
         listaFiltro.setLayoutManager(new GridLayoutManager(this, 2));
-        listaFiltro.setAdapter(itemAdapter); // Configura el RecyclerView con itemAdapter
+        listaFiltro.setAdapter(itemsAdapter); // Configura el RecyclerView con itemsAdapter
 
         // Verificar si el Intent contiene un nombre de base de datos
         Intent intent = getIntent();
@@ -163,7 +157,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        itemAdapter.getFilter().filter(newText);
+        itemsAdapter.getFilter().filter(newText);
         return false;
     }
 
@@ -201,10 +195,10 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     private void filterDates(String startDate, String endDate) {
         List<Items> filteredItems = bdVentas.getItemsByDates(startDate, endDate);
         // Actualiza el adaptador con los datos filtrados
-        itemAdapter.updateItems(filteredItems);
+        itemsAdapter.updateItems(filteredItems);
 
         // IMPORTANTE: Notifica al adaptador sobre el cambio
-        itemAdapter.notifyDataSetChanged();
+        itemsAdapter.notifyDataSetChanged();
 
         if (filteredItems.isEmpty()) {
             showAlertDialog();

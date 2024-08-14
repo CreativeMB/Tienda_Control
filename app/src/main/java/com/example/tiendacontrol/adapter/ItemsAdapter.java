@@ -20,11 +20,11 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ViewHolder> implements Filterable {
+public class ItemsAdapter extends RecyclerView.Adapter<ItemsAdapter.ViewHolder> implements Filterable {
     private List<Items> itemList;
     private List<Items> itemListFull;
 
-    public ItemAdapter(List<Items> itemList) {
+    public ItemsAdapter(List<Items> itemList) {
         this.itemList = itemList;
         this.itemListFull = new ArrayList<>(itemList); // Inicializa la lista completa para el filtrado
     }
