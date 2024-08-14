@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:gravity="center"
     android:padding="16dp">
@@ -12,13 +13,19 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:paddingTop="16dp" />
-
-<!--    <EditText-->
-<!--        android:id="@+id/editTextDatabaseName"-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:gravity="center"-->
-<!--        android:hint="Ingrese el nombre de la base de datos" />-->
+    <com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fab_set_reminder"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="10dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/notificacion"
+        app:backgroundTint="@color/Buton"
+        app:maxImageSize="40dp"
+        app:tint="@color/colorNegativo" />
 
     <LinearLayout
        android:layout_width="match_parent"

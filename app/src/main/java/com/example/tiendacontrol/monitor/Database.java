@@ -1,6 +1,11 @@
 package com.example.tiendacontrol.monitor;
 
+import static android.content.ContentValues.TAG;
+
 import android.Manifest;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -24,6 +29,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -31,15 +37,17 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.basesAdapter;
 import com.example.tiendacontrol.helper.ExcelExporter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class Database extends AppCompatActivity implements basesAdapter.OnDatabaseClickListener {
-
+    private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
     private static final int PICK_IMAGE_REQUEST = 1;
     private Button buttonCreateDatabase;
 
@@ -90,6 +98,8 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.database);
+        FloatingActionButton fabSetReminder = findViewById(R.id.fab_set_reminder);
+        fabSetReminder.setOnClickListener(view -> showTimePickerDialog());
 
 
         buttonCreateDatabase = findViewById(R.id.buttonCreateDatabase);
@@ -115,6 +125,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
         loadDatabases();
     }
+
     private void showDatabaseNameDialog() {
         final EditText input = new EditText(this);
         input.setHint("Nombre de la base de datos");
@@ -158,7 +169,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         }
     }
 
-       private void loadDatabases() {
+    private void loadDatabases() {
         databaseList.clear();
         File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
         Log.d("Database", "Directorio de documentos: " + documentsFolder.getAbsolutePath());
@@ -219,6 +230,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 .setView(dialogView)
                 .create();
 
+
         // Configurar los eventos de clic
         btnEditar.setOnClickListener(v -> {
             editDatabase(databaseName);
@@ -263,6 +275,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             showToast("Nombre de base de datos inválido");
         }
     }
+
     private void editDatabase2(String databaseName) {
         if (databaseName != null && !databaseName.isEmpty()) {
             closeCurrentDatabase();
@@ -339,7 +352,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
     private void requestStoragePermission(OnStoragePermissionResultListener listener) {
         this.storagePermissionResultListener = listener;
-               if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
             if (Environment.isExternalStorageManager()) {
                 listener.onPermissionResult(true);
 
@@ -357,4 +370,69 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         }
     }
 
+    private void showTimePickerDialog() {
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                (view, hourOfDay, minuteOfHour) -> {
+                    // Guardar la hora seleccionada
+                    Calendar selectedTime = Calendar.getInstance();
+                    selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    selectedTime.set(Calendar.MINUTE, minuteOfHour);
+                    selectedTime.set(Calendar.SECOND, 0);
+
+                    // Programar la notificación
+                    scheduleNotification(selectedTime);
+                }, hour, minute, true);
+
+        timePickerDialog.show();
+    }
+
+    private void scheduleNotification(Calendar selectedTime) {
+        AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (alarmManager != null && alarmManager.canScheduleExactAlarms()) {
+                // Crear el intent para el BroadcastReceiver
+                Intent intent = new Intent(this, NotificationReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                        this,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+
+                // Programar la alarma exacta
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, selectedTime.getTimeInMillis(), pendingIntent);
+
+                // Mostrar un Toast confirmando que el recordatorio se ha guardado
+                Toast.makeText(this, "Recordatorio guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+            } else {
+                // Solicitar permiso para programar alarmas exactas si no está permitido
+                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                startActivity(intent);
+
+                // Informar al usuario que necesita conceder permisos para guardar el recordatorio
+                Toast.makeText(this, "Debes conceder permiso para guardar el recordatorio", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            // Para versiones anteriores a Android S (API 31), simplemente programa la alarma
+            if (alarmManager != null) {
+                Intent intent = new Intent(this, NotificationReceiver.class);
+                PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                        this,
+                        0,
+                        intent,
+                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                );
+
+                alarmManager.setExact(AlarmManager.RTC_WAKEUP, selectedTime.getTimeInMillis(), pendingIntent);
+
+                // Mostrar un Toast confirmando que el recordatorio se ha guardado
+                Toast.makeText(this, "Recordatorio guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+            }
+        }
+    }
 }
