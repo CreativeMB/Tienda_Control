@@ -1,9 +1,5 @@
 package com.example.tiendacontrol.monitor;
 
-import static android.content.ContentValues.TAG;
-
-import static androidx.core.app.AlarmManagerCompat.canScheduleExactAlarms;
-
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -12,12 +8,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.media.MediaScannerConnection;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
-import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -32,7 +25,6 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -40,7 +32,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.basesAdapter;
 import com.example.tiendacontrol.helper.ExcelExporter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -406,7 +397,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     private void scheduleNotification(Calendar selectedTime) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Intent intent = new Intent(this, NotificationReceiver.class);
+        Intent intent = new Intent(this, Recordatorio.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 this,
                 0,
