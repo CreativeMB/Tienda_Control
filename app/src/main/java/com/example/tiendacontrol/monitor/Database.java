@@ -108,6 +108,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         ImageView iconCreateDatabase = findViewById(R.id.database);
         iconCreateDatabase.setOnClickListener(v -> showDatabaseNameDialog());
 
+        ImageView iconDonacion = findViewById(R.id.donacion);
 
         recyclerViewDatabases = findViewById(R.id.recyclerViewDatabases);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -118,6 +119,11 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         adapter = new basesAdapter(this, databaseList, this);
         recyclerViewDatabases.setAdapter(adapter);
 
+
+        iconDonacion.setOnClickListener(view -> {
+            Intent databaseIntent = new Intent(this, Donar.class);
+            startActivity(databaseIntent);
+        });
 
 
         // Solicita permisos cuando se inicia la actividad

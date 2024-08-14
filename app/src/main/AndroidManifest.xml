@@ -34,6 +34,7 @@
         <activity android:name=".login.Register" />
         <activity android:name=".login.PerfilUsuario" />
         <activity android:name=".monitor.Database" />
+        <activity android:name=".monitor.Donar" />
         <activity
             android:name=".model.SplashActivity"
             android:exported="true">
