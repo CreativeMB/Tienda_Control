@@ -41,6 +41,15 @@ public class NotificationReceiver extends BroadcastReceiver {
             channel.setDescription("Canal para recordatorios diarios");
             notificationManager.createNotificationChannel(channel);
         }
+        // Crear un Intent que se ejecutará cuando se toque la notificación
+        Intent notificationIntent = new Intent(context, Database.class);  // Cambia MainActivity por la actividad que deseas abrir
+        notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        PendingIntent pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                notificationIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
 
         Notification notification = new NotificationCompat.Builder(context, "your_channel_id")
                 .setContentTitle("Mi Contabilidad")
