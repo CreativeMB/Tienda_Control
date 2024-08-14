@@ -11,7 +11,7 @@
         android:id="@+id/vista_animada"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/gastos"
+        android:src="@drawable/icono"
         android:layout_gravity="center" />
 </FrameLayout>
 

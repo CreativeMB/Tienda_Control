@@ -14,6 +14,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import android.util.Log;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -72,7 +73,8 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         textViewPositiveSum = findViewById(R.id.text_view_positive_sum);
         textViewNegativeSum = findViewById(R.id.text_view_negative_sum);
         textViewDifference = findViewById(R.id.text_view_difference);
-        FloatingActionButton fabMenu = findViewById(R.id.fabMenu);
+        txtBuscar = findViewById(R.id.txtBuscar);
+        ImageView iconDatabase = findViewById(R.id.database);
         calendar = Calendar.getInstance();
 
 //        // Configuración del RecyclerView
@@ -92,10 +94,10 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         bdVentas = new BdVentas(this, currentDatabase);
 
         // Inicializar SearchView
-        txtBuscar = findViewById(R.id.txtBuscar);
+
         txtBuscar.setOnQueryTextListener(this);
 
-        fabMenu.setOnClickListener(view -> {
+        iconDatabase.setOnClickListener(view -> {
             Intent databaseIntent = new Intent(this, Database.class);
             startActivity(databaseIntent);
         });

@@ -2,6 +2,8 @@ package com.example.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
 
+import static androidx.core.app.AlarmManagerCompat.canScheduleExactAlarms;
+
 import android.Manifest;
 import android.app.AlarmManager;
 import android.app.PendingIntent;
@@ -22,6 +24,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -98,11 +101,14 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.database);
-        FloatingActionButton fabSetReminder = findViewById(R.id.fab_set_reminder);
-        fabSetReminder.setOnClickListener(view -> showTimePickerDialog());
+
+        ImageView iconRecordatorio = findViewById(R.id.recordatorio);
+        iconRecordatorio.setOnClickListener(view -> showTimePickerDialog());
+
+        ImageView iconCreateDatabase = findViewById(R.id.database);
+        iconCreateDatabase.setOnClickListener(v -> showDatabaseNameDialog());
 
 
-        buttonCreateDatabase = findViewById(R.id.buttonCreateDatabase);
         recyclerViewDatabases = findViewById(R.id.recyclerViewDatabases);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -111,7 +117,8 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         databaseList = new ArrayList<>();
         adapter = new basesAdapter(this, databaseList, this);
         recyclerViewDatabases.setAdapter(adapter);
-        buttonCreateDatabase.setOnClickListener(v -> showDatabaseNameDialog());
+
+
 
         // Solicita permisos cuando se inicia la actividad
         requestStoragePermission(granted -> {
@@ -393,46 +400,53 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     private void scheduleNotification(Calendar selectedTime) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
+        Intent intent = new Intent(this, NotificationReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this,
+                0,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            if (alarmManager != null && alarmManager.canScheduleExactAlarms()) {
-                // Crear el intent para el BroadcastReceiver
-                Intent intent = new Intent(this, NotificationReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                        this,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            if (alarmManager != null && canScheduleExactAlarms()) {
+                alarmManager.setRepeating(
+                        AlarmManager.RTC_WAKEUP,
+                        selectedTime.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY,  // Intervalo de un día
+                        pendingIntent
                 );
 
-                // Programar la alarma exacta
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, selectedTime.getTimeInMillis(), pendingIntent);
-
-                // Mostrar un Toast confirmando que el recordatorio se ha guardado
-                Toast.makeText(this, "Recordatorio guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
             } else {
-                // Solicitar permiso para programar alarmas exactas si no está permitido
-                Intent intent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
-                startActivity(intent);
+                // Solicitar permiso para alarmas exactas
+                Intent permissionIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
+                permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                startActivity(permissionIntent);
 
-                // Informar al usuario que necesita conceder permisos para guardar el recordatorio
-                Toast.makeText(this, "Debes conceder permiso para guardar el recordatorio", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Debes conceder permiso para guardar el recordatorio diario", Toast.LENGTH_SHORT).show();
             }
         } else {
-            // Para versiones anteriores a Android S (API 31), simplemente programa la alarma
             if (alarmManager != null) {
-                Intent intent = new Intent(this, NotificationReceiver.class);
-                PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                        this,
-                        0,
-                        intent,
-                        PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+                alarmManager.setRepeating(
+                        AlarmManager.RTC_WAKEUP,
+                        selectedTime.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY,  // Intervalo de un día
+                        pendingIntent
                 );
 
-                alarmManager.setExact(AlarmManager.RTC_WAKEUP, selectedTime.getTimeInMillis(), pendingIntent);
-
-                // Mostrar un Toast confirmando que el recordatorio se ha guardado
-                Toast.makeText(this, "Recordatorio guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    private boolean canScheduleExactAlarms() {
+        // Para API 31 y superior, se utiliza el método canScheduleExactAlarms
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            return alarmManager != null && alarmManager.canScheduleExactAlarms();
+        }
+        // Para versiones anteriores, siempre devolver verdadero
+        return true;
     }
 }

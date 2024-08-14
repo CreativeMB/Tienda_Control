@@ -40,5 +40,9 @@
     <string name="catorce">limpiar Base Datos</string>
 
 
+    <string name="recordatorio">¿recordatorio?</string>
+    <string name="database">Nueva base de datos</string>
+
+
 
 </resources>

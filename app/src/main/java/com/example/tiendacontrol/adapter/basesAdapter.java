@@ -44,7 +44,7 @@ public class basesAdapter extends RecyclerView.Adapter<basesAdapter.DatabaseView
         holder.textViewDatabaseName.setText(databaseName);
 
         // Usa una imagen por defecto para los ítems
-        holder.imageViewDatabaseIcon.setImageResource(R.drawable.gastos);
+        holder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
 
         holder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
         int colorFondo = R.color.fondoCAr; // Usar el color definido en colors.xml

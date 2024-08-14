@@ -86,9 +86,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         // Referencias a vistas
         imageViewProfile = findViewById(R.id.imageViewProfile);
         listaVentas = findViewById(R.id.listaVentas);
-        fabNuevo = findViewById(R.id.favNuevo);
         fabMenu = findViewById(R.id.fabMenu);
-        fabGasto = findViewById(R.id.favGasto);
+        ImageView iconIngreso = findViewById(R.id.ingreso);
+        ImageView iconEgreso = findViewById(R.id.egreso);
         textVenta = findViewById(R.id.textVenta);
         textGanacia = findViewById(R.id.textGanacia);
         textGasto = findViewById(R.id.textGasto);
@@ -111,7 +111,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         onDataChanged();
 
-        fabGasto.setOnClickListener(view -> {
+        iconEgreso.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
             // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
             GastoDialogFragment gastoDialogFragment = GastoDialogFragment.newInstance(currentDatabase);
@@ -119,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             gastoDialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
         });
 
-        fabNuevo.setOnClickListener(view -> {
+        iconIngreso.setOnClickListener(view -> {
             FragmentManager fragmentManager = getSupportFragmentManager();
             // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
             IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase);
@@ -352,7 +352,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         textVenta.setText(sumaFormateadaStr);
     }
 
-    // Método para calcular y mostrar la suma total de gastos sin decimales
+    // Método para calcular y mostrar la suma total de icono sin decimales
     private void calcularSumaTotalGasto() {
         double suma = 0.0;
         for (Items venta : listaArrayVentas) {
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     }
                 })
                 .setNegativeButton("No", null)
-                .setIcon(R.drawable.baseline_delete_forever_24)
+                .setIcon(R.drawable.eliminar)
                 .show();
     }
 

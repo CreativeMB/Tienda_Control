@@ -29,7 +29,7 @@
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:paddingLeft="8dp"
-                android:text="hjjgkñ"
+                android:text="Items"
                 android:textSize="15sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
@@ -39,15 +39,15 @@
 
             <!-- Detalles -->
             <ImageView
-                android:id="@+id/imageView"
+                android:id="@+id/imageItems"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="4dp"
-                android:src="@drawable/gastos"
+                android:src="@drawable/icono"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/viewProducto"
-                tools:srcCompat="@drawable/gastos" />
+                tools:srcCompat="@drawable/icono" />
 
 
             <TextView
@@ -63,7 +63,7 @@
                 android:textSize="15sp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageView" />
+                app:layout_constraintTop_toBottomOf="@+id/imageItems" />
 
             <TextView
                 android:id="@+id/viewValor"
@@ -74,11 +74,11 @@
                 android:layout_marginEnd="8dp"
                 android:layout_weight="1"
                 android:paddingLeft="8dp"
-                android:text="hjkahskhk"
+                android:text="Precio"
                 android:textSize="16sp"
                 android:textStyle="bold"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintStart_toEndOf="@+id/imageItems"
                 app:layout_constraintTop_toBottomOf="@+id/viewProducto" />
 
 
@@ -93,7 +93,7 @@
                 android:text="cantidad"
                 android:textSize="12sp"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageView"
+                app:layout_constraintStart_toEndOf="@+id/imageItems"
                 app:layout_constraintTop_toBottomOf="@+id/viewValor" />
 
 

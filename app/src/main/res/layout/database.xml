@@ -13,41 +13,32 @@
         android:layout_height="0dp"
         android:layout_weight="1"
         android:paddingTop="16dp" />
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fab_set_reminder"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+    <ImageView
+        android:id="@+id/recordatorio"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="20dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/recordatorio"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/recordatorio"
+        app:maxImageSize="40dp" />
+
+    <ImageView
+        android:id="@+id/database"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="10dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/notificacion"
-        app:backgroundTint="@color/Buton"
-        app:maxImageSize="40dp"
-        app:tint="@color/colorNegativo" />
-
-    <LinearLayout
-       android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="16dp">
-
-        <Button
-            android:id="@+id/buttonCreateDatabase"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="10dp"
-            android:gravity="center"
-            style="@style/Widget.AppTheme.Button"
-            android:text="Crear Base de Datos" />
-
-    </LinearLayout>
-
-
-
-
-
+        android:src="@drawable/database"
+        android:background="?attr/selectableItemBackgroundBorderless"
+        android:contentDescription="@string/database"
+        app:maxImageSize="40dp" />
 
 </LinearLayout>
