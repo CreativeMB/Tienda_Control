@@ -4,37 +4,18 @@
     <item
         android:id="@+id/inicio"
         android:orderInCategory="100"
-        android:title="@string/decimo"
+        android:title="@string/quinto"
         app:showAsAction="never" />
-
-    <item
-        android:id="@+id/nuevo_Ingreso"
-        android:orderInCategory="100"
-        android:title="@string/dos"
-        app:showAsAction="never" />
-
-    <item
-        android:id="@+id/nuevo_Egreso"
-        android:orderInCategory="100"
-        android:title="@string/tres"
-        app:showAsAction="never" />
-
     <item
         android:id="@+id/code"
         android:orderInCategory="100"
         android:title="@string/once"
         app:showAsAction="never" />
     <item
-        android:id="@+id/dataBase"
-        android:orderInCategory="100"
-        android:title="@string/quinto"
-        app:showAsAction="never" />
-    <item
         android:id="@+id/borrardados"
         android:orderInCategory="100"
         android:title="@string/catorce"
         app:showAsAction="never" />
-
     <item
         android:id="@+id/cerrar_sesion"
         android:orderInCategory="100"
