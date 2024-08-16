@@ -108,28 +108,13 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
     // Método para manejar el clic en los elementos del menú
     private void handleMenuItemClick(MenuItemImpl menuItem) {
         int id = menuItem.getItemId(); // Obtener el ID del elemento del menú
-
-        if (id == R.id.nuevo_Ingreso) {
-            // Mostrar el diálogo de nueva venta
-            FragmentManager fragmentManager = getParentFragmentManager();
-            // Crea una nueva instancia de IngresoDialogFragment con el nombre de la base de datos actual
-            IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase);
-            ingresoDialogFragment.show(fragmentManager, "nuevo_Ingreso");
-        } else if (id == R.id.nuevo_Egreso) {
-            // Mostrar el diálogo de nuevo gasto
-            FragmentManager fragmentManager = getParentFragmentManager();
-            GastoDialogFragment dialogFragment = new GastoDialogFragment();
-            dialogFragment.show(fragmentManager, "nuevo_Egreso");
-        } else if (id == R.id.inicio) {
-            // Regresar a la actividad anterior
-            getActivity().finish();
+         if (id == R.id.inicio) {
+             // Ir a la pantalla de configuración de código
+             Intent intent = new Intent(requireContext(), Database.class);
+             startActivity(intent);
         } else if (id == R.id.code) {
             // Ir a la pantalla de configuración de código
             Intent intent = new Intent(requireContext(), SetCode.class);
-            startActivity(intent);
-        } else if (id == R.id.dataBase) {
-            // Ir a la pantalla de configuración de código
-            Intent intent = new Intent(requireContext(), Database.class);
             startActivity(intent);
         } else if (id == R.id.cerrar_sesion) {
             // Cerrar sesión
