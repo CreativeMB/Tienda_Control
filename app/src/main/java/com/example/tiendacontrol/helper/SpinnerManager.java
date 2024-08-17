@@ -10,13 +10,14 @@ import android.widget.Toast;
 
 import com.example.tiendacontrol.model.Items;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
 public class SpinnerManager {
-
     private ItemManager itemManager;
     private Context context;
     private Spinner spinnerPredefined;
@@ -48,7 +49,6 @@ public class SpinnerManager {
         allItems.add(placeholderItem);
         allItems.addAll(items);
 
-        // Usar un ArrayAdapter personalizado para formatear los valores
         ArrayAdapter<Items> adapter = new ArrayAdapter<Items>(context, android.R.layout.simple_spinner_item, allItems) {
             @Override
             public View getView(int position, View convertView, ViewGroup parent) {
@@ -56,7 +56,8 @@ public class SpinnerManager {
                 TextView textView = (TextView) view.findViewById(android.R.id.text1);
                 Items item = getItem(position);
                 if (item != null) {
-                    String valorFormateado = NumberFormat.getNumberInstance(Locale.getDefault()).format(item.getValor());
+                    // Formatear el valor para la visualización
+                    String valorFormateado = NumberFormat.getNumberInstance(Locale.US).format(item.getValor());
                     textView.setText(item.getProducto() + " - " + valorFormateado);
                 }
                 return view;
@@ -68,7 +69,8 @@ public class SpinnerManager {
                 TextView textView = (TextView) view.findViewById(android.R.id.text1);
                 Items item = getItem(position);
                 if (item != null) {
-                    String valorFormateado = NumberFormat.getNumberInstance(Locale.getDefault()).format(item.getValor());
+                    // Formatear el valor para la visualización
+                    String valorFormateado = NumberFormat.getNumberInstance(Locale.US).format(item.getValor());
                     textView.setText(item.getProducto() + " - " + valorFormateado);
                 }
                 return view;
@@ -91,33 +93,45 @@ public class SpinnerManager {
         Log.d("SpinnerManager", "Valor String: " + valorStr);
         Log.d("SpinnerManager", "Cantidad String: " + cantidadStr);
 
-        if (!producto.isEmpty() && !valorStr.isEmpty() && !detalles.isEmpty() && !cantidadStr.isEmpty()) {
-            try {
-                // Limpiar valorStr y cantidadStr para asegurar formato correcto
-                valorStr = valorStr.replaceAll("[^\\d.,]", ""); // Permitir solo dígitos, punto y coma decimal
-                valorStr = valorStr.replaceAll(",", ""); // Eliminar las comas como separadores de miles
+        // Normalizar el valor ingresado
+        valorStr = normalizeNumberFormat(valorStr);
 
-                cantidadStr = cantidadStr.replaceAll("[^\\d]", "").trim(); // Permitir solo dígitos
+        // Asegurarse de que la cantidad sea un número válido
+        cantidadStr = cantidadStr.replaceAll("[^\\d]", "").trim(); // Permitir solo dígitos
 
-                double valor = Double.parseDouble(valorStr);
-                int cantidad = Integer.parseInt(cantidadStr);
+        try {
+            double valor = Double.parseDouble(valorStr);
+            int cantidad = Integer.parseInt(cantidadStr);
 
-                Items item = new Items();
-                item.setProducto(producto);
-                item.setValor(valor);
-                item.setDetalles(detalles);
-                item.setCantidad(cantidad);
-                itemManager.saveItem(item);
+            Items item = new Items();
+            item.setProducto(producto);
+            item.setValor(valor);
+            item.setDetalles(detalles);
+            item.setCantidad(cantidad);
+            itemManager.saveItem(item);
 
-                Toast.makeText(context, "Ítem guardado", Toast.LENGTH_SHORT).show();
-                loadPredefinedItems();
-            } catch (NumberFormatException e) {
-                // Mostrar mensaje de error detallado
-                Toast.makeText(context, "VALOR O CANTIDAD NO SON VÁLIDOS: " + e.getMessage(), Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Toast.makeText(context, "TODOS LOS CAMPOS DEBEN ESTAR LLENOS", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, "Ítem guardado", Toast.LENGTH_SHORT).show();
+            loadPredefinedItems();
+        } catch (NumberFormatException e) {
+            // Mostrar mensaje de error detallado
+            Toast.makeText(context, "VALOR O CANTIDAD NO SON VÁLIDOS: " + e.getMessage(), Toast.LENGTH_LONG).show();
         }
+    }
+
+    private String normalizeNumberFormat(String number) {
+        // Usar DecimalFormat para obtener los símbolos del formato decimal
+        DecimalFormat decimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
+        DecimalFormatSymbols symbols = decimalFormat.getDecimalFormatSymbols();
+        char decimalSeparator = symbols.getDecimalSeparator();
+        char groupingSeparator = symbols.getGroupingSeparator();
+
+        // Reemplazar el separador de miles y ajustar el separador decimal
+        if (decimalSeparator != '.') {
+            number = number.replace(String.valueOf(decimalSeparator), "."); // Reemplazar el separador decimal por punto
+        }
+        number = number.replace(String.valueOf(groupingSeparator), ""); // Eliminar separador de miles
+
+        return number;
     }
 
     public void clearCustomItems() {
