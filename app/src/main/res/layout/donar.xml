@@ -97,7 +97,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Número de contacto: 3014418502"
+            android:text="billeteras virtuales (3014418502)"
             android:textSize="16sp"
             android:layout_marginTop="16dp"/>
     </LinearLayout>
@@ -178,7 +178,7 @@
 
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="3028667672"
+                android:text="WhatsApp 3028667672"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
         </LinearLayout>
