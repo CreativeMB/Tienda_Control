@@ -5,23 +5,19 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-
+import com.example.tiendacontrol.helper.SpinnerManager;
 import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.helper.ItemManager;
 import com.example.tiendacontrol.helper.PuntoMil;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-
 import com.example.tiendacontrol.R;
-import java.util.ArrayList;
-import java.util.List;
 
 public class GastoDialogFragment extends BottomSheetDialogFragment {
     // Definición de las variables para los elementos de la interfaz de usuario
@@ -30,7 +26,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
     private Button btnGuarda, btnSavePredefined, btnClearCustom;
     private ItemManager itemManager;
     private String currentDatabase; // Variable para almacenar el nombre de la base de datos actual
-
+    private SpinnerManager itemManagerUtil;
     public interface OnDataChangedListener {
         void onDataChanged();
     }
@@ -73,8 +69,6 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         // Inicialización del ItemManager para manejar los ítems
         itemManager = new ItemManager(getContext());
 
-        // Cargar los ítems predefinidos en el spinner
-        loadPredefinedItems();
 
         // Limpiar los campos al iniciar el fragmento
         limpiar();
@@ -83,15 +77,25 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         if (getArguments() != null) {
             currentDatabase = getArguments().getString("databaseName");
         }
-
         // Configuración de los eventos para los botones
-        btnGuarda.setOnClickListener(view1 -> guardarGasto());
+        btnGuarda.setOnClickListener(view1 -> guardarEgreso());
 
-        btnSavePredefined.setOnClickListener(view12 -> savePredefinedItem());
+        btnSavePredefined.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                itemManagerUtil.savePredefinedItem(); // Guardar un ítem predefinido
+            }
+        });
 
-        btnClearCustom.setOnClickListener(view13 -> clearCustomItems());
+        btnClearCustom.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                itemManagerUtil.clearCustomItems(); // Limpiar ítems personalizados
+            }
+        });
+        itemManagerUtil = new SpinnerManager(getContext(), spinnerPredefined,  editProducto, editValor, editDetalles, editCantidad);
+        itemManagerUtil.loadPredefinedItems();
 
-        // Configuración del listener para el spinner
         spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
@@ -112,50 +116,36 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
             }
         });
 
+
         return view;
     }
 
-    private void loadPredefinedItems() {
-        List<Items> items = itemManager.getItems(); // Obtener ítems predefinidos de la base de datos
-        Items placeholderItem = new Items();
-        placeholderItem.setProducto("Seleccione un ítem");
-        placeholderItem.setValor(0.0);
-        placeholderItem.setDetalles("");
-        placeholderItem.setCantidad(0);
-
-        List<Items> allItems = new ArrayList<>();
-        allItems.add(placeholderItem);
-        allItems.addAll(items);
-
-        ArrayAdapter<Items> adapter = new ArrayAdapter<>(requireContext(), android.R.layout.simple_spinner_item, allItems);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerPredefined.setAdapter(adapter);
-        spinnerPredefined.setSelection(0);
-    }
-
-    public void guardarGasto() {
+    public void guardarEgreso() {
+        // Obtener los datos de los campos
         String producto = editProducto.getText().toString().trim();
         String valorStr = editValor.getText().toString().trim();
         String detalles = editDetalles.getText().toString().trim();
         String cantidadStr = editCantidad.getText().toString().trim();
 
+        // Verificar que todos los campos estén llenos
         if (producto.isEmpty() || valorStr.isEmpty() || detalles.isEmpty() || cantidadStr.isEmpty()) {
             Toast.makeText(getContext(), "DEBE LLENAR TODOS LOS CAMPOS", Toast.LENGTH_LONG).show();
             return;
         }
 
         try {
-            // Eliminar los separadores de mil antes de convertir a número
-            valorStr = valorStr.replace(",", "");
+            // Eliminar cualquier carácter no numérico antes de la conversión
+            valorStr = valorStr.replaceAll("[^\\d.]", ""); // Mantener solo dígitos y el punto decimal
+            cantidadStr = cantidadStr.replaceAll("[^\\d]", ""); // Mantener solo dígitos
 
+            // Convertir los datos a los tipos correctos
             double valor = Double.parseDouble(valorStr);
             int cantidad = Integer.parseInt(cantidadStr);
 
-            if (valor > 0) {
-                valor = -valor;
-            }
+            // Hacer que el total sea negativo para egresos
+            double total = -1 * valor * cantidad; // Multiplicar por -1 para hacerlo negativo
 
-            double total = valor * cantidad;
+            // Guardar el registro en la base de datos
             BdVentas bdVentas = new BdVentas(getContext(), currentDatabase);
             long id = bdVentas.insertarVenta(producto, total, detalles, cantidad);
 
@@ -181,35 +171,4 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         editCantidad.setText("");
     }
 
-    public void savePredefinedItem() {
-        String producto = editProducto.getText().toString().trim();
-        String valorStr = editValor.getText().toString().trim();
-        String detalles = editDetalles.getText().toString().trim();
-        String cantidadStr = editCantidad.getText().toString().trim();
-
-        if (!producto.isEmpty() && !valorStr.isEmpty() && !detalles.isEmpty() && !cantidadStr.isEmpty()) {
-            try {
-                double valor = Double.parseDouble(valorStr);
-                int cantidad = Integer.parseInt(cantidadStr);
-                Items item = new Items();
-                item.setProducto(producto);
-                item.setValor(valor);
-                item.setDetalles(detalles);
-                item.setCantidad(cantidad);
-                itemManager.saveItem(item);
-                Toast.makeText(getContext(), "Ítem guardado", Toast.LENGTH_SHORT).show();
-                loadPredefinedItems();
-            } catch (NumberFormatException e) {
-                Toast.makeText(getContext(), "Valor o cantidad no válidos", Toast.LENGTH_LONG).show();
-            }
-        } else {
-            Toast.makeText(getContext(), "Debe llenar todos los campos", Toast.LENGTH_LONG).show();
-        }
-    }
-
-    public void clearCustomItems() {
-        itemManager.removeCustomItems();
-        loadPredefinedItems();
-        Toast.makeText(requireContext(), "Ítems personalizados eliminados", Toast.LENGTH_SHORT).show();
-    }
 }
