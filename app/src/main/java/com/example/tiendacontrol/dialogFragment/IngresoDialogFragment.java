@@ -1,11 +1,9 @@
 package com.example.tiendacontrol.dialogFragment;
 import android.content.Intent;
-import android.graphics.Rect;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -16,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.helper.ItemManager;
+import com.example.tiendacontrol.helper.PuntoMil;
 import com.example.tiendacontrol.model.Items;
 import com.example.tiendacontrol.monitor.MainActivity;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
@@ -63,6 +62,9 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         btnSavePredefined = view.findViewById(R.id.btnSavePredefined);
         spinnerPredefined = view.findViewById(R.id.spinnerPredefined);
         btnClearCustom = view.findViewById(R.id.btnClearCustom);
+
+        // Aplicar el formato con separadores de mil
+        PuntoMil.formatNumberWithThousandSeparator(txtValor);
 
         // Inicialización del ItemManager para manejar los ítems
         itemManager = new ItemManager(getContext());
