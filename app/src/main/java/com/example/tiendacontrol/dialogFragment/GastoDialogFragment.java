@@ -145,6 +145,9 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         }
 
         try {
+            // Eliminar los separadores de mil antes de convertir a número
+            valorStr = valorStr.replace(",", "");
+
             double valor = Double.parseDouble(valorStr);
             int cantidad = Integer.parseInt(cantidadStr);
 

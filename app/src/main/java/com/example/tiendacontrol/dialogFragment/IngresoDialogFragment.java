@@ -201,6 +201,9 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         }
 
         try {
+            // Eliminar los separadores de mil antes de convertir a número
+            valorStr = valorStr.replace(",", "");
+
             // Convertir los datos a los tipos correctos
             double valor = Double.parseDouble(valorStr);
             int cantidad = Integer.parseInt(cantidadStr);

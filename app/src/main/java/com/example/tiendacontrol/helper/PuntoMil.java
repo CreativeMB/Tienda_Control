@@ -5,8 +5,12 @@ import android.text.TextWatcher;
 import android.widget.EditText;
 
 public class PuntoMil {
+    public static String getFormattedNumber(long number) {
+        // Formatea el número con separadores de mil
+        return String.format("%,d", Math.abs(number));
+    }
 
-    public static void formatNumberWithThousandSeparator(EditText editText) {
+    public static void formatNumberWithThousandSeparator(final EditText editText) {
         editText.addTextChangedListener(new TextWatcher() {
             private String current = "";
 
@@ -20,19 +24,20 @@ public class PuntoMil {
                 if (!s.toString().equals(current)) {
                     editText.removeTextChangedListener(this);
 
-                    String cleanString = s.toString().replaceAll("[,.]", "");
-                    double parsed;
+                    String cleanString = s.toString().replaceAll("[^\\d]", "");
+                    long parsed;
                     try {
-                        parsed = Double.parseDouble(cleanString);
+                        parsed = Long.parseLong(cleanString);
                     } catch (NumberFormatException e) {
-                        parsed = 0.00;
+                        parsed = 0;
                     }
 
-                    String formatted = String.format("%,d", (long) parsed);
+                    String formatted = getFormattedNumber(parsed);
 
-                    current = formatted;
-                    editText.setText(formatted);
-                    editText.setSelection(formatted.length());
+                    // Mantener el signo negativo si es necesario
+                    current = (s.toString().startsWith("-") ? "-" : "") + formatted;
+                    editText.setText(current);
+                    editText.setSelection(current.length());
                     editText.addTextChangedListener(this);
                 }
             }
