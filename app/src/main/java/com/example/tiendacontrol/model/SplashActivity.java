@@ -15,14 +15,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 public class SplashActivity extends AppCompatActivity {
-    private FirebaseAuth mAuth;
-
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.splashscreen);
-
-        mAuth = FirebaseAuth.getInstance();
 
         // Iniciar la animación en una vista específica
         View vistaAnimada = findViewById(R.id.vista_animada);
@@ -38,8 +34,8 @@ public class SplashActivity extends AppCompatActivity {
 
             @Override
             public void onAnimationEnd(Animation animation) {
-                // Verificar si el usuario ya ha iniciado sesión
-                checkUserLoggedIn();
+                // Redirigir siempre al usuario a la actividad de login
+                redirectToLogin();
             }
 
             @Override
@@ -49,21 +45,9 @@ public class SplashActivity extends AppCompatActivity {
         });
     }
 
-    private void checkUserLoggedIn() {
-        FirebaseUser currentUser = mAuth.getCurrentUser();
-        if (currentUser == null) {
-            // Si no hay usuario logueado, redirigir a la actividad de login
-            Intent intent = new Intent(SplashActivity.this, Login.class);
-            startActivity(intent);
-            finish();
-        } else {
-            // Si hay un usuario logueado, redirigir a MainActivity
-            Intent intent = new Intent(SplashActivity.this, Database.class);
-            startActivity(intent);
-            finish();
-
-            // Mostrar un mensaje de bienvenida
-            Toast.makeText(this, "Bienvenido, " + currentUser.getEmail(), Toast.LENGTH_SHORT).show();
-        }
+    private void redirectToLogin() {
+        Intent intent = new Intent(SplashActivity.this, Login.class);
+        startActivity(intent);
+        finish();
     }
 }
