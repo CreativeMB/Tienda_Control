@@ -135,7 +135,8 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
 
         try {
             // Eliminar cualquier carácter no numérico antes de la conversión
-            valorStr = valorStr.replaceAll("[^\\d.]", ""); // Mantener solo dígitos y el punto decimal
+            // Primero eliminar los puntos de mil, luego convertir a número
+            valorStr = valorStr.replaceAll("[.,]", ""); // Eliminar puntos y comas, si es necesario
             cantidadStr = cantidadStr.replaceAll("[^\\d]", ""); // Mantener solo dígitos
 
             // Convertir los datos a los tipos correctos
