@@ -49,7 +49,5 @@
         android:layout_marginTop="16dp"
         style="@style/Widget.AppTheme.Button"
         android:elevation="6dp" />
-
-
 </LinearLayout>
     </ScrollView>
