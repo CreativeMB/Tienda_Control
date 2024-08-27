@@ -4,7 +4,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="16dp"
-    android:background="@drawable/fondo"
     android:gravity="center">
 
     <ScrollView
@@ -24,9 +23,8 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Crear tu código personalizado para que puedas ingresar cuando estés fuera de línea de forma local. Lo puedes cambiar cuando lo necesites."
+                android:text="Modifica el PIN Para inicio de sección "
                 android:textSize="24sp"
-                android:textColor="@color/texcolor"
                 android:gravity="center"
                 android:paddingBottom="25dp"/>
 
@@ -34,18 +32,16 @@
                 android:id="@+id/editTextCode"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:hint="Ingrese un código"
-                android:textColorHint="#262626"
+                android:hint="Nuevo PIN"
                 android:inputType="text"
                 android:textSize="30sp"
-                android:textColor="@color/Buton"
                 android:gravity="center"/>
 
             <Button
                 android:id="@+id/buttonSaveCode"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Guardar Código"
+                android:text="Guardar"
                 android:elevation="6dp"
                 style="@style/Widget.AppTheme.Button"
                 android:padding="16dp"/>

@@ -17,7 +17,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Crear tu Pin para que puedas Ingresar Recuerda no olvidarlo no se podrá recuperar ni cambiar"
+            android:text="Crear tu Pin para que puedas Ingresar Recuerda no olvidarlo lo puedes modificar dentro de la aplicación en Modifica Pin"
             android:textSize="24sp"
             android:gravity="center"
             android:paddingBottom="25dp"/>

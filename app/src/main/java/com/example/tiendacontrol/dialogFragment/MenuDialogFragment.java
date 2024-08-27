@@ -19,6 +19,7 @@ import androidx.fragment.app.FragmentActivity;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.adapter.MenuAdapter;
+import com.example.tiendacontrol.monitor.SetCode;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
@@ -104,10 +105,10 @@ public class MenuDialogFragment extends BottomSheetDialogFragment {
              // Ir a la pantalla de configuración de código
              Intent intent = new Intent(requireContext(), Database.class);
              startActivity(intent);
-//        } else if (id == R.id.code) {
-//            // Ir a la pantalla de configuración de código
-//            Intent intent = new Intent(requireContext(), SetCode.class);
-//            startActivity(intent);
+        } else if (id == R.id.code) {
+            // Ir a la pantalla de configuración de código
+            Intent intent = new Intent(requireContext(), SetCode.class);
+            startActivity(intent);
 //        } else if (id == R.id.cerrar_sesion) {
 //            // Cerrar sesión
 //            FirebaseAuth.getInstance().signOut();
