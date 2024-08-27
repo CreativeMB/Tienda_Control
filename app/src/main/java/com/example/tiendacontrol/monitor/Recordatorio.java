@@ -39,7 +39,7 @@ public class Recordatorio extends BroadcastReceiver {
         }
 
         // Crear un Intent que se ejecutará cuando se toque la notificación
-        Intent notificationIntent = new Intent(context, Database.class);  // Cambia Database por la actividad que deseas abrir
+        Intent notificationIntent = new Intent(context, Inicio.class);  // Cambia Database por la actividad que deseas abrir
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,
