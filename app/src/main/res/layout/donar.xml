@@ -95,7 +95,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Número de contacto: 3014418502"
+            android:text="billeteras virtuales (3014418502)"
             android:textSize="16sp"
             android:layout_marginTop="16dp"/>
     </LinearLayout>
@@ -136,6 +136,47 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Enlace de PayPal"
+                android:textSize="16sp"
+                android:textStyle="bold"/>
+        </LinearLayout>
+
+    </LinearLayout>
+    <!-- Sección para donación internacional -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/button_background"
+        android:padding="16dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Soporte y Contacto"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginBottom="8dp"/>
+
+        <!-- Opción de PayPal -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center">
+
+            <ImageView
+
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:src="@drawable/icono"
+                android:contentDescription="Donar con PayPal"
+                android:layout_marginEnd="16dp"/>
+
+            <TextView
+
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="WhatsApp 3028667672"
                 android:textSize="16sp"
                 android:textStyle="bold"/>
         </LinearLayout>

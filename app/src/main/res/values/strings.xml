@@ -43,6 +43,12 @@
     <string name="recordatorio">¿recordatorio?</string>
     <string name="database">Nueva base de datos</string>
 
+    <string-array name="spinner_options">
+        <item>Todos</item>
+        <item>Positivos</item>
+        <item>Negativos</item>
+    </string-array>
+
 
 
 </resources>
