@@ -11,6 +11,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.login.Login;
+import com.example.tiendacontrol.monitor.Inicio;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -46,7 +47,7 @@ public class SplashActivity extends AppCompatActivity {
     }
 
     private void redirectToLogin() {
-        Intent intent = new Intent(SplashActivity.this, Login.class);
+        Intent intent = new Intent(SplashActivity.this, Inicio.class);
         startActivity(intent);
         finish();
     }

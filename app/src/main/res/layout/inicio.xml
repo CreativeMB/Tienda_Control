@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <!-- Imagen de bienvenida -->
+        <ImageView
+            android:id="@+id/imagen_bienvenida"
+            android:layout_width="300dp"
+            android:layout_height="300dp"
+            android:src="@drawable/icono"
+            android:layout_centerHorizontal="true"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="24dp"/>
+
+        <!-- Título de la pantalla de bienvenida -->
+        <TextView
+            android:id="@+id/titulo_bienvenida"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Bienvenido a Control Financiero"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:padding="16dp"
+            android:gravity="center"
+            android:layout_below="@id/imagen_bienvenida"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"/>
+
+        <!-- Enlace a configuración de seguridad por PIN -->
+        <TextView
+            android:id="@+id/entrar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ingresar Con PIN"
+            android:layout_below="@id/titulo_bienvenida"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/selector_background"
+            android:padding="12dp"
+            android:gravity="center"/>
+
+        <!-- Enlace a configuración de seguridad por Patron -->
+        <TextView
+            android:id="@+id/patron"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="huella o Patron"
+            android:layout_below="@id/entrar"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="10dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/selector_background"
+            android:padding="12dp"
+            android:gravity="center"/>
+
+        <!-- Enlace a configuración de seguridad por PIN -->
+        <TextView
+            android:id="@+id/pin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Configurar Su PIN"
+            android:layout_below="@id/patron"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:background="@drawable/selector_background"
+            android:padding="12dp"
+            android:gravity="center"/>
+
+
+
+    </RelativeLayout>
+</ScrollView>
