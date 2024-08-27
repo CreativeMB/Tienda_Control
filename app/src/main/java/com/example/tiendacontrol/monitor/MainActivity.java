@@ -31,7 +31,6 @@ import java.util.Locale;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.model.Items;
-import com.example.tiendacontrol.login.PerfilUsuario;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -65,9 +64,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitymain);
-        // Inicialización de Firebase
-        mAuth = FirebaseAuth.getInstance();
-        db = FirebaseFirestore.getInstance();
+//        // Inicialización de Firebase
+//        mAuth = FirebaseAuth.getInstance();
+//        db = FirebaseFirestore.getInstance();
 
         // *** Inicializar SharedPreferences ***
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -104,8 +103,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new DatosAdapter(this, listaArrayVentas, bdVentas); // Pasa la instancia
         listaVentas.setAdapter(adapter);
 
-        // Cargar la imagen de perfil del usuario si ya está autenticado
-        cargarimperfil();
+//        // Cargar la imagen de perfil del usuario si ya está autenticado
+//        cargarimperfil();
         // Inicializar SearchView
         txtBuscar.setOnQueryTextListener(this);
 
@@ -150,19 +149,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 }
         );
 
-        // Configurar OnClickListener para el ImageView de perfil
-        imageViewProfile.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Verifica si el usuario está autenticado antes de abrir la actividad
-                if (mAuth.getCurrentUser() != null) {
-                    Intent intent = new Intent(MainActivity.this, PerfilUsuario.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(MainActivity.this, "Debes estar autenticado para acceder a este perfil", Toast.LENGTH_SHORT).show();
-                }
-            }
-        });
+//        // Configurar OnClickListener para el ImageView de perfil
+//        imageViewProfile.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                // Verifica si el usuario está autenticado antes de abrir la actividad
+//                if (mAuth.getCurrentUser() != null) {
+//                    Intent intent = new Intent(MainActivity.this, PerfilUsuario.class);
+//                    startActivity(intent);
+//                } else {
+//                    Toast.makeText(MainActivity.this, "Debes estar autenticado para acceder a este perfil", Toast.LENGTH_SHORT).show();
+//                }
+//            }
+//        });
         onDataChanged();
     }
     @Override
@@ -229,19 +228,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
-    private void cargarimperfil() {
-
-        if (userLoggedIn) {
-            FirebaseUser user = mAuth.getCurrentUser();
-            if (user != null) {
-                userId = user.getUid();
-                loadProfileImage(userId);
-                imageViewProfile.setVisibility(View.VISIBLE);
-            }
-        } else {
-            imageViewProfile.setVisibility(View.GONE);
-        }
-    }
+//    private void cargarimperfil() {
+//
+//        if (userLoggedIn) {
+//            FirebaseUser user = mAuth.getCurrentUser();
+//            if (user != null) {
+//                userId = user.getUid();
+//                loadProfileImage(userId);
+//                imageViewProfile.setVisibility(View.VISIBLE);
+//            }
+//        } else {
+//            imageViewProfile.setVisibility(View.GONE);
+//        }
+//    }
 
     // Método para obtener el nombre de la base de datos desde SharedPreferences
     private String getCurrentDatabaseName() {
@@ -255,25 +254,25 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         editor.putString(KEY_CURRENT_DATABASE, currentDatabase);
         editor.apply();
     }
-    @Override
-    protected void onStart() {
-
-        super.onStart();
-               FirebaseUser user = mAuth.getCurrentUser();
-        if (user != null) {
-            userLoggedIn = true;
-            // Ya hay un usuario autenticado, actualiza el estado y la imagen de perfil
-            userId = user.getUid();
-            loadProfileImage(userId);
-            imageViewProfile.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "Autenticado", Toast.LENGTH_LONG).show();
-        } else {
-            // No hay un usuario autenticado, muestra el mensaje "No autenticado"
-            userLoggedIn = false;
-            imageViewProfile.setVisibility(View.GONE);
-            Toast.makeText(this, "No autenticado", Toast.LENGTH_LONG).show();
-        }
-    }
+//    @Override
+//    protected void onStart() {
+//
+//        super.onStart();
+//               FirebaseUser user = mAuth.getCurrentUser();
+//        if (user != null) {
+//            userLoggedIn = true;
+//            // Ya hay un usuario autenticado, actualiza el estado y la imagen de perfil
+//            userId = user.getUid();
+//            loadProfileImage(userId);
+//            imageViewProfile.setVisibility(View.VISIBLE);
+//            Toast.makeText(this, "Autenticado", Toast.LENGTH_LONG).show();
+//        } else {
+//            // No hay un usuario autenticado, muestra el mensaje "No autenticado"
+//            userLoggedIn = false;
+//            imageViewProfile.setVisibility(View.GONE);
+//            Toast.makeText(this, "No autenticado", Toast.LENGTH_LONG).show();
+//        }
+//    }
     // Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -413,6 +412,4 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
         super.onDestroy();
     }
-
-
 }

@@ -6,19 +6,19 @@
         android:orderInCategory="100"
         android:title="@string/quinto"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/code"
-        android:orderInCategory="100"
-        android:title="@string/once"
-        app:showAsAction="never" />
+<!--    <item-->
+<!--        android:id="@+id/code"-->
+<!--        android:orderInCategory="100"-->
+<!--        android:title="@string/once"-->
+<!--        app:showAsAction="never" />-->
     <item
         android:id="@+id/borrardados"
         android:orderInCategory="100"
         android:title="@string/catorce"
         app:showAsAction="never" />
-    <item
-        android:id="@+id/cerrar_sesion"
-        android:orderInCategory="100"
-        android:title="@string/cuatro"
-        app:showAsAction="never" />
+<!--    <item-->
+<!--        android:id="@+id/cerrar_sesion"-->
+<!--        android:orderInCategory="100"-->
+<!--        android:title="@string/cuatro"-->
+<!--        app:showAsAction="never" />-->
 </menu>

@@ -24,7 +24,7 @@
             android:id="@+id/titulo_bienvenida"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Bienvenido a Control Financiero"
+            android:text="Bienvenido a Tienda Control"
             android:textSize="24sp"
             android:textStyle="bold"
             android:padding="16dp"
