@@ -1,187 +1,188 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
     android:padding="16dp">
 
-    <ImageView
-        android:id="@+id/database"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/inicio"/>
-    <!-- Título de la sección -->
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="¡Apóyanos con tu donación!"
-        android:textSize="24sp"
-        android:fontFamily="sans-serif-medium"
-        android:textStyle="bold"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="24dp"/>
-
-    <!-- Descripción de la importancia de la donación -->
-    <TextView
-        android:id="@+id/description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@drawable/selector_background"
-        android:text="Tu contribución nos ayuda a continuar ofreciendo nuestros servicios. ¡Gracias por ser parte de este esfuerzo!"
-        android:textSize="16sp"
-        android:fontFamily="sans-serif"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginBottom="24dp"
-        android:gravity="center"/>
-
-    <!-- Sección para donación en Colombia -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/selector_background"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp">
+        android:orientation="vertical">
 
+        <ImageView
+            android:id="@+id/database"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="top|end"
+            android:layout_margin="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/inicio" />
+
+        <!-- Título de la sección -->
         <TextView
+            android:id="@+id/title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Donación en Colombia"
-            android:textSize="18sp"
+            android:text="¡Apóyanos con tu donación!"
+            android:textSize="24sp"
+            android:fontFamily="sans-serif-medium"
             android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp" />
 
-        <LinearLayout
+        <!-- Descripción de la importancia de la donación -->
+        <TextView
+            android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <!-- Opción de Nequi -->
-            <ImageView
-                android:id="@+id/nequi"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/nequi"
-                android:contentDescription="Donar con Nequi"
-                android:layout_marginEnd="16dp"/>
-
-            <!-- Opción de Daviplata -->
-            <ImageView
-                android:id="@+id/daviplata"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/daviplata"
-                android:contentDescription="Donar con Daviplata"
-                android:layout_marginEnd="16dp"/>
-            <!-- Opción de Tarjeta de Crédito -->
-            <ImageView
-                android:id="@+id/tarjeta"
-                android:layout_width="160dp"
-                android:layout_height="60dp"
-                android:src="@drawable/tarjeta"
-                android:contentDescription="Donar con Tarjeta de Crédito"
-                android:layout_marginEnd="16dp"/>
-        </LinearLayout>
-
-        <!-- Número de contacto para Nequi y Daviplata -->
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="billeteras virtuales (3014418502)"
+            android:background="@drawable/selector_background"
+            android:text="Tu contribución nos ayuda a continuar ofreciendo nuestros servicios. ¡Gracias por ser parte de este esfuerzo!"
             android:textSize="16sp"
-            android:layout_marginTop="16dp"/>
-    </LinearLayout>
+            android:fontFamily="sans-serif"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginBottom="24dp"
+            android:gravity="center" />
 
-    <!-- Sección para donación internacional -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/selector_background"
-        android:padding="16dp"
-        android:layout_marginBottom="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Donación Internacional"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Opción de PayPal -->
+        <!-- Sección para donación en Colombia -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <ImageView
-                android:id="@+id/paypal"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/paypal"
-                android:contentDescription="Donar con PayPal"
-                android:layout_marginEnd="16dp"/>
+            android:orientation="vertical"
+            android:background="@drawable/selector_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
 
             <TextView
-                android:id="@+id/paypallink"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Enlace de PayPal"
+                android:text="Donación en Colombia"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <!-- Opción de Nequi -->
+                <ImageView
+                    android:id="@+id/nequi"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/nequi"
+                    android:contentDescription="Donar con Nequi"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Opción de Daviplata -->
+                <ImageView
+                    android:id="@+id/daviplata"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/daviplata"
+                    android:contentDescription="Donar con Daviplata"
+                    android:layout_marginEnd="16dp" />
+
+                <!-- Opción de Tarjeta de Crédito -->
+                <ImageView
+                    android:id="@+id/tarjeta"
+                    android:layout_width="160dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/tarjeta"
+                    android:contentDescription="Donar con Tarjeta de Crédito"
+                    android:layout_marginEnd="16dp" />
+            </LinearLayout>
+
+            <!-- Número de contacto para Nequi y Daviplata -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="billeteras virtuales (3014418502)"
                 android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:layout_marginTop="16dp" />
         </LinearLayout>
 
-    </LinearLayout>
-    <!-- Sección para donación internacional -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:background="@drawable/selector_background"
-        android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Soporte y Contacto"
-            android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="8dp"/>
-
-        <!-- Opción de PayPal -->
+        <!-- Sección para donación internacional -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center">
-
-            <ImageView
-
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:src="@drawable/icono"
-                android:contentDescription="Donar con PayPal"
-                android:layout_marginEnd="16dp"/>
+            android:orientation="vertical"
+            android:background="@drawable/selector_background"
+            android:padding="16dp"
+            android:layout_marginBottom="16dp">
 
             <TextView
-
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="WhatsApp 3028667672"
-                android:textSize="16sp"
-                android:textStyle="bold"/>
+                android:text="Donación Internacional"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <!-- Opción de PayPal -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:id="@+id/paypal"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/paypal"
+                    android:contentDescription="Donar con PayPal"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:id="@+id/paypallink"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Enlace de PayPal"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
         </LinearLayout>
 
+        <!-- Sección de Soporte y Contacto -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:background="@drawable/selector_background"
+            android:padding="16dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Soporte y Contacto"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="8dp" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center">
+
+                <ImageView
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/icono"
+                    android:contentDescription="Contacto WhatsApp"
+                    android:layout_marginEnd="16dp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="WhatsApp 3028667672"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
+        </LinearLayout>
     </LinearLayout>
-
-
-
-</LinearLayout>
+</ScrollView>
