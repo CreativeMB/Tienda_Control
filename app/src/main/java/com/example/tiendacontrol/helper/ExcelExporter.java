@@ -50,15 +50,19 @@ public class ExcelExporter {
             SQLiteDatabase db = bdVentas.getReadableDatabase();
 
             // Consulta para obtener todos los datos de la tabla de ventas
+            // Nota: Puedes ajustar la consulta para obtener solo las columnas
+            //       deseadas. Por ejemplo: SELECT id, producto, valor FROM ventas;
             String query = "SELECT * FROM " + BdVentas.TABLE_VENTAS;
             Cursor cursor = db.rawQuery(query, null);
 
+            // Crear el libro de trabajo de Excel
             Workbook workbook = new XSSFWorkbook();
             CreationHelper createHelper = workbook.getCreationHelper();
             Sheet sheet = workbook.createSheet("Datos");
 
             // Escribir los encabezados en la primera fila
             Row headerRow = sheet.createRow(0);
+            // Asegúrate de que los nombres de las columnas coincidan con los de la base de datos
             String[] headers = {"ID", "Producto", "Valor", "Detalles", "Cantidad", "Fecha Registro"};
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
@@ -67,20 +71,43 @@ public class ExcelExporter {
 
             // Escribir los datos obtenidos de la base de datos
             int rowNum = 1;
-            while (cursor.moveToNext()) {
-                Row row = sheet.createRow(rowNum++);
-                row.createCell(0).setCellValue(cursor.getInt(cursor.getColumnIndex("id")));
-                row.createCell(1).setCellValue(cursor.getString(cursor.getColumnIndex("producto")));
-                row.createCell(2).setCellValue(cursor.getDouble(cursor.getColumnIndex("valor")));
-                row.createCell(3).setCellValue(cursor.getString(cursor.getColumnIndex("detalles")));
-                row.createCell(4).setCellValue(cursor.getInt(cursor.getColumnIndex("cantidad")));
-                row.createCell(5).setCellValue(cursor.getString(cursor.getColumnIndex("fecha_registro")));
+            // Verifica si el cursor tiene filas
+            if (cursor.moveToFirst()) {
+                while (!cursor.isAfterLast()) {
+                    Row row = sheet.createRow(rowNum++);
+
+                    // Obtener los valores de las columnas de la base de datos
+                    // y escribirlos en la fila correspondiente
+                    // Verifica que las columnas existen en el cursor
+                    if (cursor.getColumnIndex("id") != -1) {
+                        row.createCell(0).setCellValue(cursor.getInt(cursor.getColumnIndex("id")));
+                    }
+                    if (cursor.getColumnIndex("producto") != -1) {
+                        row.createCell(1).setCellValue(cursor.getString(cursor.getColumnIndex("producto")));
+                    }
+                    if (cursor.getColumnIndex("valor") != -1) {
+                        row.createCell(2).setCellValue(cursor.getDouble(cursor.getColumnIndex("valor")));
+                    }
+                    if (cursor.getColumnIndex("detalles") != -1) {
+                        row.createCell(3).setCellValue(cursor.getString(cursor.getColumnIndex("detalles")));
+                    }
+                    if (cursor.getColumnIndex("cantidad") != -1) {
+                        row.createCell(4).setCellValue(cursor.getInt(cursor.getColumnIndex("cantidad")));
+                    }
+                    if (cursor.getColumnIndex("fecha_registro") != -1) {
+                        row.createCell(5).setCellValue(cursor.getString(cursor.getColumnIndex("fecha_registro")));
+                    }
+
+                    cursor.moveToNext();
+                }
+            } else {
+                Log.e(TAG, "Cursor está vacío.");
             }
+            cursor.close();
+            db.close();
 
-//            cursor.close();
-//            db.close();
-
-            // Generar un nombre de archivo basado en el nombre de la base de datos y una marca de tiempo
+            // Generar un nombre de archivo basado en el nombre de la base de datos
+            // y una marca de tiempo
             String fileName = generateFileName(databaseName);
 
             // Obtener la ruta de documentos públicos
@@ -104,6 +131,7 @@ public class ExcelExporter {
                 }
             }
         }
+
 
         @Override
         protected void onPostExecute(Boolean success) {
