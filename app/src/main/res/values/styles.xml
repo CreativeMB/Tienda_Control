@@ -10,4 +10,7 @@
          <item name="android:textSize">18sp</item>
     </style>
 
+    <style name="MenuItemTextStyle">
+        <item name="android:textSize">25sp</item> <!-- Ajusta el tamaño del texto aquí -->
+    </style>
 </resources>

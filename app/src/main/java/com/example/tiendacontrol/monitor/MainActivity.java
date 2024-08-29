@@ -2,6 +2,8 @@ package com.example.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -64,10 +66,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activitymain);
-//        // Inicialización de Firebase
-//        mAuth = FirebaseAuth.getInstance();
-//        db = FirebaseFirestore.getInstance();
-
         // *** Inicializar SharedPreferences ***
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -83,15 +81,16 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             currentDatabase = getCurrentDatabaseName();
         }
         // Referencias a vistas
-        imageViewProfile = findViewById(R.id.imageViewProfile);
         listaVentas = findViewById(R.id.listaVentas);
-        fabMenu = findViewById(R.id.fabMenu);
         ImageView iconIngreso = findViewById(R.id.ingreso);
         ImageView iconEgreso = findViewById(R.id.egreso);
         textVenta = findViewById(R.id.textVenta);
         textGanacia = findViewById(R.id.textGanacia);
         textGasto = findViewById(R.id.textGasto);
         txtBuscar = findViewById(R.id.txtBuscar);
+
+        ImageView iconLimpiar = findViewById(R.id.borrardados);
+        ImageView iconInicio = findViewById(R.id.inicio);
 
         // Configuración del RecyclerView
         listaVentas.setLayoutManager(new GridLayoutManager(this, 2));
@@ -103,12 +102,22 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new DatosAdapter(this, listaArrayVentas, bdVentas); // Pasa la instancia
         listaVentas.setAdapter(adapter);
 
-//        // Cargar la imagen de perfil del usuario si ya está autenticado
-//        cargarimperfil();
         // Inicializar SearchView
         txtBuscar.setOnQueryTextListener(this);
 
         onDataChanged();
+
+        iconInicio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(MainActivity.this, Database.class);
+                startActivity(intent);
+            }
+        });
+
+        iconLimpiar.setOnClickListener(view -> {
+            confirmarEliminarTodo();
+        });
 
         iconEgreso.setOnClickListener(view -> {
             GastoDialogFragment dialogFragment = new GastoDialogFragment();
@@ -125,16 +134,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             ingresoDialogFragment.setDataChangedListener( this); // Asegúrate de esta línea
             ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
         });
-
-        fabMenu.setOnClickListener(view -> {
-            FragmentManager fragmentManager = getSupportFragmentManager();
-            MenuDialogFragment menuDialogFragment = new MenuDialogFragment();
-            menuDialogFragment.setListener(this);
-            menuDialogFragment.show(fragmentManager, "MenuDialogFragment");
-        });
-
-
-        // Inicializa el lanzador para la solicitud de permisos
+                // Inicializa el lanzador para la solicitud de permisos
         requestStoragePermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(),
                 isGranted -> {
@@ -149,19 +149,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 }
         );
 
-//        // Configurar OnClickListener para el ImageView de perfil
-//        imageViewProfile.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                // Verifica si el usuario está autenticado antes de abrir la actividad
-//                if (mAuth.getCurrentUser() != null) {
-//                    Intent intent = new Intent(MainActivity.this, PerfilUsuario.class);
-//                    startActivity(intent);
-//                } else {
-//                    Toast.makeText(MainActivity.this, "Debes estar autenticado para acceder a este perfil", Toast.LENGTH_SHORT).show();
-//                }
-//            }
-//        });
         onDataChanged();
     }
     @Override
@@ -228,19 +215,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         }
     }
 
-//    private void cargarimperfil() {
-//
-//        if (userLoggedIn) {
-//            FirebaseUser user = mAuth.getCurrentUser();
-//            if (user != null) {
-//                userId = user.getUid();
-//                loadProfileImage(userId);
-//                imageViewProfile.setVisibility(View.VISIBLE);
-//            }
-//        } else {
-//            imageViewProfile.setVisibility(View.GONE);
-//        }
-//    }
 
     // Método para obtener el nombre de la base de datos desde SharedPreferences
     private String getCurrentDatabaseName() {
@@ -254,25 +228,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         editor.putString(KEY_CURRENT_DATABASE, currentDatabase);
         editor.apply();
     }
-//    @Override
-//    protected void onStart() {
-//
-//        super.onStart();
-//               FirebaseUser user = mAuth.getCurrentUser();
-//        if (user != null) {
-//            userLoggedIn = true;
-//            // Ya hay un usuario autenticado, actualiza el estado y la imagen de perfil
-//            userId = user.getUid();
-//            loadProfileImage(userId);
-//            imageViewProfile.setVisibility(View.VISIBLE);
-//            Toast.makeText(this, "Autenticado", Toast.LENGTH_LONG).show();
-//        } else {
-//            // No hay un usuario autenticado, muestra el mensaje "No autenticado"
-//            userLoggedIn = false;
-//            imageViewProfile.setVisibility(View.GONE);
-//            Toast.makeText(this, "No autenticado", Toast.LENGTH_LONG).show();
-//        }
-//    }
+
     // Este método se llama cuando el usuario envía el texto en el campo de búsqueda.
     @Override
     public boolean onQueryTextSubmit(String query) {
@@ -378,8 +334,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     // Método para confirmar la eliminación de la base de datos
     public void confirmarEliminarTodo() {
         new AlertDialog.Builder(this)
-                .setTitle("Eliminar base de datos")
-                .setMessage("¿Estás seguro de que deseas eliminar toda la base de datos?")
+                .setTitle("Eliminar Todos los Items")
+                .setMessage("¿Estás seguro de que deseas limpiar toda la base de datos no se prodran recuperar en el futuro?")
                 .setPositiveButton("Sí", (dialog, which) -> {
                     // Usa la instancia 'bdVentas' existente en la actividad
                     boolean resultado = bdVentas.eliminarTodo();

@@ -10,13 +10,30 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <android.widget.SearchView
-            android:id="@+id/txtBuscar"
-            android:layout_width="250dp"
-            android:layout_height="30dp"
-            android:layout_margin="0dp"
-            android:background="@drawable/buscador" />
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <android.widget.SearchView
+                android:id="@+id/txtBuscar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="0dp"
+                android:background="@drawable/buscador" />
+            <TextView
+                android:id="@+id/textGanacia"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="Ganancia"
+                android:textColor="#2196F3"
+                android:textSize="30sp" />
+        </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaVentas"
@@ -37,18 +54,9 @@
                 android:layout_weight="1"
                 android:gravity="center"
                 android:text="Ingreso"
+                android:textStyle="bold"
                 android:textColor="@color/colorPositivo"
-                android:textSize="20sp" />
-
-            <TextView
-                android:id="@+id/textGanacia"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Ganacia"
-                android:textColor="#2196F3"
-                android:textSize="20sp" />
+                android:textSize="30sp" />
 
             <TextView
                 android:id="@+id/textGasto"
@@ -56,9 +64,10 @@
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
                 android:gravity="center"
+                android:textStyle="bold"
                 android:text="Egreso"
                 android:textColor="@color/colorNegativo"
-                android:textSize="20sp" />
+                android:textSize="30sp" />
         </LinearLayout>
 
         <LinearLayout
@@ -78,16 +87,6 @@
                 android:textSize="18sp" />
 
             <TextView
-                android:id="@+id/textView2"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:gravity="center"
-                android:text="Ganacias"
-                android:textColor="#2196F3"
-                android:textSize="18sp" />
-
-            <TextView
                 android:id="@+id/textView3"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
@@ -100,21 +99,6 @@
 
 
     </LinearLayout>
-
-          <!-- FloatingActionButton superpuesto -->
-    <com.google.android.material.floatingactionbutton.FloatingActionButton
-        android:id="@+id/fabMenu"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="top|end"
-        android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
-        android:layout_marginTop="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/menu"
-        app:backgroundTint="@color/Buton"
-        app:maxImageSize="25dp"/>
 
     <ImageView
         android:id="@+id/ingreso"
@@ -139,15 +123,27 @@
         android:src="@drawable/egreso"/>
 
     <ImageView
-        android:id="@+id/imageViewProfile"
-        android:layout_width="55dp"
-        android:layout_height="55dp"
+        android:id="@+id/inicio"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="260dp"
+        android:layout_marginBottom="300dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginStart="-155dp"
-        android:src="@drawable/icono" />
+        android:src="@drawable/database" />
+    <ImageView
+        android:id="@+id/borrardados"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="360dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginStart="-155dp"
+        android:src="@drawable/eliminar" />
+
 
 </FrameLayout>

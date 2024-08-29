@@ -14,6 +14,7 @@ import android.provider.Settings;
 import androidx.core.app.NotificationCompat;
 
 import com.example.tiendacontrol.R;
+import com.example.tiendacontrol.model.SplashActivity;
 
 import java.util.Calendar;
 
@@ -39,7 +40,7 @@ public class Recordatorio extends BroadcastReceiver {
         }
 
         // Crear un Intent que se ejecutará cuando se toque la notificación
-        Intent notificationIntent = new Intent(context, Inicio.class);  // Cambia Database por la actividad que deseas abrir
+        Intent notificationIntent = new Intent(context, SplashActivity.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(
                 context,

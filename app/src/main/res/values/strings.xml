@@ -28,7 +28,7 @@
     <string name="uno">Exportar Datos</string>
     <string name="dos">Ingreso</string>
     <string name="tres">Egreso</string>
-    <string name="cuatro">Cerrar Sesión</string>
+    <string name="cuatro">Salir</string>
     <string name="quinto">Mis Bases Datos</string>
     <string name="sexto">Tienda Control</string>
     <string name="Septimo">Importar Datos</string>
@@ -37,7 +37,7 @@
     <string name="once">Modifica PIN</string>
     <string name="doce">Buscar</string>
     <string name="trece">Contabilidad</string>
-    <string name="catorce">limpiar Base Datos</string>
+    <string name="catorce">Nosotros</string>
 
 
     <string name="recordatorio">¿recordatorio?</string>
@@ -48,6 +48,13 @@
         <item>Positivos</item>
         <item>Negativos</item>
     </string-array>
+
+    <!-- Cadenas para el menú -->
+
+    <string name="inicio">Inicio</string>
+    <string name="code">Código</string>
+    <string name="dona">Donar</string>
+    <string name="salir">Salir</string>
 
 
 </resources>

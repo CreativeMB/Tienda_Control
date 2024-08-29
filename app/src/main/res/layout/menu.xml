@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.appcompat.widget.LinearLayoutCompat xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_gravity="start"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:paddingTop="24dp"
+    android:fitsSystemWindows="true"
+    android:background="@color/colorPrimary">
+
+    <!-- Imagen de perfil -->
+    <ImageView
+        android:id="@+id/nav_header_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_gravity="center"
+        android:layout_marginBottom="8dp"
+        android:src="@drawable/icono"
+        android:contentDescription="V 1.0"/>
+
+    <!-- Nombre del usuario -->
+    <TextView
+        android:id="@+id/nav_header_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginHorizontal="16dp"
+        android:text="Tienda Control V1.0"
+        android:textAppearance="@style/TextAppearance.AppCompat.Large"
+        />
+
+    <!-- Correo electrónico del usuario -->
+    <TextView
+        android:id="@+id/nav_header_email"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="16dp"
+        android:text="WhatsApp 3028667672"
+        android:textAppearance="@style/TextAppearance.AppCompat.Medium" />
+
+</androidx.appcompat.widget.LinearLayoutCompat>

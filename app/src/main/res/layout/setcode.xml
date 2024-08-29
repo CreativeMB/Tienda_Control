@@ -23,7 +23,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="Modifica el PIN Para inicio de sección "
+                android:text="Activa o Modifícalo el PIN (Desbloqueo con Huella y Patrón) Para inicio de sección"
                 android:textSize="24sp"
                 android:gravity="center"
                 android:paddingBottom="25dp"/>
@@ -37,26 +37,35 @@
                 android:textSize="30sp"
                 android:gravity="center"/>
 
-            <Button
-                android:id="@+id/buttonSaveCode"
+            <!-- Enlace a configuración de seguridad por PIN -->
+            <TextView
+                android:id="@+id/GuardaPin"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Guardar"
-                android:elevation="6dp"
-                style="@style/Widget.AppTheme.Button"
-                android:padding="16dp"/>
+                android:text="Configurar Su PIN"
+                android:textStyle="bold"
+                android:layout_below="@id/patron"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="16dp"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@drawable/selector_background"
+                android:padding="12dp"
+                android:gravity="center"/>
+
+            <TextView
+                android:id="@+id/textViewDeleteCode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Eliminar PIN"
+                android:textSize="20dp"
+                android:textColor="@android:color/holo_red_dark"
+                android:layout_marginTop="16dp"
+                android:layout_gravity="center"
+                android:clickable="true"
+                android:focusable="true" />
 
         </LinearLayout>
     </ScrollView>
-
-    <ImageView
-        android:id="@+id/database"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/inicio"/>
 
 </FrameLayout>

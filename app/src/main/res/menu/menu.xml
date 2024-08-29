@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- res/menu/menu.xml -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/inicioItem"
+        android:icon="@drawable/inicio"
+        android:titleTextAppearance="@style/MenuItemTextStyle"
+        android:title="Inicio"/>
+    <item
+        android:id="@+id/codeItem"
+        android:icon="@drawable/pin"
+        android:titleTextAppearance="@style/MenuItemTextStyle"
+        android:title="Pin"/>
+    <item
+        android:id="@+id/donaItem"
+        android:icon="@drawable/donar"
+        android:titleTextAppearance="@style/MenuItemTextStyle"
+        android:title="Donar"/>
+    <item
+        android:id="@+id/salirItem"
+        android:icon="@drawable/salir"
+        android:titleTextAppearance="@style/MenuItemTextStyle"
+        android:title="Salir"/>
+</menu>

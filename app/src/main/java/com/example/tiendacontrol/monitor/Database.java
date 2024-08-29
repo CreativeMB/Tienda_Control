@@ -14,6 +14,7 @@ import android.os.Environment;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -23,15 +24,19 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.basesAdapter;
 import com.example.tiendacontrol.helper.ExcelExporter;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.android.material.navigation.NavigationView;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -43,8 +48,8 @@ import java.util.List;
 public class Database extends AppCompatActivity implements basesAdapter.OnDatabaseClickListener {
     private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
     private static final int PICK_IMAGE_REQUEST = 1;
-    private Button buttonCreateDatabase;
-
+    private DrawerLayout drawerLayout;
+    private NavigationView navView;
     private RecyclerView recyclerViewDatabases;
     private SharedPreferences sharedPreferences;
     private static final String PREFS_NAME = "MyPrefs";
@@ -93,6 +98,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         super.onCreate(savedInstanceState);
         setContentView(R.layout.database);
 
+
         ImageView iconRecordatorio = findViewById(R.id.recordatorio);
         iconRecordatorio.setOnClickListener(view -> showTimePickerDialog());
 
@@ -116,6 +122,51 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             startActivity(databaseIntent);
         });
 
+        // Inicializa los componentes del layout
+        ImageView iconMenu = findViewById(R.id.menu);
+        drawerLayout = findViewById(R.id.drawerLayout);
+        navView = findViewById(R.id.nav_view);
+
+        iconMenu.setOnClickListener(view -> {
+            if (drawerLayout.isDrawerOpen(navView)) {
+                drawerLayout.closeDrawer(navView);
+            } else {
+                drawerLayout.openDrawer(navView);
+            }
+        });
+        // Configurar el Listener para NavigationView
+        navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+                int id = item.getItemId();
+                try {
+                    if (id == R.id.inicioItem) {
+                        // Acción para Inicio
+                        Intent intent = new Intent(Database.this, Database.class);
+                        startActivity(intent);
+                    } else if (id == R.id.codeItem) {
+                        // Acción para Código
+                        Intent intent = new Intent(Database.this, SetCode.class);
+                        startActivity(intent);
+                    } else if (id == R.id.donaItem) {
+                        // Acción para Donar
+                        Intent intent = new Intent(Database.this, Donar.class);
+                        startActivity(intent);
+                    } else if (id == R.id.salirItem) {
+                        // Acción para Salir
+                        finishAffinity();
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(Database.this, "Ocurrió un error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+                // Cerrar el menú después de la selección
+                drawerLayout.closeDrawers();
+
+                return true;
+            }
+        });
 
         // Solicita permisos cuando se inicia la actividad
         requestStoragePermission(granted -> {

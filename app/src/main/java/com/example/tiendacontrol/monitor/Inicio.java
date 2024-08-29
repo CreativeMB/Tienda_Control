@@ -21,7 +21,6 @@ public class Inicio extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.inicio);
 
-        TextView enlaceConfiguracionPin = findViewById(R.id.pin);
         TextView enlaceConfiguracionPatron = findViewById(R.id.patron);
         TextView EntraPin = findViewById(R.id.entrar);
 
@@ -33,15 +32,6 @@ public class Inicio extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 patron.iniciarAutenticacion();
-            }
-        });
-
-        enlaceConfiguracionPin.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Reemplaza con la actividad de configuración por PIN
-                Intent intent = new Intent(Inicio.this, Pin.class);
-                startActivity(intent);
             }
         });
 

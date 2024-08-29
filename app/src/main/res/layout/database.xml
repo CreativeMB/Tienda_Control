@@ -1,67 +1,98 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.drawerlayout.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/drawerLayout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true">
 
-    <!-- RecyclerView ocupa todo el espacio -->
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/recyclerViewDatabases"
+    <!-- Contenido principal de la actividad -->
+    <FrameLayout
+        android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:paddingTop="16dp" />
+        android:layout_height="match_parent">
 
-    <!-- Icono flotante para Recordatorio -->
-    <ImageView
-        android:id="@+id/recordatorio"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="20dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/recordatorio"
-        android:elevation="8dp"/>
 
-    <!-- Icono flotante para Database -->
-    <ImageView
-        android:id="@+id/database"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="100dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/database"
-        android:elevation="8dp"/>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recyclerViewDatabases"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingTop="16dp" />
 
-    <!-- Icono flotante para Donaciones -->
-    <ImageView
-        android:id="@+id/donacion"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="bottom|start"
-        android:layout_marginStart="30dp"
-        android:layout_marginBottom="20dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:src="@drawable/donacion"
-        android:elevation="8dp"/>
+        <!-- Iconos flotantes -->
+        <ImageView
+            android:id="@+id/recordatorio"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/recordatorio"
+            android:elevation="8dp"/>
 
-    <!-- Texto para Donaciones (puedes ajustar el layout si es necesario) -->
-    <TextView
-        android:id="@+id/textDonaciones"
+        <ImageView
+            android:id="@+id/database"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="100dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/database"
+            android:elevation="8dp"/>
+
+        <ImageView
+            android:id="@+id/donacion"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="30dp"
+            android:layout_marginBottom="20dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/donacion"
+            android:elevation="8dp"/>
+
+        <TextView
+            android:id="@+id/textDonaciones"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom|start"
+            android:layout_marginStart="2dp"
+            android:layout_marginBottom="80dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="¡Tu apoyo nos impulsa! 🙌"
+            android:textSize="10sp"
+            android:elevation="8dp"/>
+
+        <!-- FloatingActionButton superpuesto -->
+        <ImageView
+            android:id="@+id/menu"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="190dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/menu"
+            app:maxImageSize="25dp"/>
+
+    </FrameLayout>
+
+    <!-- Navegación lateral -->
+    <com.google.android.material.navigation.NavigationView
+        android:id="@+id/nav_view"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="bottom|start"
-        android:layout_marginStart="2dp"
-        android:layout_marginBottom="80dp"
-        android:clickable="true"
-        android:focusable="true"
-        android:text="¡Tu apoyo nos impulsa! 🙌"
-        android:textSize="10sp"
-        android:elevation="8dp"/>
-</FrameLayout>
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/menu"
+        app:itemTextAppearance="@style/MenuItemTextStyle"
+        app:menu="@menu/menu" />
+
+</androidx.drawerlayout.widget.DrawerLayout>

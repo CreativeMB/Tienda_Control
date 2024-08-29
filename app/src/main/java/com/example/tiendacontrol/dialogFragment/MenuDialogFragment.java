@@ -1,136 +1,125 @@
 package com.example.tiendacontrol.dialogFragment;
 
+import static androidx.core.app.ActivityCompat.finishAffinity;
 import static com.google.common.reflect.Reflection.getPackageName;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ListView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.view.menu.MenuBuilder;
 import androidx.appcompat.view.menu.MenuItemImpl;
+import androidx.coordinatorlayout.widget.CoordinatorLayout;
 import androidx.fragment.app.FragmentActivity;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.monitor.Database;
 import com.example.tiendacontrol.adapter.MenuAdapter;
+import com.example.tiendacontrol.monitor.Donar;
+import com.example.tiendacontrol.monitor.Inicio;
 import com.example.tiendacontrol.monitor.SetCode;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import java.util.ArrayList;
 import java.util.List;
 
 public class MenuDialogFragment extends BottomSheetDialogFragment {
-    private ListView menuListView; // Vista para mostrar los elementos del menú
-    private MenuAdapter menuAdapter; // Adaptador para los elementos del menú
-    private List<MenuItemImpl> menuItems = new ArrayList<>(); // Lista de elementos del menú
+    private ListView menuListView;
+    private MenuAdapter menuAdapter;
+    private List<MenuItemImpl> menuItems = new ArrayList<>();
 
-    private FragmentActivity activity; // Variable para la Activity
-    private static final String PREFS_NAME = "TiendaControlPrefs"; // Declare PREFS_NAME aquí
-    private static final String KEY_CURRENT_DATABASE = "currentDatabase"; // Declare KEY_CURRENT_DATABASE aquí
-    private String currentDatabase;
+    private FragmentActivity activity;
 
-
-    public interface MainActivityListener { // Interfaz para la comunicación
+    public interface MainActivityListener {
         void confirmarEliminarTodo();
     }
 
-    private MainActivityListener listener; // Referencia al listener de MainActivity
+    private MainActivityListener listener;
 
     public static MenuDialogFragment newInstance() {
-        return new MenuDialogFragment(); // Crear una nueva instancia del fragmento
+        return new MenuDialogFragment();
     }
 
     public void setListener(MainActivityListener listener) {
         this.listener = listener;
     }
 
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.menu_dialog, container, false); // Inflar el diseño del fragmento
+        View view = inflater.inflate(R.layout.menu_dialog, container, false);
 
-        menuListView = view.findViewById(R.id.menu_list); // Obtener la vista de la lista del menú
+        menuListView = view.findViewById(R.id.menu_list);
 
-        // Crear un MenuBuilder y cargar el menú desde XML
-        MenuBuilder menuBuilder = new MenuBuilder(requireContext());
-        MenuInflater menuInflater = new MenuInflater(requireContext());
-        menuInflater.inflate(R.menu.menudialog, menuBuilder);
-
-        // Obtener los elementos del menú como una lista de MenuItemImpl
-        menuItems = getMenuItemsFromMenuBuilder(menuBuilder);
-
-        // Crear el adaptador de menú personalizado
+        // Configurar el adaptador de menú personalizado
         menuAdapter = new MenuAdapter(requireContext(), menuItems);
         menuListView.setAdapter(menuAdapter);
 
         // Manejar clics en los elementos del menú
         menuListView.setOnItemClickListener((parent, view1, position, id) -> {
-            MenuItemImpl menuItem = menuItems.get(position); // Obtener el elemento del menú clicado
-            handleMenuItemClick(menuItem); // Manejar el clic en el elemento del menú
-
-            // Cerrar el diálogo al seleccionar un elemento del menú
+            MenuItemImpl menuItem = menuItems.get(position);
+            handleMenuItemClick(menuItem);
             dismiss();
         });
 
         return view;
     }
 
-    public interface OnStoragePermissionResultListener {
-        void onPermissionResult(boolean granted);
-    }
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
 
-    // Método para obtener los elementos del menú como una lista de MenuItemImpl
-    private List<MenuItemImpl> getMenuItemsFromMenuBuilder(MenuBuilder menuBuilder) {
-        List<MenuItemImpl> items = new ArrayList<>();
-        int size = menuBuilder.size();
-        for (int i = 0; i < size; i++) {
-            MenuItemImpl item = (MenuItemImpl) menuBuilder.getItem(i);
-            if (item.isVisible()) {
-                items.add(item);
+        BottomSheetDialog dialog = (BottomSheetDialog) getDialog();
+        if (dialog != null) {
+            FrameLayout bottomSheet = dialog.findViewById(com.google.android.material.R.id.design_bottom_sheet);
+            if (bottomSheet != null) {
+                CoordinatorLayout.LayoutParams layoutParams = (CoordinatorLayout.LayoutParams) bottomSheet.getLayoutParams();
+                DisplayMetrics displayMetrics = new DisplayMetrics();
+                requireActivity().getWindowManager().getDefaultDisplay().getMetrics(displayMetrics);
+                int screenWidth = displayMetrics.widthPixels;
+                int width = (int) (screenWidth * 0.6);
+                layoutParams.width = width;
+                bottomSheet.setLayoutParams(layoutParams);
+
+                BottomSheetBehavior<FrameLayout> behavior = BottomSheetBehavior.from(bottomSheet);
+                behavior.setPeekHeight(ViewGroup.LayoutParams.WRAP_CONTENT);
+                behavior.setFitToContents(true);
+                behavior.setState(BottomSheetBehavior.STATE_EXPANDED);
+
+                // Animación de entrada desde la izquierda
+                bottomSheet.setTranslationX(-screenWidth);
+                bottomSheet.animate()
+                        .translationX(0)
+                        .setDuration(300)
+                        .start();
             }
         }
-        return items;
     }
 
-    // Método para manejar el clic en los elementos del menú
     private void handleMenuItemClick(MenuItemImpl menuItem) {
-        int id = menuItem.getItemId(); // Obtener el ID del elemento del menú
-         if (id == R.id.inicio) {
-             // Ir a la pantalla de configuración de código
-             Intent intent = new Intent(requireContext(), Database.class);
-             startActivity(intent);
-        } else if (id == R.id.code) {
-            // Ir a la pantalla de configuración de código
-            Intent intent = new Intent(requireContext(), SetCode.class);
+        int id = menuItem.getItemId();
+        if (id == R.id.inicio) {
+            Intent intent = new Intent(requireContext(), Database.class);
             startActivity(intent);
-//        } else if (id == R.id.cerrar_sesion) {
-//            // Cerrar sesión
-//            FirebaseAuth.getInstance().signOut();
-//            Intent intent = new Intent(requireContext(), Login.class);
+//        } else if (id == R.id.code) {
+//            Intent intent = new Intent(requireContext(), SetCode.class);
 //            startActivity(intent);
-        } else if (id == R.id.borrardados) {
-            showDeleteConfirmationDialog();
-        }
-    }
-
-    // Método para mostrar el diálogo de confirmación de eliminación de base de datos
-    private void showDeleteConfirmationDialog() {
-        // Verificar si el fragmento está adjunto a una actividad antes de continuar
-        if (!isAdded()) {
-            Log.e("MenuDialogFragment", "Fragmento no está adjunto a una actividad");
-            return;
-        }
-        // Verificar si el listener de MainActivity no es nulo antes de llamar al método para eliminar la base de datos
-        if (listener != null) {
-            listener.confirmarEliminarTodo(); // Llamar al método para eliminar la base de datos
-        } else {
-            Log.e("MenuDialogFragment", "El listener de MainActivity es nulo");
+//        } else if (id == R.id.dona) {
+//            Intent intent = new Intent(requireContext(), Donar.class);
+//            startActivity(intent);
+//        } else if (id == R.id.salir) {
+//            if (getActivity() != null) {
+//                getActivity().finishAffinity();
+//            }
         }
     }
 }

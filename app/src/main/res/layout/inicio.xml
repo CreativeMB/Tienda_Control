@@ -43,6 +43,7 @@
             android:layout_below="@id/titulo_bienvenida"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="16dp"
+            android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
             android:background="@drawable/selector_background"
@@ -58,26 +59,14 @@
             android:layout_below="@id/entrar"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="10dp"
+            android:textStyle="bold"
             android:clickable="true"
             android:focusable="true"
             android:background="@drawable/selector_background"
             android:padding="12dp"
             android:gravity="center"/>
 
-        <!-- Enlace a configuración de seguridad por PIN -->
-        <TextView
-            android:id="@+id/pin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Configurar Su PIN"
-            android:layout_below="@id/patron"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="16dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:background="@drawable/selector_background"
-            android:padding="12dp"
-            android:gravity="center"/>
+
 
 
 

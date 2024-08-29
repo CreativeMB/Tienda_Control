@@ -16,7 +16,6 @@ import androidx.appcompat.view.menu.MenuItemImpl;
 import java.util.List;
 
 public class MenuAdapter extends ArrayAdapter<MenuItemImpl> {
-
     private Context mContext;  // Contexto de la aplicación
     private List<MenuItemImpl> mMenuItems;  // Lista de elementos de menú
 
