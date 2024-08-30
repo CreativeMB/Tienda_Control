@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="25dp"
+    android:gravity="center"
+    android:orientation="vertical">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:src="@drawable/donar" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:textSize="20dp"
+        android:gravity="center"
+        android:text="¡Tu base de datos está lista!
+
+Ahora es el momento de agregar tus primeros ítems. Registra tus ingresos y egresos para comenzar a tener un control total de tus finanzas. ¡Hazlo ahora y empieza a ver los resultados!" />
+
+</LinearLayout>
