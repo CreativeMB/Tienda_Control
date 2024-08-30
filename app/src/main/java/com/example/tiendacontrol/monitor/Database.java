@@ -2,12 +2,14 @@ package com.example.tiendacontrol.monitor;
 
 import android.Manifest;
 import android.app.AlarmManager;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
@@ -241,8 +243,6 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             } else {
                 showToast("No se encontraron bases de datos");
             }
-        } else {
-            showToast("Tienes que dar permisos para comenzar");
         }
         adapter.notifyDataSetChanged();
     }
@@ -412,6 +412,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                 listener.onPermissionResult(true);
 
             } else {
+                showToast("Tienes que dar permisos para comenzar");
                 Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
                 manageAllFilesPermissionLauncher.launch(intent);
             }
@@ -488,13 +489,41 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         }
     }
 
+    private void openAppSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        showToast("Revisa las notificaciones están habilitadas");
+        intent.setData(uri);
+        startActivity(intent);
+
+    }
+
     private boolean canScheduleExactAlarms() {
-        // Para API 31 y superior, se utiliza el método canScheduleExactAlarms
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            return alarmManager != null && alarmManager.canScheduleExactAlarms();
+            if (alarmManager != null && alarmManager.canScheduleExactAlarms()) {
+                // Verificar permisos de notificación en Android 13 y superior
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (notificationManager != null) {
+                        if (notificationManager.areNotificationsEnabled()) {
+                            // Aquí podrías verificar si las burbujas están habilitadas, pero no se puede hacer directamente.
+                            return true;
+                        } else {
+                            // Abrir la configuración de notificaciones
+                            openAppSettings();
+                            return false;
+                        }
+                    }
+                } else {
+
+                    // Para versiones anteriores a Android 13, siempre se considera que las notificaciones están habilitadas
+                    return true;
+                }
+            }
+            return false;
         }
-        // Para versiones anteriores, siempre devolver verdadero
+        // Para versiones anteriores a Android 12, siempre devolver verdadero
         return true;
     }
 }

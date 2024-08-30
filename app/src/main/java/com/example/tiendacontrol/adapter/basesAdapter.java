@@ -39,7 +39,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             View view = LayoutInflater.from(context).inflate(R.layout.itemdatabase, parent, false);
             return new DatabaseViewHolder(view);
         } else {
-            View view = LayoutInflater.from(context).inflate(R.layout.empty_view, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.baseinicio, parent, false);
             return new EmptyViewHolder(view);
         }
     }
