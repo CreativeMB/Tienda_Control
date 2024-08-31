@@ -170,6 +170,7 @@
                 android:gravity="center">
 
                 <ImageView
+                    android:id="@+id/imageLink"
                     android:layout_width="60dp"
                     android:layout_height="60dp"
                     android:src="@drawable/icono"

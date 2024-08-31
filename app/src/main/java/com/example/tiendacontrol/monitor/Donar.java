@@ -33,6 +33,18 @@ public class Donar extends AppCompatActivity {
         paypalLink = findViewById(R.id.paypallink);
         ImageView iconDatabase = findViewById(R.id.database);
 
+        ImageView imageView = findViewById(R.id.imageLink);
+        imageView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // URL al que quieres dirigir al usuario
+                String url = "https://www.floristerialoslirios.com/tienda-control";
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
+        });
+
         // Configuración de eventos
         setupClickListeners();
 
