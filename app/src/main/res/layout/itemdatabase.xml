@@ -8,8 +8,8 @@
         android:id="@+id/cardView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_margin="10dp"
-        android:padding="16dp"
+        android:layout_margin="15dp"
+        android:padding="15dp"
         app:cardCornerRadius="18dp"
         android:background="@color/colorFondoPredeterminado"
         app:cardElevation="10dp">
@@ -26,14 +26,13 @@
                 android:layout_height="150dp"
                 android:padding="10dp"
                 android:contentDescription="Database"
-                android:src="@drawable/database"
-                android:layout_marginEnd="16dp"/>
+                android:src="@drawable/database" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="16dp"
+                android:padding="10dp"
                 android:gravity="center">
 
                 <TextView
@@ -42,7 +41,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Base de datos"
-                    android:textSize="25sp"
+                    android:textSize="30sp"
                     android:textStyle="bold"
                     android:padding="5dp"
                     android:textColor="@color/white"/>
