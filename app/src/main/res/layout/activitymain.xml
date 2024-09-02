@@ -10,12 +10,10 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
-
             <android.widget.SearchView
                 android:id="@+id/txtBuscar"
                 android:layout_width="0dp"
@@ -34,7 +32,6 @@
                 android:textColor="#2196F3"
                 android:textSize="30sp" />
         </LinearLayout>
-
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaVentas"
             android:layout_width="match_parent"
