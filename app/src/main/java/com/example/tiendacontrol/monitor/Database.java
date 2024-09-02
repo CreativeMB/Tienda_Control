@@ -32,6 +32,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
@@ -112,8 +113,8 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         recyclerViewDatabases = findViewById(R.id.recyclerViewDatabases);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        // Inicializa el RecyclerView con GridLayoutManager
-        recyclerViewDatabases.setLayoutManager(new GridLayoutManager(this, 1)); // 2 columnas
+        recyclerViewDatabases.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, false));
+
         databaseList = new ArrayList<>();
         adapter = new basesAdapter(this, databaseList,this);
         recyclerViewDatabases.setAdapter(adapter);
