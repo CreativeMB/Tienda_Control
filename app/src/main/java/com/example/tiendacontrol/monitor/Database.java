@@ -113,9 +113,9 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
         // Inicializa el RecyclerView con GridLayoutManager
-        recyclerViewDatabases.setLayoutManager(new GridLayoutManager(this, 2)); // 2 columnas
+        recyclerViewDatabases.setLayoutManager(new GridLayoutManager(this, 1)); // 2 columnas
         databaseList = new ArrayList<>();
-        adapter = new basesAdapter(this, databaseList, this);
+        adapter = new basesAdapter(this, databaseList,this);
         recyclerViewDatabases.setAdapter(adapter);
 
 

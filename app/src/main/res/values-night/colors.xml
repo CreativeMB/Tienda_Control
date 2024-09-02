@@ -16,7 +16,7 @@
 
     <color name="toolbarBackground">#2196F3</color>
     <color name="texcolor">#8C4A1D</color>
-    <color name="colorNegativo">#900000</color>
+    <color name="colorNegativo">#5F0F0F</color>
     <color name="colorPositivo">#4CAF50</color>
     <color name="colorFondoNegativo">#93F44336</color>
     <color name="colorFondoPositivo">#4CAF50</color>

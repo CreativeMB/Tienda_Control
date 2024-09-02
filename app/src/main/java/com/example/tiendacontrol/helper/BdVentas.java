@@ -54,13 +54,6 @@ public class BdVentas extends SQLiteOpenHelper {
     }
 
 
-    public static synchronized BdVentas getInstance(Context context, String databaseName) {
-        if (instance == null) {
-            instance = new BdVentas(context.getApplicationContext(), databaseName);
-        }
-        return instance;
-    }
-
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
         Log.d("BdVentas", "Creando tabla: " + TABLE_VENTAS);
@@ -275,5 +268,58 @@ public class BdVentas extends SQLiteOpenHelper {
             }
         }
         return filteredItems;
+    }
+    public double obtenerTotalVentas() {
+        double total = 0.0;
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = getReadableDatabase();
+            cursor = db.rawQuery("SELECT SUM(valor) FROM " + TABLE_VENTAS, null);
+            if (cursor.moveToFirst()) {
+                total = cursor.getDouble(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("BdVentas", "Error al obtener el total de ventas: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null && db.isOpen()) {
+                db.close();
+            }
+        }
+        return total;
+    }
+
+    public double obtenerTotalEgresos() {
+        double total = 0.0;
+        SQLiteDatabase db = null;
+        Cursor cursor = null;
+        try {
+            db = getReadableDatabase();
+            cursor = db.rawQuery("SELECT SUM(valor) FROM " + TABLE_VENTAS + " WHERE valor < 0", null);
+            if (cursor.moveToFirst()) {
+                total = cursor.getDouble(0);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("BdVentas", "Error al obtener el total de egresos: " + e.getMessage());
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            if (db != null && db.isOpen()) {
+                db.close();
+            }
+        }
+        return total;
+    }
+
+    public double obtenerDiferencia() {
+        double ingresos = obtenerTotalVentas();
+        double egresos = obtenerTotalEgresos();
+        return ingresos - egresos; // Como los egresos son negativos, sumamos.
     }
 }

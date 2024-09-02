@@ -11,6 +11,9 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
+import com.example.tiendacontrol.helper.BdVentas;
+import com.example.tiendacontrol.helper.PuntoMil;
+
 import java.util.List;
 
 public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -43,12 +46,32 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             return new EmptyViewHolder(view);
         }
     }
+
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         if (holder instanceof DatabaseViewHolder) {
             DatabaseViewHolder databaseHolder = (DatabaseViewHolder) holder;
             String databaseName = databaseList.get(position);
+
+            // Obtener instancia de BdVentas para la base de datos actual
+            BdVentas bdVentas = new BdVentas(context, databaseName);
+
+            // Obtener los valores para esta base de datos
+            double ingresos = bdVentas.obtenerTotalVentas();
+            double egresos = bdVentas.obtenerTotalEgresos();
+            double diferencia = bdVentas.obtenerDiferencia(); // O calcula diferencia aquí
+
+            // Formatear los valores con PuntoMil
+            String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
+            String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
+            String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
+
+            // Mostrar los valores FORMATEADOS en los TextViews
             databaseHolder.textViewDatabaseName.setText(databaseName);
+            databaseHolder.textViewIngresos.setText("Ganancia: $" + ingresosFormatted);
+            databaseHolder.textViewEgresos.setText("Egresos: $" + egresosFormatted);
+            databaseHolder.textViewDiferencia.setText("Ingresos: $" + diferenciaFormatted);
+            bdVentas.close();
             databaseHolder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
             databaseHolder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
             int colorFondo = R.color.fondoCAr;
@@ -56,6 +79,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         } else if (holder instanceof EmptyViewHolder) {
             // No es necesario hacer nada aquí, ya que la vista EmptyViewHolder se configura en el layout XML.
         }
+
     }
 
     @Override
@@ -68,24 +92,6 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         return databaseList.isEmpty() ? VIEW_TYPE_EMPTY : VIEW_TYPE_ITEM;
     }
 
-    public static class DatabaseViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewDatabaseName;
-        CardView cardView;
-        ImageView imageViewDatabaseIcon;
-
-        public DatabaseViewHolder(@NonNull View itemView) {
-            super(itemView);
-            textViewDatabaseName = itemView.findViewById(R.id.textViewDatabaseName);
-            imageViewDatabaseIcon = itemView.findViewById(R.id.imageViewDatabase);
-            cardView = itemView.findViewById(R.id.cardView);
-        }
-    }
-
-    public static class EmptyViewHolder extends RecyclerView.ViewHolder {
-        public EmptyViewHolder(View itemView) {
-            super(itemView);
-        }
-    }
     @Override
     public void onAttachedToRecyclerView(@NonNull RecyclerView recyclerView) {
         super.onAttachedToRecyclerView(recyclerView);
@@ -102,4 +108,31 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             });
         }
     }
+
+    public static class DatabaseViewHolder extends RecyclerView.ViewHolder {
+        TextView textViewDatabaseName;
+        TextView textViewIngresos;
+        TextView textViewEgresos;
+        TextView textViewDiferencia;
+        CardView cardView;
+        ImageView imageViewDatabaseIcon;
+
+        public DatabaseViewHolder(@NonNull View itemView) {
+            super(itemView);
+            textViewDatabaseName = itemView.findViewById(R.id.textViewDatabaseName);
+            // Asegúrate de que estos IDs coincidan con los de tu layout itemdatabase.xml
+            textViewIngresos = itemView.findViewById(R.id.textViewIngresos);
+            textViewEgresos = itemView.findViewById(R.id.textViewEgresos);
+            textViewDiferencia = itemView.findViewById(R.id.textViewDiferencia);
+            imageViewDatabaseIcon = itemView.findViewById(R.id.imageViewDatabase);
+            cardView = itemView.findViewById(R.id.cardView);
+        }
+    }
+
+    public static class EmptyViewHolder extends RecyclerView.ViewHolder {
+        public EmptyViewHolder(View itemView) {
+            super(itemView);
+        }
+    }
+
 }
