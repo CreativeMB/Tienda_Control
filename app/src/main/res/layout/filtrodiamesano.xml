@@ -102,6 +102,6 @@
         android:layout_margin="16dp"
         android:clickable="true"
         android:focusable="true"
-        android:src="@drawable/inicio"/>
+        android:src="@drawable/database"/>
 
 </FrameLayout>
