@@ -100,7 +100,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.database);
-        ImageView imageMnual = findViewById(R.id.manual);
+        ImageView imageManual = findViewById(R.id.manual);
 
         ImageView iconRecordatorio = findViewById(R.id.recordatorio);
         iconRecordatorio.setOnClickListener(view -> showTimePickerDialog());
@@ -125,7 +125,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             startActivity(databaseIntent);
         });
 
-        imageMnual.setOnClickListener(new View.OnClickListener() {
+        imageManual.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 // URL al que quieres dirigir al usuario
@@ -166,6 +166,13 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                         // Acción para Donar
                         Intent intent = new Intent(Database.this, Donar.class);
                         startActivity(intent);
+                    } else if (id == R.id.manual)  {
+                        // URL al que quieres dirigir al usuario
+                        String url = "https://www.floristerialoslirios.com/tienda-control";
+                        Intent intent = new Intent(Intent.ACTION_VIEW);
+                        intent.setData(Uri.parse(url));
+                        startActivity(intent);
+                        return true;
                     } else if (id == R.id.salirItem) {
                         // Acción para Salir
                         finishAffinity();
