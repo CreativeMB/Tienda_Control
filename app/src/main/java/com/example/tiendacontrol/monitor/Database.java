@@ -100,7 +100,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.database);
-
+        ImageView imageMnual = findViewById(R.id.manual);
 
         ImageView iconRecordatorio = findViewById(R.id.recordatorio);
         iconRecordatorio.setOnClickListener(view -> showTimePickerDialog());
@@ -123,6 +123,17 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         iconDonacion.setOnClickListener(view -> {
             Intent databaseIntent = new Intent(this, Donar.class);
             startActivity(databaseIntent);
+        });
+
+        imageMnual.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // URL al que quieres dirigir al usuario
+                String url = "https://www.floristerialoslirios.com/tienda-control";
+                Intent intent = new Intent(Intent.ACTION_VIEW);
+                intent.setData(Uri.parse(url));
+                startActivity(intent);
+            }
         });
 
         // Inicializa los componentes del layout
