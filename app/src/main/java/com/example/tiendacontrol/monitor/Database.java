@@ -53,6 +53,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CODE_EXACT_ALARM = 1;
+    private Calendar selectedTime;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private RecyclerView recyclerViewDatabases;
@@ -454,7 +455,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
         TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                 (view, hourOfDay, minuteOfHour) -> {
-                    Calendar selectedTime = Calendar.getInstance();
+                    selectedTime = Calendar.getInstance();
                     selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
                     selectedTime.set(Calendar.MINUTE, minuteOfHour);
                     selectedTime.set(Calendar.SECOND, 0);
@@ -468,7 +469,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     private void scheduleNotification(Calendar selectedTime) {
         AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
 
-        Intent intent = new Intent(this, Recordatorio.class); // Reemplaza "Recordatorio" con el nombre de tu clase BroadcastReceiver
+        Intent intent = new Intent(this, Recordatorio.class);
         PendingIntent pendingIntent = PendingIntent.getBroadcast(
                 this,
                 0,
@@ -478,59 +479,85 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             if (alarmManager != null && canScheduleExactAlarms()) {
-                alarmManager.setExactAndAllowWhileIdle(
+                alarmManager.setRepeating(
                         AlarmManager.RTC_WAKEUP,
                         selectedTime.getTimeInMillis(),
+                        AlarmManager.INTERVAL_DAY,  // Intervalo de un día
                         pendingIntent
                 );
-                showToast("Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE));
+
+                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
             } else {
                 // Solicitar permiso para alarmas exactas
                 Intent permissionIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
                 permissionIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                startActivityForResult(permissionIntent, REQUEST_CODE_EXACT_ALARM);
+                startActivity(permissionIntent);
+
+                Toast.makeText(this, "Debes conceder permiso para guardar el recordatorio diario", Toast.LENGTH_SHORT).show();
             }
         } else {
             if (alarmManager != null) {
                 alarmManager.setRepeating(
                         AlarmManager.RTC_WAKEUP,
                         selectedTime.getTimeInMillis(),
-                        AlarmManager.INTERVAL_DAY,
+                        AlarmManager.INTERVAL_DAY,  // Intervalo de un día
                         pendingIntent
                 );
-                showToast("Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE));
+
+                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
+    private boolean canScheduleExactAlarms() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+            if (alarmManager != null && alarmManager.canScheduleExactAlarms()) {
+                // Verificar permisos de notificación en Android 13 y superior
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                    NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+                    if (notificationManager != null) {
+                        if (notificationManager.areNotificationsEnabled()) {
+                            // Aquí podrías verificar si las burbujas están habilitadas, pero no se puede hacer directamente.
+                            return true;
+                        } else {
+                            // Abrir la configuración de notificaciones
+                            openAppSettings();
+                            return false;
+                        }
+                    }
+                } else {
+
+                    // Para versiones anteriores a Android 13, siempre se considera que las notificaciones están habilitadas
+                    return true;
+                }
+            }
+            return false;
+        }
+        // Para versiones anteriores a Android 12, siempre devolver verdadero
+        return true;
+    }
     private void openAppSettings() {
         Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
         Uri uri = Uri.fromParts("package", getPackageName(), null);
         showToast("Revisa las notificaciones están habilitadas");
         intent.setData(uri);
         startActivity(intent);
-    }
 
-    private boolean canScheduleExactAlarms() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            AlarmManager alarmManager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-            return alarmManager != null && alarmManager.canScheduleExactAlarms();
-        }
-        return true;
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+
         if (requestCode == REQUEST_CODE_EXACT_ALARM) {
             if (resultCode == RESULT_OK) {
-                // El usuario ha concedido el permiso, vuelve a intentar programar la alarma
-                Calendar calendar = Calendar.getInstance(); // Obtén la hora actual o cualquier otra hora que necesites
-                scheduleNotification(calendar);
+                // Permiso concedido, reintentar programar la alarma
+                scheduleNotification(selectedTime);
             } else {
+                // Permiso denegado, informar al usuario
                 Toast.makeText(this, "Se requiere permiso para programar la alarma", Toast.LENGTH_SHORT).show();
             }
         }
     }
-
 }
