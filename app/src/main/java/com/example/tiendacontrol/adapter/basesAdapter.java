@@ -60,12 +60,10 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             double ingresos = bdVentas.obtenerTotalVentas();
             double egresos = bdVentas.obtenerTotalEgresos();
             double diferencia = bdVentas.obtenerDiferencia(); // O calcula diferencia aquí
-
             // Formatear los valores con PuntoMil
             String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
             String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
             String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
-
             // Mostrar los valores FORMATEADOS en los TextViews
             databaseHolder.textViewDatabaseName.setText(databaseName);
             databaseHolder.textViewIngresos.setText("Ganancia: $" + ingresosFormatted);
