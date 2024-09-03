@@ -72,8 +72,8 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             bdVentas.close();
             databaseHolder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
             databaseHolder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
-            int colorFondo = R.color.fondoCAr;
-            databaseHolder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), colorFondo));
+//            int colorFondo = R.color.fondoCAr;
+//            databaseHolder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), colorFondo));
         } else if (holder instanceof EmptyViewHolder) {
             // No es necesario hacer nada aquí, ya que la vista EmptyViewHolder se configura en el layout XML.
         }

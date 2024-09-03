@@ -215,7 +215,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             adapter.ordenarPorFecha();
             adapter.setItems(listaArrayVentas);
             adapter.setBdVentas(bdVentas);
-            mostrarValores();
+
             adapter.notifyDataSetChanged();
             mostrarValores();
             Log.d(TAG, "RecyclerView actualizado, tamaño de la lista: " + listaArrayVentas.size());
