@@ -24,8 +24,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.adapter.DatosAdapter;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
-import com.example.tiendacontrol.dialogFragment.MenuDialogFragment;
-
 
 import com.example.tiendacontrol.helper.BdVentas;
 import java.text.NumberFormat;
@@ -41,7 +39,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.squareup.picasso.Picasso;
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, MenuDialogFragment.MainActivityListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener {
+public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener {
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
