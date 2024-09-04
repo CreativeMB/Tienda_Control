@@ -30,7 +30,11 @@
             android:name=".monitor.Inicio"
             android:exported="false" />
 
-        <receiver android:name=".monitor.Recordatorio" />
+        <receiver
+            android:name=".monitor.Recordatorio"
+            android:enabled="true"
+            android:exported="false">
+        </receiver>
         <activity android:name=".model.Items" />
         <activity android:name=".dialogFragment.IngresoDialogFragment" />
         <activity android:name=".dialogFragment.GastoDialogFragment" />

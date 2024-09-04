@@ -27,7 +27,7 @@ public class Recordatorio extends BroadcastReceiver {
     private void mostrarNotificacion(Context context) {
         NotificationManager notificationManager = context.getSystemService(NotificationManager.class);
 
-        crearCanalNotificacion(context, notificationManager);
+        crearCanalNotificacion(notificationManager, context); // Llama el método para crear el canal
 
         // Intent para abrir la aplicación al tocar la notificación
         Intent notificationIntent = new Intent(context, SplashActivity.class);
@@ -40,13 +40,13 @@ public class Recordatorio extends BroadcastReceiver {
                 .setContentTitle("Mi Contabilidad")
                 .setContentText("No Olvides Realizar Las Cuentas Hoy.")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
-                .setAutoCancel(true)
+                .setAutoCancel(true) // Cierra la notificación al tocarla
                 .setContentIntent(pendingIntent);
 
         notificationManager.notify(NOTIFICATION_ID, builder.build());
     }
 
-    private void crearCanalNotificacion(Context context, NotificationManager notificationManager) {
+    private void crearCanalNotificacion(NotificationManager notificationManager, Context context) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(CHANNEL_ID, "Recordatorios Diarios",
                     NotificationManager.IMPORTANCE_HIGH);
