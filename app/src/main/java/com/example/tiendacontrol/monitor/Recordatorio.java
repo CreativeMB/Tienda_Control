@@ -37,8 +37,8 @@ public class Recordatorio extends BroadcastReceiver {
 
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
                 .setSmallIcon(R.drawable.contabilidad) // Reemplaza con tu icono
-                .setContentTitle("Mi Contabilidad")
-                .setContentText("No Olvides Realizar Las Cuentas Hoy.")
+                .setContentTitle("¡No Lo Dejes Pasar!")
+                .setContentText("Registra Hoy Tus Ingresos y Egresos¡Tu futuro financiero lo agradecerá!")
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true) // Cierra la notificación al tocarla
                 .setContentIntent(pendingIntent);

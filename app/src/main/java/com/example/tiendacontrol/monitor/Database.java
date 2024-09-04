@@ -336,8 +336,6 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
         // Mostrar el diálogo
         dialog.show();
-        // Ejemplo de llamada al método para mostrar el TimePicker
-        showTimePickerDialog();
     }
 
     private void editDatabase(String databaseName) {
