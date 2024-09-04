@@ -167,7 +167,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     protected void onResume() {
         super.onResume();
-        mostrarValores();
+//        mostrarValores();
         onDataChanged();
         bdVentas = new BdVentas(this, currentDatabase);
         if (adapter == null) {
@@ -215,9 +215,21 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             adapter.ordenarPorFecha();
             adapter.setItems(listaArrayVentas);
             adapter.setBdVentas(bdVentas);
+            // Obtener los valores para la base de datos ACTUAL después de actualizar el adaptador
+            double ingresos = bdVentas.obtenerTotalVentas();
+            double egresos = bdVentas.obtenerTotalEgresos();
+            String diferenciaFormateada = bdVentas.obtenerDiferencia();
 
+            // Formatear los valores con PuntoMil
+            String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
+            String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
+
+            // Mostrar los valores en los TextView
+            textIngresos.setText(String.format("$%s", ingresosFormatted));
+            textEgresos.setText(String.format("$%s", egresosFormatted));
+            textDiferencia.setText(String.format("$%s", diferenciaFormateada));
             adapter.notifyDataSetChanged();
-            mostrarValores();
+//            mostrarValores();
             Log.d(TAG, "RecyclerView actualizado, tamaño de la lista: " + listaArrayVentas.size());
         }
     }
@@ -232,7 +244,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                         Toast.makeText(this, "Base de datos eliminada", Toast.LENGTH_SHORT).show();
                         listaArrayVentas.clear();
                         adapter.notifyDataSetChanged();
-                        mostrarValores();
+//                        mostrarValores();
                         onDataChanged();
                     } else {
                         Toast.makeText(this, "Error al eliminar la base de datos", Toast.LENGTH_SHORT).show();
@@ -243,21 +255,20 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 .show();
     }
 
-    private void mostrarValores() {
-        // Obtener los valores de ingresos, egresos y diferencia
-        double ingresos = bdVentas.obtenerTotalVentas();
-        double egresos = bdVentas.obtenerTotalEgresos();
-        double diferencia = bdVentas.obtenerDiferencia();
-
-        // Convertir a long y formatear con punto de mil
-        String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
-        String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
-        String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
-
-        // Mostrar los valores en los TextView
-        textIngresos.setText(String.format("$%s", ingresosFormatted));
-        textEgresos.setText(String.format("$%s", egresosFormatted));
-        textDiferencia.setText(String.format("$%s", diferenciaFormatted));
-    }
+//    private void mostrarValores() {
+//        // Obtener los valores de ingresos, egresos y diferencia
+//        double ingresos = bdVentas.obtenerTotalVentas();
+//        double egresos = bdVentas.obtenerTotalEgresos();
+//        String diferenciaFormateada = bdVentas.obtenerDiferencia();
+//
+//        // Convertir a long y formatear con punto de mil
+//        String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
+//        String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
+//
+//        // Mostrar los valores en los TextView
+//        textIngresos.setText(String.format("$%s", ingresosFormatted));
+//        textEgresos.setText(String.format("$%s", egresosFormatted));
+//        textDiferencia.setText(String.format("$%s", diferenciaFormateada));
+//    }
 
 }

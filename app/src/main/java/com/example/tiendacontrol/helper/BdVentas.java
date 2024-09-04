@@ -1,4 +1,5 @@
 package com.example.tiendacontrol.helper;
+
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -7,8 +8,11 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Environment;
 import android.util.Log;
+
 import androidx.annotation.Nullable;
+
 import com.example.tiendacontrol.model.Items;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -31,6 +35,7 @@ public class BdVentas extends SQLiteOpenHelper {
         this.currentDatabase = databaseName;
         Log.d("BdVentas", "Ruta de la base de datos: " + getDatabasePath(context, databaseName));
     }
+
     private static String getDatabasePath(Context context, @Nullable String databaseName) {
         if (databaseName == null || databaseName.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre de la base de datos no puede ser null o vacío.");
@@ -269,13 +274,15 @@ public class BdVentas extends SQLiteOpenHelper {
         }
         return filteredItems;
     }
+
     public double obtenerTotalVentas() {
         double total = 0.0;
         SQLiteDatabase db = null;
         Cursor cursor = null;
         try {
-            db = getReadableDatabase();
-            cursor = db.rawQuery("SELECT SUM(valor) FROM " + TABLE_VENTAS, null);
+            db = getReadableDatabase(); // Abrir la conexión aquí
+            // Obtener el total de ventas (ingresos positivos)
+            cursor = db.rawQuery("SELECT SUM(valor) FROM " + TABLE_VENTAS + " WHERE valor > 0", null);
             if (cursor.moveToFirst()) {
                 total = cursor.getDouble(0);
             }
@@ -284,10 +291,10 @@ public class BdVentas extends SQLiteOpenHelper {
             Log.e("BdVentas", "Error al obtener el total de ventas: " + e.getMessage());
         } finally {
             if (cursor != null) {
-                cursor.close();
+                cursor.close(); // Cerrar el cursor
             }
             if (db != null && db.isOpen()) {
-                db.close();
+                db.close(); // Cerrar la conexión a la base de datos
             }
         }
         return total;
@@ -317,9 +324,43 @@ public class BdVentas extends SQLiteOpenHelper {
         return total;
     }
 
-    public double obtenerDiferencia() {
-        double ingresos = obtenerTotalVentas();
-        double egresos = obtenerTotalEgresos();
-        return ingresos - egresos; // Como los egresos son negativos, sumamos.
+    public String obtenerDiferencia() {
+        SQLiteDatabase db = null;
+        double ingresos = 0.0;
+        double egresos = 0.0;
+
+        try {
+            db = getReadableDatabase(); // Abrir la conexión aquí
+
+            // Obtener ingresos (valores positivos)
+            Cursor cursorIngresos = db.rawQuery("SELECT SUM(valor) FROM " + TABLE_VENTAS + " WHERE valor > 0", null);
+            if (cursorIngresos.moveToFirst()) {
+                ingresos = cursorIngresos.getDouble(0);
+            }
+            cursorIngresos.close();
+
+            // Obtener egresos (valores negativos)
+            Cursor cursorEgresos = db.rawQuery("SELECT SUM(valor) FROM " + TABLE_VENTAS + " WHERE valor < 0", null);
+            if (cursorEgresos.moveToFirst()) {
+                egresos = cursorEgresos.getDouble(0);
+            }
+            cursorEgresos.close();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.e("BdVentas", "Error al obtener la diferencia: " + e.getMessage());
+        } finally {
+            if (db != null && db.isOpen()) {
+                db.close(); // Cerrar la conexión aquí
+            }
+        }
+
+        // Calcular la diferencia (suma de ingresos y egresos)
+        double diferencia = ingresos + egresos; // Aquí, egresos ya es negativo, por lo que se suma directamente
+
+        // Aplicar el formato con PuntoMil y el signo
+        String signo = diferencia >= 0 ? "" : "-";
+        long diferenciaAbsoluta = (long) Math.abs(diferencia);
+        return String.format("%s%s", signo, PuntoMil.getFormattedNumber(diferenciaAbsoluta));
     }
 }

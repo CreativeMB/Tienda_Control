@@ -59,16 +59,19 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             // Obtener los valores para esta base de datos
             double ingresos = bdVentas.obtenerTotalVentas();
             double egresos = bdVentas.obtenerTotalEgresos();
-            double diferencia = bdVentas.obtenerDiferencia(); // O calcula diferencia aquí
+
             // Formatear los valores con PuntoMil
             String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
             String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
-            String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
+//            String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
+            String diferenciaFormateada = bdVentas.obtenerDiferencia();
+
             // Mostrar los valores FORMATEADOS en los TextViews
             databaseHolder.textViewDatabaseName.setText(databaseName);
-            databaseHolder.textViewIngresos.setText("Ganancia: $" + ingresosFormatted);
+            databaseHolder.textViewIngresos.setText("Ingresos: $" + ingresosFormatted);
             databaseHolder.textViewEgresos.setText("Egresos: $" + egresosFormatted);
-            databaseHolder.textViewDiferencia.setText("Ingresos: $" + diferenciaFormatted);
+            // Asegúrate de que esto sea correcto:
+            databaseHolder.textViewDiferencia.setText("Ganancia: $" + diferenciaFormateada);
             bdVentas.close();
             databaseHolder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
             databaseHolder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));

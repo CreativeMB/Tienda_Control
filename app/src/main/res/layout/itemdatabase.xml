@@ -47,7 +47,7 @@
                     android:textColor="#F7AB45"/>
 
                 <TextView
-                    android:id="@+id/textViewIngresos"
+                    android:id="@+id/textViewDiferencia"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
@@ -58,7 +58,7 @@
                     />
 
                 <TextView
-                    android:id="@+id/textViewDiferencia"
+                    android:id="@+id/textViewIngresos"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
