@@ -98,10 +98,21 @@
         android:id="@+id/database"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="110dp"
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/database"/>
+    <ImageView
+        android:id="@+id/filtro"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="200dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/calendario"/>
 
 </FrameLayout>

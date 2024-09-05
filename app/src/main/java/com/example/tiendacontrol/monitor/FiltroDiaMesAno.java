@@ -3,7 +3,6 @@ package com.example.tiendacontrol.monitor;
 import static android.app.PendingIntent.getActivity;
 import static android.content.ContentValues.TAG;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.ItemsAdapter;
 
+import com.example.tiendacontrol.dialogFragment.CustomDatePickerDialog;
 import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -69,6 +69,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         textViewDifference = findViewById(R.id.text_view_difference);
         txtBuscar = findViewById(R.id.txtBuscar);
         ImageView iconDatabase = findViewById(R.id.database);
+        ImageView iconFiltro = findViewById(R.id.filtro);
         calendar = Calendar.getInstance();
 
 //        // Configuración del RecyclerView
@@ -95,6 +96,10 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
             Intent databaseIntent = new Intent(this, Database.class);
             startActivity(databaseIntent);
         });
+        iconFiltro.setOnClickListener(view -> {
+            recreate();
+        });
+
 
         // Seleccionar la fecha de inicio
         selectStartDate();
@@ -166,11 +171,13 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog startDatePickerDialog = new DatePickerDialog(FiltroDiaMesAno.this,
+        CustomDatePickerDialog startDatePickerDialog = new CustomDatePickerDialog(FiltroDiaMesAno.this,
                 (view, year1, month1, dayOfMonth) -> {
                     String formattedMonth = String.format("%02d", month1 + 1);
                     String formattedDay = String.format("%02d", dayOfMonth);
                     startDate = year1 + "-" + formattedMonth + "-" + formattedDay;
+
+                    // Automáticamente pasa a seleccionar la fecha final
                     selectEndDate();
                 }, year, month, day);
         startDatePickerDialog.show();
@@ -181,11 +188,12 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog endDatePickerDialog = new DatePickerDialog(FiltroDiaMesAno.this,
+        CustomDatePickerDialog endDatePickerDialog = new CustomDatePickerDialog(FiltroDiaMesAno.this,
                 (view, year1, month1, dayOfMonth) -> {
                     String formattedMonth = String.format("%02d", month1 + 1);
                     String formattedDay = String.format("%02d", dayOfMonth);
                     endDate = year1 + "-" + formattedMonth + "-" + formattedDay;
+
                     textViewSelectedDateRange.setText("De: " + startDate + " A: " + endDate);
                     filterDates(startDate, endDate);
                 }, year, month, day);
