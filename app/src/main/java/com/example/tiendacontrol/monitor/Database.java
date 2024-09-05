@@ -307,8 +307,10 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         Button btnExportar = dialogView.findViewById(R.id.btnExportar);
         TextView tvContabilidad = dialogView.findViewById(R.id.btnContabilidad);
 
+
+
         // Crear el AlertDialog con el diseño inflado
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.TransparentDialogTheme)
                 .setView(dialogView)
                 .create();
 

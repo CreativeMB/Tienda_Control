@@ -13,4 +13,10 @@
     <style name="MenuItemTextStyle">
         <item name="android:textSize">25sp</item> <!-- Ajusta el tamaño del texto aquí -->
     </style>
+    <!-- Tema para diálogos transparentes -->
+    <style name="TransparentDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <item name="android:backgroundDimEnabled">false</item> <!-- Para evitar el oscurecimiento del fondo -->
+    </style>
+
 </resources>
