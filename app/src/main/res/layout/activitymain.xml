@@ -105,7 +105,6 @@
             android:textSize="20dp"
             android:textStyle="bold" />
     </LinearLayout>
-
     <ImageView
         android:id="@+id/ingreso"
         android:layout_width="60dp"
