@@ -24,6 +24,7 @@ import com.example.tiendacontrol.adapter.ItemsAdapter;
 
 import com.example.tiendacontrol.dialogFragment.CustomDatePickerDialog;
 import com.example.tiendacontrol.helper.BdVentas;
+import com.example.tiendacontrol.helper.PuntoMil;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -223,11 +224,19 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
                 sumaNegativos += item.getValor();
             }
         }
+        // Calcula la diferencia
+        double diferencia = sumaPositivos + sumaNegativos;
 
-        // Actualiza los TextView
-        textViewPositiveSum.setText(formatoNumerico(sumaPositivos));
-        textViewNegativeSum.setText(formatoNumerico(sumaNegativos));
-        textViewDifference.setText(formatoNumerico(sumaPositivos + sumaNegativos));
+        // Actualiza los TextView usando PuntoMil
+        textViewPositiveSum.setText(String.format("$%s", PuntoMil.getFormattedNumber((long) sumaPositivos)));
+        textViewNegativeSum.setText(String.format("$%s", PuntoMil.getFormattedNumber((long) sumaNegativos)));
+
+        // Mostrar diferencia con signo negativo si es necesario
+        if (diferencia < 0) {
+            textViewDifference.setText(String.format("$-%s", PuntoMil.getFormattedNumber((long) -diferencia)));
+        } else {
+            textViewDifference.setText(String.format("$%s", PuntoMil.getFormattedNumber((long) diferencia)));
+        }
     }
 
     private void showAlertDialog() {
@@ -241,10 +250,4 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         builder.show();
     }
 
-    public String formatoNumerico(double valor) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setGroupingSeparator('.'); // Punto como separador de miles
-        DecimalFormat df = new DecimalFormat("#,###;#,###", symbols);
-        return "$" + df.format(valor);
-    }
 }
