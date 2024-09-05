@@ -3,7 +3,6 @@ package com.example.tiendacontrol.monitor;
 import static android.app.PendingIntent.getActivity;
 import static android.content.ContentValues.TAG;
 
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -23,7 +22,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.ItemsAdapter;
 
+import com.example.tiendacontrol.dialogFragment.CustomDatePickerDialog;
 import com.example.tiendacontrol.helper.BdVentas;
+import com.example.tiendacontrol.helper.PuntoMil;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -46,6 +47,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     private Calendar calendar;
     private String startDate, endDate;
     private String currentDatabase;
+    private TextView textViewDatabaseName;
 
     private TextView textViewPositiveSum, textViewNegativeSum, textViewDifference;
     private SearchView txtBuscar;
@@ -69,7 +71,11 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         textViewDifference = findViewById(R.id.text_view_difference);
         txtBuscar = findViewById(R.id.txtBuscar);
         ImageView iconDatabase = findViewById(R.id.database);
+        ImageView iconFiltro = findViewById(R.id.filtro);
         calendar = Calendar.getInstance();
+        // Inicializar el nuevo TextView
+        textViewDatabaseName = findViewById(R.id.text_view_database_name);
+
 
 //        // Configuración del RecyclerView
         itemsAdapter = new ItemsAdapter(new ArrayList<>()); // Inicializa con una lista vacía
@@ -87,6 +93,9 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         // Crea una instancia de BdHelper (solo una vez)
         bdVentas = new BdVentas(this, currentDatabase);
 
+        // Actualizar el TextView con el nombre de la base de datos actual
+        textViewDatabaseName.setText("Cuenta: " + currentDatabase);
+
         // Inicializar SearchView
 
         txtBuscar.setOnQueryTextListener(this);
@@ -95,6 +104,10 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
             Intent databaseIntent = new Intent(this, Database.class);
             startActivity(databaseIntent);
         });
+        iconFiltro.setOnClickListener(view -> {
+            recreate();
+        });
+
 
         // Seleccionar la fecha de inicio
         selectStartDate();
@@ -166,11 +179,13 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog startDatePickerDialog = new DatePickerDialog(FiltroDiaMesAno.this,
+        CustomDatePickerDialog startDatePickerDialog = new CustomDatePickerDialog(FiltroDiaMesAno.this,
                 (view, year1, month1, dayOfMonth) -> {
                     String formattedMonth = String.format("%02d", month1 + 1);
                     String formattedDay = String.format("%02d", dayOfMonth);
                     startDate = year1 + "-" + formattedMonth + "-" + formattedDay;
+
+                    // Automáticamente pasa a seleccionar la fecha final
                     selectEndDate();
                 }, year, month, day);
         startDatePickerDialog.show();
@@ -181,11 +196,12 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        DatePickerDialog endDatePickerDialog = new DatePickerDialog(FiltroDiaMesAno.this,
+        CustomDatePickerDialog endDatePickerDialog = new CustomDatePickerDialog(FiltroDiaMesAno.this,
                 (view, year1, month1, dayOfMonth) -> {
                     String formattedMonth = String.format("%02d", month1 + 1);
                     String formattedDay = String.format("%02d", dayOfMonth);
                     endDate = year1 + "-" + formattedMonth + "-" + formattedDay;
+
                     textViewSelectedDateRange.setText("De: " + startDate + " A: " + endDate);
                     filterDates(startDate, endDate);
                 }, year, month, day);
@@ -215,11 +231,19 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
                 sumaNegativos += item.getValor();
             }
         }
+        // Calcula la diferencia
+        double diferencia = sumaPositivos + sumaNegativos;
 
-        // Actualiza los TextView
-        textViewPositiveSum.setText(formatoNumerico(sumaPositivos));
-        textViewNegativeSum.setText(formatoNumerico(sumaNegativos));
-        textViewDifference.setText(formatoNumerico(sumaPositivos + sumaNegativos));
+        // Actualiza los TextView usando PuntoMil
+        textViewPositiveSum.setText(String.format("$%s", PuntoMil.getFormattedNumber((long) sumaPositivos)));
+        textViewNegativeSum.setText(String.format("$%s", PuntoMil.getFormattedNumber((long) sumaNegativos)));
+
+        // Mostrar diferencia con signo negativo si es necesario
+        if (diferencia < 0) {
+            textViewDifference.setText(String.format("$-%s", PuntoMil.getFormattedNumber((long) -diferencia)));
+        } else {
+            textViewDifference.setText(String.format("$%s", PuntoMil.getFormattedNumber((long) diferencia)));
+        }
     }
 
     private void showAlertDialog() {
@@ -233,10 +257,4 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         builder.show();
     }
 
-    public String formatoNumerico(double valor) {
-        DecimalFormatSymbols symbols = new DecimalFormatSymbols();
-        symbols.setGroupingSeparator('.'); // Punto como separador de miles
-        DecimalFormat df = new DecimalFormat("#,###;#,###", symbols);
-        return "$" + df.format(valor);
-    }
 }

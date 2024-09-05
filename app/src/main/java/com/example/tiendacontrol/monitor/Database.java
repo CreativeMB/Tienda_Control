@@ -27,6 +27,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -40,17 +41,24 @@ import com.example.tiendacontrol.adapter.basesAdapter;
 import com.example.tiendacontrol.helper.ExcelExporter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
+import com.google.android.material.timepicker.MaterialTimePicker;
+import com.google.android.material.timepicker.TimeFormat;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class Database extends AppCompatActivity implements basesAdapter.OnDatabaseClickListener {
     private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
     private static final int PICK_IMAGE_REQUEST = 1;
+    private static final int REQUEST_CODE_EXACT_ALARM = 1;
+    private Calendar selectedTime;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
     private RecyclerView recyclerViewDatabases;
@@ -116,7 +124,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         recyclerViewDatabases.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         databaseList = new ArrayList<>();
-        adapter = new basesAdapter(this, databaseList,this);
+        adapter = new basesAdapter(this, databaseList, this);
         recyclerViewDatabases.setAdapter(adapter);
 
 
@@ -166,7 +174,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                         // Acción para Donar
                         Intent intent = new Intent(Database.this, Donar.class);
                         startActivity(intent);
-                    } else if (id == R.id.manual)  {
+                    } else if (id == R.id.manual) {
                         // URL al que quieres dirigir al usuario
                         String url = "https://www.floristerialoslirios.com/tienda-control";
                         Intent intent = new Intent(Intent.ACTION_VIEW);
@@ -446,23 +454,31 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     }
 
     private void showTimePickerDialog() {
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"));
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
         int minute = calendar.get(Calendar.MINUTE);
 
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                (view, hourOfDay, minuteOfHour) -> {
-                    // Guardar la hora seleccionada
-                    Calendar selectedTime = Calendar.getInstance();
-                    selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    selectedTime.set(Calendar.MINUTE, minuteOfHour);
-                    selectedTime.set(Calendar.SECOND, 0);
+        MaterialTimePicker timePicker = new MaterialTimePicker.Builder()
+                .setTimeFormat(TimeFormat.CLOCK_12H)
+                .setHour(hour)
+                .setMinute(minute)
+                .setTitleText("Selecciona la hora para Recordatorio diario")
+                .build();
 
-                    // Programar la notificación
-                    scheduleNotification(selectedTime);
-                }, hour, minute, true);
+        timePicker.addOnPositiveButtonClickListener(dialog -> {
+            int hourOfDay = timePicker.getHour();
+            int minuteOfHour = timePicker.getMinute();
 
-        timePickerDialog.show();
+            TimeZone bogotaTimeZone = TimeZone.getTimeZone("America/Bogota");
+            selectedTime = Calendar.getInstance(bogotaTimeZone);
+            selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
+            selectedTime.set(Calendar.MINUTE, minuteOfHour);
+            selectedTime.set(Calendar.SECOND, 0);
+
+            scheduleNotification(selectedTime);
+        });
+
+        timePicker.show(getSupportFragmentManager(), "time_picker");
     }
 
     private void scheduleNotification(Calendar selectedTime) {
@@ -485,7 +501,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                         pendingIntent
                 );
 
-                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Recordatorio diario guardado para las " + formatTime(selectedTime), Toast.LENGTH_SHORT).show();
             } else {
                 // Solicitar permiso para alarmas exactas
                 Intent permissionIntent = new Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM);
@@ -503,18 +519,15 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                         pendingIntent
                 );
 
-                Toast.makeText(this, "Recordatorio diario guardado para las " + selectedTime.get(Calendar.HOUR_OF_DAY) + ":" + selectedTime.get(Calendar.MINUTE), Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Recordatorio diario guardado para las " + formatTime(selectedTime), Toast.LENGTH_SHORT).show();
             }
         }
     }
 
-    private void openAppSettings() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-        Uri uri = Uri.fromParts("package", getPackageName(), null);
-        showToast("Revisa las notificaciones están habilitadas");
-        intent.setData(uri);
-        startActivity(intent);
-
+    private String formatTime(Calendar calendar) {
+        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+        return sdf.format(calendar.getTime());
     }
 
     private boolean canScheduleExactAlarms() {
@@ -526,23 +539,41 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                     NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
                     if (notificationManager != null) {
                         if (notificationManager.areNotificationsEnabled()) {
-                            // Aquí podrías verificar si las burbujas están habilitadas, pero no se puede hacer directamente.
                             return true;
                         } else {
-                            // Abrir la configuración de notificaciones
                             openAppSettings();
                             return false;
                         }
                     }
                 } else {
-
-                    // Para versiones anteriores a Android 13, siempre se considera que las notificaciones están habilitadas
                     return true;
                 }
             }
             return false;
         }
-        // Para versiones anteriores a Android 12, siempre devolver verdadero
         return true;
+    }
+
+    private void openAppSettings() {
+        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
+        Uri uri = Uri.fromParts("package", getPackageName(), null);
+        Toast.makeText(this, "Revisa las notificaciones están habilitadas", Toast.LENGTH_SHORT).show();
+        intent.setData(uri);
+        startActivity(intent);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == REQUEST_CODE_EXACT_ALARM) {
+            if (resultCode == RESULT_OK) {
+                // Permiso concedido, reintentar programar la alarma
+                scheduleNotification(selectedTime);
+            } else {
+                // Permiso denegado, informar al usuario
+                Toast.makeText(this, "Se requiere permiso para programar la alarma", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }

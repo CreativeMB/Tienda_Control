@@ -58,7 +58,7 @@ public class SpinnerManager {
                 if (item != null) {
                     // Formatear el valor para la visualización
                     String valorFormateado = NumberFormat.getNumberInstance(Locale.US).format(item.getValor());
-                    textView.setText(item.getProducto() + " - " + valorFormateado);
+                    textView.setText(item.getProducto() + " $" + valorFormateado);
                 }
                 return view;
             }
@@ -71,7 +71,7 @@ public class SpinnerManager {
                 if (item != null) {
                     // Formatear el valor para la visualización
                     String valorFormateado = NumberFormat.getNumberInstance(Locale.US).format(item.getValor());
-                    textView.setText(item.getProducto() + " - " + valorFormateado);
+                    textView.setText(item.getProducto() + " $" + valorFormateado);
                 }
                 return view;
             }

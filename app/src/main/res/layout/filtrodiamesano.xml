@@ -10,12 +10,30 @@
         android:orientation="vertical"
         android:padding="0dp">
 
-        <android.widget.SearchView
-            android:id="@+id/txtBuscar"
-            android:layout_width="250dp"
-            android:layout_height="30dp"
-            android:layout_margin="0dp"
-            android:background="@drawable/buscador" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <android.widget.SearchView
+                    android:id="@+id/txtBuscar"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:layout_margin="0dp"
+                    android:background="@drawable/buscador" />
+
+                <TextView
+                    android:id="@+id/text_view_difference"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:textStyle="bold"
+                    android:text="Ganancia"
+                    android:textColor="#2196F3"
+                    android:textSize="30sp" />
+            </LinearLayout>
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaFiltro"
@@ -30,10 +48,11 @@
             android:padding="10dp">
 
             <TextView
+                android:id="@+id/text_view_database_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Toma nota de su Contabilidad"
+                android:text="Mi Base de datos"
                 android:textColor="@color/Buton"
                 android:textSize="20dp"
                 android:textStyle="bold" />
@@ -54,42 +73,56 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:padding="5dp">
+                android:padding="0dp">
 
                 <TextView
                     android:id="@+id/text_view_positive_sum"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:gravity="center"
                     android:text="Ingreso"
+                    android:textStyle="bold"
                     android:textColor="@color/colorPositivo"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:id="@+id/text_view_difference"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:gravity="center"
-                    android:text="Ganancia"
-                    android:textColor="@color/Buton"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
+                    android:textSize="30sp" />
 
                 <TextView
                     android:id="@+id/text_view_negative_sum"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
                     android:layout_weight="1"
                     android:gravity="center"
+                    android:textStyle="bold"
                     android:text="Egreso"
                     android:textColor="@color/colorNegativo"
-                    android:textSize="18dp"
-                    android:textStyle="bold" />
+                    android:textSize="30sp" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:padding="10dp">
+
+                <TextView
+                    android:id="@+id/textView1"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Total Ingreso"
+                    android:textColor="#327A35"
+                    android:textSize="18sp" />
+
+                <TextView
+                    android:id="@+id/textView3"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Total Egreso"
+                    android:textColor="@color/colorNegativo"
+                    android:textSize="18sp" />
             </LinearLayout>
         </LinearLayout>
     </LinearLayout>
@@ -98,10 +131,21 @@
         android:id="@+id/database"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:layout_gravity="top|end"
-        android:layout_margin="16dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="290dp"
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/database"/>
+    <ImageView
+        android:id="@+id/filtro"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="210dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/calendario"/>
 
 </FrameLayout>
