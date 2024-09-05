@@ -48,10 +48,11 @@
             android:padding="10dp">
 
             <TextView
+                android:id="@+id/text_view_database_name"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Toma nota de su Contabilidad"
+                android:text="Mi Base de datos"
                 android:textColor="@color/Buton"
                 android:textSize="20dp"
                 android:textStyle="bold" />

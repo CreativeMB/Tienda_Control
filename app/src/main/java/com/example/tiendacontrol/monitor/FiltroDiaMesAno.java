@@ -47,6 +47,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
     private Calendar calendar;
     private String startDate, endDate;
     private String currentDatabase;
+    private TextView textViewDatabaseName;
 
     private TextView textViewPositiveSum, textViewNegativeSum, textViewDifference;
     private SearchView txtBuscar;
@@ -72,6 +73,9 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         ImageView iconDatabase = findViewById(R.id.database);
         ImageView iconFiltro = findViewById(R.id.filtro);
         calendar = Calendar.getInstance();
+        // Inicializar el nuevo TextView
+        textViewDatabaseName = findViewById(R.id.text_view_database_name);
+
 
 //        // Configuración del RecyclerView
         itemsAdapter = new ItemsAdapter(new ArrayList<>()); // Inicializa con una lista vacía
@@ -88,6 +92,9 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
 
         // Crea una instancia de BdHelper (solo una vez)
         bdVentas = new BdVentas(this, currentDatabase);
+
+        // Actualizar el TextView con el nombre de la base de datos actual
+        textViewDatabaseName.setText("Cuenta: " + currentDatabase);
 
         // Inicializar SearchView
 

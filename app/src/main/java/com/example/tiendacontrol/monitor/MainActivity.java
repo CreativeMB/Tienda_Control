@@ -56,7 +56,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     private TextView textIngresos, textEgresos, textDiferencia;
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
     private String currentDatabase;
-
+    private TextView textViewDatabaseName;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,7 +82,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         // Configurar RecyclerView
         configurarRecyclerView();
-
+        // Actualizar el TextView con el nombre de la base de datos actual
+        textViewDatabaseName.setText("Cuenta: " + currentDatabase);
         // Configurar SearchView
         txtBuscar.setOnQueryTextListener(this);
 
@@ -104,7 +105,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         txtBuscar = findViewById(R.id.txtBuscar);
         ImageView iconLimpiar = findViewById(R.id.borrardados);
         ImageView iconInicio = findViewById(R.id.inicio);
-
+        // Inicializar el nuevo TextView
+        textViewDatabaseName = findViewById(R.id.text_view_database_name);
         iconInicio.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, Database.class)));
         iconLimpiar.setOnClickListener(view -> confirmarEliminarTodo());
         iconEgreso.setOnClickListener(view -> mostrarGastoDialogFragment());
