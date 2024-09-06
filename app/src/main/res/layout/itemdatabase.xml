@@ -44,7 +44,7 @@
                     android:textSize="30sp"
                     android:textStyle="bold"
                     android:padding="5dp"
-                    android:textColor="#F7AB45"/>
+                    android:textColor="@color/texcolor"/>
 
                 <TextView
                     android:id="@+id/textViewDiferencia"

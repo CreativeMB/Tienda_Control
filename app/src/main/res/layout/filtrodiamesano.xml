@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:text="Mi Base de datos"
-                android:textColor="@color/Buton"
+                android:textColor="@color/texcolor"
                 android:textSize="20dp"
                 android:textStyle="bold" />
 
