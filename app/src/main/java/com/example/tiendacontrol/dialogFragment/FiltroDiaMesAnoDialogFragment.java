@@ -3,11 +3,11 @@ import android.app.DatePickerDialog;
 import android.content.Context;
 import android.widget.DatePicker;
 
-public class CustomDatePickerDialog extends DatePickerDialog {
+public class FiltroDiaMesAnoDialogFragment extends DatePickerDialog {
 
     private final OnDateSetListener dateSetListener;
 
-    public CustomDatePickerDialog(Context context, OnDateSetListener listener, int year, int month, int dayOfMonth) {
+    public FiltroDiaMesAnoDialogFragment(Context context, OnDateSetListener listener, int year, int month, int dayOfMonth) {
         super(context, listener, year, month, dayOfMonth);
         this.dateSetListener = listener;  // Guardamos el listener para usarlo más tarde
     }

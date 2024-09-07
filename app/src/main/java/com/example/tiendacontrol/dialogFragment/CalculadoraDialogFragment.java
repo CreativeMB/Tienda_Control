@@ -1,4 +1,5 @@
 package com.example.tiendacontrol.dialogFragment;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.LayoutInflater;
@@ -6,14 +7,12 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.helper.PuntoMil;
-import com.google.android.material.bottomsheet.BottomSheetBehavior;
-import com.google.android.material.bottomsheet.BottomSheetDialog;
+import com.example.tiendacontrol.model.ControlCalculadora;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.math.BigDecimal;
@@ -47,7 +46,12 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
 
         return view;
     }
-
+    @Override
+    public void onDismiss(@NonNull DialogInterface dialog) {
+        super.onDismiss(dialog);
+        // Actualizar el estado global cuando el diálogo se cierra
+        ControlCalculadora.getInstance().setCalculadoraDialogVisible(false);
+    }
     private void setUpButtonListeners(View view) {
         // Botón de limpiar pantalla
         Button btnClear = view.findViewById(R.id.btn_clear);

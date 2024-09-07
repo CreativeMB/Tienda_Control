@@ -1,6 +1,4 @@
 package com.example.tiendacontrol.dialogFragment;
-import android.content.ActivityNotFoundException;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -16,6 +14,7 @@ import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.helper.ItemManager;
 import com.example.tiendacontrol.helper.SpinnerManager;
 import com.example.tiendacontrol.helper.PuntoMil;
+import com.example.tiendacontrol.model.ControlCalculadora;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.example.tiendacontrol.helper.BdVentas;
@@ -78,12 +77,22 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         btnGuarda.setOnClickListener(view1 -> guardarIngreso());
 
         txtValor.setOnClickListener(v -> {
-            // Muestra una calculadora personalizada
-            CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
-            calculadoraDialog.setCalculadoraListener(valorCalculado -> {
-                txtValor.setText(String.valueOf(valorCalculado));
-            });
-            calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
+            // Verifica si el diálogo ya está visible, para evitar múltiples aperturas
+            if (!ControlCalculadora.getInstance().isCalculadoraDialogVisible()) {
+                // Muestra el `CalculadoraDialogFragment`
+                CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
+
+                // Configura el listener para recibir el valor calculado
+                calculadoraDialog.setCalculadoraListener(valorCalculado -> {
+                    txtValor.setText(String.valueOf(valorCalculado)); // Establece el valor en el TextView
+                });
+
+                // Marca el diálogo como visible globalmente
+                ControlCalculadora.getInstance().setCalculadoraDialogVisible(true);
+
+                // Muestra el diálogo usando `getParentFragmentManager()` ya que estás dentro de un fragmento
+                calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
+            }
         });
 
         btnSavePredefined.setOnClickListener(new View.OnClickListener() {
