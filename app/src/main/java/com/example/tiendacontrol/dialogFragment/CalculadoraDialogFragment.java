@@ -37,7 +37,7 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        View view = inflater.inflate(R.layout.dialog_calculadora, container, false);
+        View view = inflater.inflate(R.layout.calculadora, container, false);
 
         display = view.findViewById(R.id.display);
         display.setText("0");

@@ -12,7 +12,7 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.model.SplashActivity;
+import com.example.tiendacontrol.model.AnimacionInicio;
 
 
 public class Recordatorio extends BroadcastReceiver {
@@ -30,7 +30,7 @@ public class Recordatorio extends BroadcastReceiver {
         crearCanalNotificacion(notificationManager, context); // Llama el método para crear el canal
 
         // Intent para abrir la aplicación al tocar la notificación
-        Intent notificationIntent = new Intent(context, SplashActivity.class);
+        Intent notificationIntent = new Intent(context, AnimacionInicio.class);
         notificationIntent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_SINGLE_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(context, 0, notificationIntent,
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);

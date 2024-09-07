@@ -13,11 +13,11 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.tiendacontrol.R;
 
-public class EntraPin extends AppCompatActivity {
+public class InicioPin extends AppCompatActivity {
     private EditText editTextAccessCode;
     private static final String PREFS_NAME = "CodePrefs";
     private static final String CODE_KEY = "accesscode";
-    private static final String TAG = "EntraPin";
+    private static final String TAG = "InicioPin";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,14 +47,14 @@ public class EntraPin extends AppCompatActivity {
         Log.d(TAG, "Pin guardado en preferencias: " + savedCode);
 
         if (savedCode.isEmpty()) {
-            Toast.makeText(EntraPin.this, "Primero debes configurar el Pin de acceso personalizado", Toast.LENGTH_LONG).show();
+            Toast.makeText(InicioPin.this, "Primero debes configurar el Pin de acceso personalizado", Toast.LENGTH_LONG).show();
         } else {
             if (validateCode(inputCode)) {
-                Intent intent = new Intent(EntraPin.this, Database.class);
+                Intent intent = new Intent(InicioPin.this, BaseDatos.class);
                 startActivity(intent);
                 finish();
             } else {
-                Toast.makeText(EntraPin.this, "Pin incorrecto", Toast.LENGTH_SHORT).show();
+                Toast.makeText(InicioPin.this, "Pin incorrecto", Toast.LENGTH_SHORT).show();
             }
         }
     }

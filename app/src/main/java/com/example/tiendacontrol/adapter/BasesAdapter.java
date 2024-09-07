@@ -7,7 +7,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.cardview.widget.CardView;
-import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
@@ -16,7 +15,7 @@ import com.example.tiendacontrol.helper.PuntoMil;
 
 import java.util.List;
 
-public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_EMPTY = 0;
     private static final int VIEW_TYPE_ITEM = 1;
@@ -29,7 +28,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<String> databaseList;
     private OnDatabaseClickListener listener;
 
-    public basesAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
+    public BasesAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
         this.context = context;
         this.databaseList = databaseList;
         this.listener = listener;
@@ -39,7 +38,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_ITEM) {
-            View view = LayoutInflater.from(context).inflate(R.layout.itemdatabase, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.itembasedatos, parent, false);
             return new DatabaseViewHolder(view);
         } else {
             View view = LayoutInflater.from(context).inflate(R.layout.baseinicio, parent, false);
@@ -121,7 +120,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public DatabaseViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewDatabaseName = itemView.findViewById(R.id.textViewDatabaseName);
-            // Asegúrate de que estos IDs coincidan con los de tu layout itemdatabase.xml
+            // Asegúrate de que estos IDs coincidan con los de tu layout itembasedatos.xml
             textViewIngresos = itemView.findViewById(R.id.textViewIngresos);
             textViewEgresos = itemView.findViewById(R.id.textViewEgresos);
             textViewDiferencia = itemView.findViewById(R.id.textViewDiferencia);

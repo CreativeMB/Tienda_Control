@@ -2,14 +2,11 @@ package com.example.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -26,21 +23,15 @@ import com.example.tiendacontrol.adapter.DatosAdapter;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 
 import com.example.tiendacontrol.helper.BdVentas;
-import java.text.NumberFormat;
-import java.util.Locale;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.helper.PuntoMil;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener {
+public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener {
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
@@ -60,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activitymain);
+        setContentView(R.layout.datosdatos);
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -107,7 +98,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         ImageView iconInicio = findViewById(R.id.inicio);
         // Inicializar el nuevo TextView
         textViewDatabaseName = findViewById(R.id.text_view_database_name);
-        iconInicio.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, Database.class)));
+        iconInicio.setOnClickListener(view -> startActivity(new Intent(DatosDatos.this, BaseDatos.class)));
         iconLimpiar.setOnClickListener(view -> confirmarEliminarTodo());
         iconEgreso.setOnClickListener(view -> mostrarGastoDialogFragment());
         iconIngreso.setOnClickListener(view -> mostrarIngresoDialogFragment());

@@ -98,7 +98,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         txtBuscar.setOnQueryTextListener(this);
 
         iconDatabase.setOnClickListener(view -> {
-            Intent databaseIntent = new Intent(this, Database.class);
+            Intent databaseIntent = new Intent(this, BaseDatos.class);
             startActivity(databaseIntent);
         });
         iconFiltro.setOnClickListener(view -> {

@@ -8,17 +8,17 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.monitor.Database;
+import com.example.tiendacontrol.monitor.BaseDatos;
 import com.example.tiendacontrol.monitor.Inicio;
 
-public class SplashActivity extends AppCompatActivity {
+public class AnimacionInicio extends AppCompatActivity {
     private static final String PREFS_NAME = "CodePrefs";
     private static final String CODE_KEY = "accesscode";
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.splashscreen);
+        setContentView(R.layout.animacioninicio);
 
         // Iniciar la animación en una vista específica
         View vistaAnimada = findViewById(R.id.vista_animada);
@@ -51,11 +51,11 @@ public class SplashActivity extends AppCompatActivity {
 
         Intent intent;
         if (savedCode.isEmpty()) {
-            // No hay PIN guardado, redirigir a Database
-            intent = new Intent(SplashActivity.this, Database.class);
+            // No hay PIN guardado, redirigir a BaseDatos
+            intent = new Intent(AnimacionInicio.this, BaseDatos.class);
         } else {
             // Hay un PIN guardado, redirigir a Inicio
-            intent = new Intent(SplashActivity.this, Inicio.class);
+            intent = new Intent(AnimacionInicio.this, Inicio.class);
         }
         startActivity(intent);
         finish();

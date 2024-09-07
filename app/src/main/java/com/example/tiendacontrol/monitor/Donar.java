@@ -49,7 +49,7 @@ public class Donar extends AppCompatActivity {
         setupClickListeners();
 
         iconDatabase.setOnClickListener(view -> {
-            Intent databaseIntent = new Intent(this, Database.class);
+            Intent databaseIntent = new Intent(this, BaseDatos.class);
             startActivity(databaseIntent);
         });
     }
