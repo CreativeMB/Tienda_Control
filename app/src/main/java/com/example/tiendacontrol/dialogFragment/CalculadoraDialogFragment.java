@@ -6,10 +6,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.helper.PuntoMil;
+import com.google.android.material.bottomsheet.BottomSheetBehavior;
+import com.google.android.material.bottomsheet.BottomSheetDialog;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.math.BigDecimal;
@@ -64,10 +68,6 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
 
         Button btnAdd = view.findViewById(R.id.btn_add);
         btnAdd.setOnClickListener(v -> applyOperator("+"));
-
-        // Botón de igual para calcular el resultado
-//        Button btnEquals = view.findViewById(R.id.btn_equals);
-//        btnEquals.setOnClickListener(v -> calculateResult());
 
         // Botón para enviar el resultado
         Button btnSendResult = view.findViewById(R.id.btn_send_result);

@@ -50,6 +50,9 @@
         <activity android:name=".monitor.Patron" />
         <activity android:name=".monitor.NavigationDrawerActivity" />
         <activity
+            android:name=".dialogFragment.CalculadoraDialogFragment"
+            android:windowSoftInputMode="adjustResize" />
+        <activity
             android:name=".model.SplashActivity"
             android:exported="true">
             <intent-filter>
