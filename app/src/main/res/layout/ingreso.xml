@@ -60,8 +60,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:inputType="number"
                 android:labelFor="@+id/viewValor"
+                android:focusable="false"
+                android:inputType="none"
+                android:clickable="true"
                 android:textSize="18sp" />
 
             <TextView

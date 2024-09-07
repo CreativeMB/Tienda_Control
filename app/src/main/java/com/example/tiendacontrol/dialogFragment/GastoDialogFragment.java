@@ -80,6 +80,15 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         // Configuración de los eventos para los botones
         btnGuarda.setOnClickListener(view1 -> guardarEgreso());
 
+        editValor.setOnClickListener(v -> {
+            // Muestra una calculadora personalizada
+            CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
+            calculadoraDialog.setCalculadoraListener(valorCalculado -> {
+                editValor.setText(String.valueOf(valorCalculado));
+            });
+            calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
+        });
+
         btnSavePredefined.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

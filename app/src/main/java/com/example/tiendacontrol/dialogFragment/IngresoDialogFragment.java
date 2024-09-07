@@ -1,4 +1,6 @@
 package com.example.tiendacontrol.dialogFragment;
+import android.content.ActivityNotFoundException;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,6 +76,15 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         }
         // Configuración de los eventos para los botones
         btnGuarda.setOnClickListener(view1 -> guardarIngreso());
+
+        txtValor.setOnClickListener(v -> {
+            // Muestra una calculadora personalizada
+            CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
+            calculadoraDialog.setCalculadoraListener(valorCalculado -> {
+                txtValor.setText(String.valueOf(valorCalculado));
+            });
+            calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
+        });
 
         btnSavePredefined.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -164,4 +175,5 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         txtDetalles.setText("");
         txtCantidad.setText("");
     }
+
 }
