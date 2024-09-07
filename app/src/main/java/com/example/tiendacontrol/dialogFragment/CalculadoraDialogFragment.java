@@ -172,9 +172,13 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
         if (currentText.length() > 0 && !isResultDisplayed) {
             currentText = currentText.substring(0, currentText.length() - 1);
             display.setText(currentText.isEmpty() ? "0" : currentText);
+
+            // Eliminar también de operationString
+            if (operationString.length() > 0) {
+                operationString.deleteCharAt(operationString.length() - 1);
+            }
         }
     }
-
     // Método para evaluar la expresión matemática
     private BigDecimal evaluateExpression(String expression) throws Exception {
         Stack<BigDecimal> values = new Stack<>();

@@ -27,6 +27,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
     private ItemManager itemManager;
     private String currentDatabase; // Variable para almacenar el nombre de la base de datos actual
     private SpinnerManager itemManagerUtil;
+
     public interface OnDataChangedListener {
         void onDataChanged();
     }
