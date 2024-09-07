@@ -20,7 +20,7 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
     private EditText display;
     private StringBuilder operationString = new StringBuilder();
     private boolean isNewOperation = true;
-    private boolean isResultDisplayed = false; // Track if result is displayed
+    private boolean isResultDisplayed = false; // Para rastrear si se muestra el resultado
     private CalculadoraListener calculadoraListener;
 
     public interface CalculadoraListener {
@@ -45,9 +45,11 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
     }
 
     private void setUpButtonListeners(View view) {
+        // Botón de limpiar pantalla
         Button btnClear = view.findViewById(R.id.btn_clear);
         btnClear.setOnClickListener(v -> clear());
 
+        // Botones de operaciones
         Button btnPercent = view.findViewById(R.id.btn_percent);
         btnPercent.setOnClickListener(v -> applyOperator("%"));
 
@@ -63,12 +65,22 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
         Button btnAdd = view.findViewById(R.id.btn_add);
         btnAdd.setOnClickListener(v -> applyOperator("+"));
 
-        Button btnEquals = view.findViewById(R.id.btn_equals);
-        btnEquals.setOnClickListener(v -> calculateResult());
+        // Botón de igual para calcular el resultado
+//        Button btnEquals = view.findViewById(R.id.btn_equals);
+//        btnEquals.setOnClickListener(v -> calculateResult());
 
+        // Botón para enviar el resultado
         Button btnSendResult = view.findViewById(R.id.btn_send_result);
-        btnSendResult.setOnClickListener(v -> sendResult());
+        btnSendResult.setOnClickListener(v -> {
+            calculateResult();  // Primero calcula el resultado
+            sendResult();       // Luego envía el resultado
+        });
 
+        // Botón para eliminar el último dígito
+        Button btnBackspace = view.findViewById(R.id.btn_backspace);
+        btnBackspace.setOnClickListener(v -> deleteLastDigit());
+
+        // Listener para los botones de números
         View.OnClickListener numberClickListener = v -> {
             Button button = (Button) v;
             onNumberClick(button.getText().toString());
@@ -85,77 +97,86 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
         view.findViewById(R.id.btn8).setOnClickListener(numberClickListener);
         view.findViewById(R.id.btn9).setOnClickListener(numberClickListener);
 
+        // Botón del punto decimal
         Button btnDot = view.findViewById(R.id.btn_dot);
         btnDot.setOnClickListener(v -> onNumberClick("."));
     }
 
+    // Método para limpiar la pantalla y restablecer los valores
     private void clear() {
         display.setText("0");
-        operationString.setLength(0); // Clear the operation string
+        operationString.setLength(0); // Limpiar la cadena de la operación
         isNewOperation = true;
-        isResultDisplayed = false; // Reset result display flag
+        isResultDisplayed = false; // Reiniciar el indicador de resultado
     }
 
+    // Método para gestionar la entrada de números
     private void onNumberClick(String number) {
         if (isResultDisplayed) {
-            // If result is displayed, start a new calculation
-            clear();
+            clear(); // Iniciar un nuevo cálculo si ya se mostró un resultado
             isResultDisplayed = false;
         }
 
         if (isNewOperation) {
-            display.setText(""); // Clear display for new number input
+            display.setText(""); // Limpiar la pantalla para nuevo número
             isNewOperation = false;
         }
-        // Append the number to display and operationString
+
+        // Añadir el número a la pantalla y a la cadena de operación
         display.append(number);
         operationString.append(number);
         updateDisplay();
     }
 
+    // Método para aplicar operadores matemáticos
     private void applyOperator(String operator) {
         if (isResultDisplayed) {
-            // If result is displayed, start a new calculation
-            clear();
+            clear(); // Iniciar un nuevo cálculo si ya se mostró un resultado
             isResultDisplayed = false;
         }
 
         if (!TextUtils.isEmpty(display.getText())) {
-            // Add operator to the operation string and reset display
-            operationString.append(" ").append(operator).append(" ");
+            operationString.append(" ").append(operator).append(" "); // Añadir el operador a la cadena
             display.setText("");
             isNewOperation = true;
             updateDisplay();
         }
     }
 
+    // Método para calcular el resultado de la operación
     private void calculateResult() {
         try {
-            // Calculate the result of the entire operation string
             String operationText = operationString.toString().trim();
             if (TextUtils.isEmpty(operationText)) {
                 display.setText("Error");
                 return;
             }
 
-            // Evaluate the expression
-            BigDecimal result = evaluateExpression(operationText);
+            BigDecimal result = evaluateExpression(operationText); // Evaluar la expresión
             display.setText(PuntoMil.getFormattedNumber(result.longValue()));
 
-            // Append the result to the operation string
-            operationString.setLength(0);
+            operationString.setLength(0); // Limpiar la cadena y añadir el resultado
             operationString.append(operationText).append(" = ").append(result.toString());
 
             isNewOperation = true;
-            isResultDisplayed = true; // Flag to indicate that result is displayed
+            isResultDisplayed = true; // Marcar que se ha mostrado el resultado
         } catch (Exception e) {
             display.setText("Error");
         }
         updateDisplay();
     }
 
+    // Método para eliminar el último dígito ingresado
+    private void deleteLastDigit() {
+        String currentText = display.getText().toString();
+        if (currentText.length() > 0 && !isResultDisplayed) {
+            currentText = currentText.substring(0, currentText.length() - 1);
+            display.setText(currentText.isEmpty() ? "0" : currentText);
+        }
+    }
+
+    // Método para evaluar la expresión matemática
     private BigDecimal evaluateExpression(String expression) throws Exception {
-        // Parse and evaluate the expression
         Stack<BigDecimal> values = new Stack<>();
         Stack<Character> operators = new Stack<>();
         StringBuilder number = new StringBuilder();
@@ -191,6 +212,7 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
         return values.pop();
     }
 
+    // Método para definir la precedencia de los operadores
     private int precedence(char op) {
         switch (op) {
             case '+':
@@ -205,6 +227,7 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
         return -1;
     }
 
+    // Método para aplicar la operación matemática
     private BigDecimal applyOperation(BigDecimal val1, BigDecimal val2, char op) {
         switch (op) {
             case '+':
@@ -217,29 +240,28 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
                 if (val2.compareTo(BigDecimal.ZERO) != 0) {
                     return val1.divide(val2, 2, BigDecimal.ROUND_HALF_UP);
                 }
-                throw new ArithmeticException("Division by zero");
+                throw new ArithmeticException("División por cero");
             case '%':
                 return val1.multiply(val2).divide(BigDecimal.valueOf(100));
             default:
-                throw new UnsupportedOperationException("Operator not supported");
+                throw new UnsupportedOperationException("Operador no soportado");
         }
     }
 
+    // Método para actualizar la pantalla con la operación actual
     private void updateDisplay() {
-        // Update display to show current operation string without the final equals
         String displayText = operationString.toString();
         if (isResultDisplayed) {
-            // Only show the final result
-            displayText = display.getText().toString();
+            displayText = display.getText().toString(); // Mostrar solo el resultado
         }
         display.setText(displayText);
     }
 
+    // Método para enviar el resultado final al listener
     private void sendResult() {
-        // Send the current display text as the result
         if (calculadoraListener != null) {
             calculadoraListener.onResult(display.getText().toString());
         }
-        dismiss(); // Close the dialog
+        dismiss(); // Cerrar el diálogo después de enviar el resultado
     }
 }
