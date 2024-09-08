@@ -16,6 +16,8 @@ import com.example.tiendacontrol.model.ControlCalculadora;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
+import java.math.RoundingMode;
 import java.util.Stack;
 
 public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
@@ -117,16 +119,17 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
     // Método para gestionar la entrada de números
     private void onNumberClick(String number) {
         if (isResultDisplayed) {
-            clear(); // Iniciar un nuevo cálculo si ya se mostró un resultado
+            clear();
             isResultDisplayed = false;
         }
 
         if (isNewOperation) {
-            display.setText(""); // Limpiar la pantalla para nuevo número
-            isNewOperation = false;
+            display.setText("");
         }
 
-        // Añadir el número a la pantalla y a la cadena de operación
+        // Esta línea SIEMPRE debe ejecutarse al ingresar un número
+        isNewOperation = false;
+
         display.append(number);
         operationString.append(number);
         updateDisplay();
@@ -134,40 +137,52 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
 
     // Método para aplicar operadores matemáticos
     private void applyOperator(String operator) {
-        if (isResultDisplayed) {
-            clear(); // Iniciar un nuevo cálculo si ya se mostró un resultado
-            isResultDisplayed = false;
+        // Obtener el texto actual de la operación
+        String currentOperation = operationString.toString().trim();
+
+        // Verificar si la pantalla muestra solo el "0" y no permitir añadir operadores en ese caso
+        if (display.getText().toString().equals("0") && currentOperation.length() == 0) {
+            return; // No hace nada si no hay un número antes del operador
         }
 
-        if (!TextUtils.isEmpty(display.getText())) {
-            operationString.append(" ").append(operator).append(" "); // Añadir el operador a la cadena
-            display.setText("");
-            isNewOperation = true;
-            updateDisplay();
+        // Verificar si el último carácter es un operador
+        if (!currentOperation.isEmpty()) {
+            char lastChar = currentOperation.charAt(currentOperation.length() -1);
+
+            // Si el último carácter es un operador, lo reemplazamos por el nuevo
+            if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' || lastChar == '%') {
+                // Si el penúltimo carácter es un espacio, retrocede dos posiciones
+                int replaceIndex = operationString.length() - 1;
+                if (operationString.charAt(replaceIndex - 1) == ' ') {
+                    replaceIndex -= 2;
+                }
+                operationString.setCharAt(replaceIndex, operator.charAt(0));
+            } else {
+                // Si no es un operador, agregar el nuevo operador
+                operationString.append(operator);
+            }
+        } else {
+            // Si es la primera vez que se agrega un operador, agregar el número actual seguido del operador
+            operationString.append(display.getText().toString()).append(" ").append(operator).append(" ");
         }
+
+        // Limpiar la pantalla para que el usuario pueda ingresar el siguiente número
+        display.setText("");
+        isNewOperation = true;
+        updateDisplay();
     }
-
     // Método para calcular el resultado de la operación
     private void calculateResult() {
         try {
-            String operationText = operationString.toString().trim();
-            if (TextUtils.isEmpty(operationText)) {
-                display.setText("Error");
-                return;
-            }
-
-            BigDecimal result = evaluateExpression(operationText); // Evaluar la expresión
-            display.setText(PuntoMil.getFormattedNumber(result.longValue()));
-
-            operationString.setLength(0); // Limpiar la cadena y añadir el resultado
-            operationString.append(operationText).append(" = ").append(result.toString());
-
+            BigDecimal result = evaluateExpression(operationString.toString());
+            display.setText(result.stripTrailingZeros().toPlainString());
+            operationString.setLength(0);
+            operationString.append(result);
             isNewOperation = true;
-            isResultDisplayed = true; // Marcar que se ha mostrado el resultado
+            isResultDisplayed = true;
         } catch (Exception e) {
             display.setText("Error");
         }
-        updateDisplay();
     }
 
     // Método para eliminar el último dígito ingresado
@@ -191,35 +206,32 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
 
         for (int i = 0; i < expression.length(); i++) {
             char ch = expression.charAt(i);
+
             if (Character.isDigit(ch) || ch == '.') {
                 number.append(ch);
-            } else if (ch == ' ') {
+            } else if (ch == '+' || ch == '-' || ch == '*' || ch == '/' || ch == '%') {
                 if (number.length() > 0) {
                     values.push(new BigDecimal(number.toString()));
                     number.setLength(0);
                 }
-            } else {
+
                 while (!operators.isEmpty() && precedence(ch) <= precedence(operators.peek())) {
-                    BigDecimal val2 = values.pop();
-                    BigDecimal val1 = values.pop();
-                    char op = operators.pop();
-                    values.push(applyOperation(val1, val2, op));
+                    applyLastOperation(values, operators);
                 }
                 operators.push(ch);
             }
         }
+
         if (number.length() > 0) {
             values.push(new BigDecimal(number.toString()));
         }
+
         while (!operators.isEmpty()) {
-            BigDecimal val2 = values.pop();
-            BigDecimal val1 = values.pop();
-            char op = operators.pop();
-            values.push(applyOperation(val1, val2, op));
+            applyLastOperation(values, operators);
         }
+
         return values.pop();
     }
-
     // Método para definir la precedencia de los operadores
     private int precedence(char op) {
         switch (op) {
@@ -235,7 +247,6 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
         return -1;
     }
 
-    // Método para aplicar la operación matemática
     private BigDecimal applyOperation(BigDecimal val1, BigDecimal val2, char op) {
         switch (op) {
             case '+':
@@ -246,23 +257,18 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
                 return val1.multiply(val2);
             case '/':
                 if (val2.compareTo(BigDecimal.ZERO) != 0) {
-                    return val1.divide(val2, 2, BigDecimal.ROUND_HALF_UP);
+                    return val1.divide(val2, MathContext.DECIMAL128);
                 }
                 throw new ArithmeticException("División por cero");
             case '%':
-                return val1.multiply(val2).divide(BigDecimal.valueOf(100));
+                return val1.multiply(val2).divide(BigDecimal.valueOf(100), MathContext.DECIMAL128);
             default:
                 throw new UnsupportedOperationException("Operador no soportado");
         }
     }
-
     // Método para actualizar la pantalla con la operación actual
     private void updateDisplay() {
-        String displayText = operationString.toString();
-        if (isResultDisplayed) {
-            displayText = display.getText().toString(); // Mostrar solo el resultado
-        }
-        display.setText(displayText);
+        display.setText(operationString.toString());
     }
 
     // Método para enviar el resultado final al listener
@@ -271,5 +277,13 @@ public class CalculadoraDialogFragment extends BottomSheetDialogFragment {
             calculadoraListener.onResult(display.getText().toString());
         }
         dismiss(); // Cerrar el diálogo después de enviar el resultado
+    }
+    private void applyLastOperation(Stack<BigDecimal> values, Stack<Character> operators) {
+        if (!operators.isEmpty()) {
+            char op = operators.pop();
+            BigDecimal val2 = values.pop();
+            BigDecimal val1 = values.pop();
+            values.push(applyOperation(val1, val2, op));
+        }
     }
 }
