@@ -94,15 +94,6 @@
                 android:labelFor="@+id/viewCantidad"
                 android:textSize="18sp" />
 
-            <Button
-                android:id="@+id/btnGuarda"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:elevation="3dp"
-                style="@style/Widget.AppTheme.Button"
-                android:text="@string/btn_guarda" />
-
             <View
                 android:layout_width="match_parent"
                 android:layout_height="5dp" />
@@ -114,26 +105,41 @@
                 android:orientation="horizontal"
                 android:padding="16dp">
 
-                <Button
-                    android:id="@+id/btnSavePredefined"
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/texGuardar"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="8dp"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
                     android:layout_weight="1"
-                    android:elevation="3dp"
-                    style="@style/Widget.AppTheme.Button"
-                    android:text="Guardar Predefinido" />
+                    android:layout_marginEnd="16dp"
+                    android:background="@drawable/selector_background"
+                    android:text="@string/btn_guarda"
+                    android:textStyle="bold"/>
 
-                <Button
-                    android:id="@+id/btnClearCustom"
-                    android:layout_width="0dp"
+                <TextView
+                    android:id="@+id/texGuardarPredefinido"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="16dp"
                     android:layout_weight="1"
-                    android:elevation="3dp"
-                    style="@style/Widget.AppTheme.Button"
-                    android:text="Eliminar Predefinido" />
+                    android:background="@drawable/selector_background"
+                    android:text="Predefinido"
+                    android:textStyle="bold"/>
+
             </LinearLayout>
 
+            <TextView
+                android:id="@+id/texEliminar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:layout_gravity="center"
+                android:layout_marginTop="16dp"
+                android:text="Eliminar Predefinido" />
 
         </LinearLayout>
     </ScrollView>

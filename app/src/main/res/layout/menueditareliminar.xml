@@ -19,29 +19,30 @@ cardview:cardBackgroundColor="@android:color/transparent">
             android:layout_marginBottom="8dp"
             android:layout_gravity="center">
 
-                <Button
+                <TextView
                     android:id="@+id/opcionEditar"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:background="@drawable/selector_background"
                     android:layout_columnWeight="1"
                     android:layout_rowWeight="1"
                     android:text="Editar"
-                    style="@style/Widget.AppTheme.Button"
-                    android:padding="15dp"
-                    android:layout_marginEnd="8dp"
+                    android:textStyle="bold"
                     android:layout_marginBottom="10dp"/>
 
-                <Button
+                <TextView
                     android:id="@+id/opcionEliminar"
-                    android:layout_width="0dp"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:gravity="center"
+                    android:layout_gravity="center"
+                    android:background="@drawable/selector_background"
                     android:layout_columnWeight="1"
                     android:layout_rowWeight="1"
                     android:text="Eliminar"
-                    style="@style/Widget.AppTheme.Button"
-                    android:padding="15dp"
-                    android:layout_marginBottom="10dp"
-                    android:layout_marginEnd="8dp"/>
+                    android:textStyle="bold"/>
 
         </GridLayout>
 

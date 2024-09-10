@@ -299,9 +299,9 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         View dialogView = inflater.inflate(R.layout.menubasedatos, null);
 
         // Encontrar los botones y elementos en el diseño inflado
-        Button btnEditar = dialogView.findViewById(R.id.btnEditar);
-        Button btnEliminar = dialogView.findViewById(R.id.btnEliminar);
-        Button btnExportar = dialogView.findViewById(R.id.btnExportar);
+        TextView btnEditar = dialogView.findViewById(R.id.btnEditar);
+        TextView btnEliminar = dialogView.findViewById(R.id.btnEliminar);
+        TextView btnExportar = dialogView.findViewById(R.id.btnExportar);
         TextView tvContabilidad = dialogView.findViewById(R.id.btnContabilidad);
 
 

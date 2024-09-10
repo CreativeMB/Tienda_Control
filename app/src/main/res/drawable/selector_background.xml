@@ -10,7 +10,7 @@
                         android:angle="90" />
                     <corners android:radius="10dp" />
                     <size android:width="250dp"
-                        android:height="50dp" />
+                        android:height="70dp" />
                 </shape>
             </item>
         </layer-list>
@@ -21,12 +21,12 @@
             <item>
                 <shape android:shape="rectangle">
                     <gradient
-                        android:startColor="#66BB6A"
-                        android:endColor="#43A047"
+                        android:startColor="#304FFE"
+                        android:endColor="#6200EA"
                         android:angle="90" />
                     <corners android:radius="10dp" />
                     <size android:width="250dp"
-                        android:height="50dp" />
+                        android:height="70dp" />
                 </shape>
             </item>
         </layer-list>
@@ -37,12 +37,12 @@
             <item>
                 <shape android:shape="rectangle">
                     <gradient
-                        android:startColor="#42A5F5"
-                        android:endColor="#167E8E"
+                        android:startColor="@color/colorPrimary"
+                        android:endColor="@color/colorPositivo"
                         android:angle="90" />
                     <corners android:radius="10dp" />
                     <size android:width="250dp"
-                        android:height="50dp" />
+                        android:height="70dp" />
                 </shape>
             </item>
         </layer-list>

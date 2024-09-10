@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,7 +26,8 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
     Button btnGuarda, btnSavePredefined, btnClearCustom;
     Spinner spinnerPredefined;
     ItemManager itemManager;
-    String currentDatabase; // Variable para almacenar el nombre de la base de datos actual
+    String currentDatabase;
+    TextView texEliminar, texGuardar, texGuardarPredefinido;
     private SpinnerManager itemManagerUtil;
     public interface OnDataChangedListener {
         void onDataChanged();
@@ -55,10 +57,10 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         txtValor = view.findViewById(R.id.txtValor);
         txtDetalles = view.findViewById(R.id.txtDetalles);
         txtCantidad = view.findViewById(R.id.txtCantidad);
-        btnGuarda = view.findViewById(R.id.btnGuarda);
-        btnSavePredefined = view.findViewById(R.id.btnSavePredefined);
+        texGuardar = view.findViewById(R.id.texGuardar);
+        texGuardarPredefinido = view.findViewById(R.id.texGuardarPredefinido);
         spinnerPredefined = view.findViewById(R.id.spinnerPredefined);
-        btnClearCustom = view.findViewById(R.id.btnClearCustom);
+        texEliminar = view.findViewById(R.id.texEliminar);
 
         // Aplicar el formato con separadores de mil
         PuntoMil.formatNumberWithThousandSeparator(txtValor);
@@ -74,7 +76,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             currentDatabase = getArguments().getString("databaseName");
         }
         // Configuración de los eventos para los botones
-        btnGuarda.setOnClickListener(view1 -> guardarIngreso());
+        texGuardar.setOnClickListener(view1 -> guardarIngreso());
 
         txtValor.setOnClickListener(v -> {
             // Verifica si el diálogo ya está visible, para evitar múltiples aperturas
@@ -95,14 +97,14 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             }
         });
 
-        btnSavePredefined.setOnClickListener(new View.OnClickListener() {
+        texGuardarPredefinido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 itemManagerUtil.savePredefinedItem(); // Guardar un ítem predefinido
             }
         });
 
-        btnClearCustom.setOnClickListener(new View.OnClickListener() {
+        texEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 itemManagerUtil.clearCustomItems(); // Limpiar ítems personalizados
