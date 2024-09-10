@@ -2,10 +2,10 @@
 <!-- res/menuprincipal/menuprincipal.xml -->
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:id="@+id/inicioItem"
-        android:icon="@drawable/inicio"
+        android:id="@+id/loslirios"
+        android:icon="@drawable/estrella"
         android:titleTextAppearance="@style/MenuItemTextStyle"
-        android:title="Inicio"/>
+        android:title="Floristeria los lirios"/>
     <item
         android:id="@+id/codeItem"
         android:icon="@drawable/pin"
@@ -21,6 +21,7 @@
         android:icon="@drawable/manual"
         android:titleTextAppearance="@style/MenuItemTextStyle"
         android:title="Manual"/>
+
     <item
         android:id="@+id/salirItem"
         android:icon="@drawable/salir"

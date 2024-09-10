@@ -24,6 +24,9 @@
         android:theme="@style/TiendaControl"
         tools:targetApi="31">
         <activity
+            android:name=".monitor.LosLirios"
+            android:exported="false" />
+        <activity
             android:name=".monitor.InicioPin"
             android:exported="false" />
         <activity
@@ -33,8 +36,8 @@
         <receiver
             android:name=".monitor.Recordatorio"
             android:enabled="true"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
+
         <activity android:name=".model.Items" />
         <activity android:name=".dialogFragment.IngresoDialogFragment" />
         <activity android:name=".dialogFragment.GastoDialogFragment" />
@@ -45,8 +48,7 @@
         <activity android:name=".monitor.BaseDatos" />
         <activity android:name=".monitor.Donar" />
         <activity android:name=".monitor.Patron" />
-        <activity
-            android:name=".dialogFragment.CalculadoraDialogFragment" />
+        <activity android:name=".dialogFragment.CalculadoraDialogFragment" />
         <activity
             android:name=".model.AnimacionInicio"
             android:exported="true">

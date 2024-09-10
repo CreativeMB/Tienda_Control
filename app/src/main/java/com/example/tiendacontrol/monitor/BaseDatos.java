@@ -159,9 +159,8 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 try {
-                    if (id == R.id.inicioItem) {
-                        // Acción para Inicio
-                        Intent intent = new Intent(BaseDatos.this, BaseDatos.class);
+                    if (id == R.id.loslirios) {
+                        Intent intent = new Intent(BaseDatos.this, LosLirios.class);
                         startActivity(intent);
                     } else if (id == R.id.codeItem) {
                         // Acción para Código
