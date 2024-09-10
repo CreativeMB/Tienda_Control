@@ -15,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -200,7 +201,6 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         editor.apply();
     }
 
-    @Override
     public void onDataChanged() {
         if (adapter != null) {
             listaArrayVentas.clear();
@@ -208,6 +208,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             adapter.ordenarPorFecha();
             adapter.setItems(listaArrayVentas);
             adapter.setBdVentas(bdVentas);
+
             // Obtener los valores para la base de datos ACTUAL después de actualizar el adaptador
             double ingresos = bdVentas.obtenerTotalVentas();
             double egresos = bdVentas.obtenerTotalEgresos();
@@ -221,8 +222,17 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             textIngresos.setText(String.format("$%s", ingresosFormatted));
             textEgresos.setText(String.format("$%s", egresosFormatted));
             textDiferencia.setText(String.format("$%s", diferenciaFormateada));
+
+            // Cambiar el color del texto basado en el valor formateado
+            int colorTexto = diferenciaFormateada.startsWith("-") ?
+                    ContextCompat.getColor(this, R.color.colorNegativo) :
+                    ContextCompat.getColor(this, R.color.colorPositivo);
+            // Imprimir el color asignado para depuración
+            Log.d(TAG, "Color de texto: " + (diferenciaFormateada.startsWith("-") ? "Negativo" : "Positivo"));
+            textDiferencia.setTextColor(colorTexto);
+
             adapter.notifyDataSetChanged();
-//            mostrarValores();
+
             Log.d(TAG, "RecyclerView actualizado, tamaño de la lista: " + listaArrayVentas.size());
         }
     }
@@ -247,21 +257,5 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
                 .setIcon(R.drawable.eliminar)
                 .show();
     }
-
-//    private void mostrarValores() {
-//        // Obtener los valores de ingresos, egresos y diferencia
-//        double ingresos = bdVentas.obtenerTotalVentas();
-//        double egresos = bdVentas.obtenerTotalEgresos();
-//        String diferenciaFormateada = bdVentas.obtenerDiferencia();
-//
-//        // Convertir a long y formatear con punto de mil
-//        String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
-//        String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
-//
-//        // Mostrar los valores en los TextView
-//        textIngresos.setText(String.format("$%s", ingresosFormatted));
-//        textEgresos.setText(String.format("$%s", egresosFormatted));
-//        textDiferencia.setText(String.format("$%s", diferenciaFormateada));
-//    }
 
 }
