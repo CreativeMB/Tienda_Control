@@ -139,7 +139,7 @@
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:layout_marginTop="16dp"
-                android:text="Eliminar Predefinido" />
+                android:text="Eliminar el Items Guardado" />
 
         </LinearLayout>
     </ScrollView>

@@ -107,7 +107,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         texEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                itemManagerUtil.clearCustomItems(); // Limpiar ítems personalizados
+                itemManagerUtil.removeSelectedItem(); // Limpiar ítems personalizados
             }
         });
         itemManagerUtil = new SpinnerManager(getContext(), spinnerPredefined, txtProducto, txtValor, txtDetalles, txtCantidad);
