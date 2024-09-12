@@ -56,7 +56,6 @@ public class SpinnerManager {
                 TextView textView = (TextView) view.findViewById(android.R.id.text1);
                 Items item = getItem(position);
                 if (item != null) {
-                    // Formatear el valor para la visualización
                     String valorFormateado = NumberFormat.getNumberInstance(Locale.US).format(item.getValor());
                     textView.setText(item.getProducto() + " $" + valorFormateado);
                 }
@@ -69,7 +68,6 @@ public class SpinnerManager {
                 TextView textView = (TextView) view.findViewById(android.R.id.text1);
                 Items item = getItem(position);
                 if (item != null) {
-                    // Formatear el valor para la visualización
                     String valorFormateado = NumberFormat.getNumberInstance(Locale.US).format(item.getValor());
                     textView.setText(item.getProducto() + " $" + valorFormateado);
                 }
@@ -88,12 +86,7 @@ public class SpinnerManager {
         String valorStr = txtValor.getText().toString();
         String detalles = txtDetalles.getText().toString();
         String cantidadStr = txtCantidad.getText().toString();
-
-        // Imprimir los valores para depuración
-        Log.d("SpinnerManager", "Valor String: " + valorStr);
-        Log.d("SpinnerManager", "Cantidad String: " + cantidadStr);
-
-        // Normalizar el valor ingresado
+                // Normalizar el valor ingresado
         valorStr = normalizeNumberFormat(valorStr);
 
         // Asegurarse de que la cantidad sea un número válido
@@ -113,8 +106,8 @@ public class SpinnerManager {
             Toast.makeText(context, "Ítem guardado", Toast.LENGTH_SHORT).show();
             loadPredefinedItems();
         } catch (NumberFormatException e) {
-            // Mostrar mensaje de error detallado
-            Toast.makeText(context, "VALOR O CANTIDAD NO SON VÁLIDOS: " + e.getMessage(), Toast.LENGTH_LONG).show();
+            // Mostrar mensaje de error específico
+            Toast.makeText(context, "Todos los campos son obligatorios", Toast.LENGTH_LONG).show();
         }
     }
 
@@ -133,10 +126,15 @@ public class SpinnerManager {
 
         return number;
     }
-
-    public void clearCustomItems() {
-        itemManager.removeCustomItems();
-        loadPredefinedItems();
-        Toast.makeText(context, "Ítems personalizados eliminados", Toast.LENGTH_SHORT).show();
+    public void removeSelectedItem() {
+        int position = spinnerPredefined.getSelectedItemPosition();
+        if (position > 0) { // Ignorar el primer ítem que es el placeholder
+            Items selectedItem = (Items) spinnerPredefined.getItemAtPosition(position);
+            itemManager.removeItem(selectedItem); // Llamar al método para eliminar el ítem
+            Toast.makeText(context, "Ítem eliminado", Toast.LENGTH_SHORT).show();
+            loadPredefinedItems(); // Recargar los ítems después de la eliminación
+        } else {
+            Toast.makeText(context, "Por favor, seleccione un ítem para eliminar", Toast.LENGTH_SHORT).show();
+        }
     }
 }
