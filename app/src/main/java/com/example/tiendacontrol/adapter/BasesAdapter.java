@@ -1,5 +1,8 @@
 package com.example.tiendacontrol.adapter;
+import static android.content.ContentValues.TAG;
+
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,7 +19,7 @@ import com.example.tiendacontrol.helper.PuntoMil;
 
 import java.util.List;
 
-public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 
     private static final int VIEW_TYPE_EMPTY = 0;
     private static final int VIEW_TYPE_ITEM = 1;
@@ -29,7 +32,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     private List<String> databaseList;
     private OnDatabaseClickListener listener;
 
-    public basesAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
+    public BasesAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
         this.context = context;
         this.databaseList = databaseList;
         this.listener = listener;
@@ -39,7 +42,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_ITEM) {
-            View view = LayoutInflater.from(context).inflate(R.layout.itemdatabase, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.itembasedatos, parent, false);
             return new DatabaseViewHolder(view);
         } else {
             View view = LayoutInflater.from(context).inflate(R.layout.baseinicio, parent, false);
@@ -63,24 +66,29 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             // Formatear los valores con PuntoMil
             String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
             String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
-//            String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
             String diferenciaFormateada = bdVentas.obtenerDiferencia();
 
             // Mostrar los valores FORMATEADOS en los TextViews
             databaseHolder.textViewDatabaseName.setText(databaseName);
             databaseHolder.textViewIngresos.setText("Ingresos: $" + ingresosFormatted);
             databaseHolder.textViewEgresos.setText("Egresos: $" + egresosFormatted);
-            // Asegúrate de que esto sea correcto:
             databaseHolder.textViewDiferencia.setText("Ganancia: $" + diferenciaFormateada);
+
+            // Cambiar el color del texto basado en el valor formateado
+            int colorTexto = diferenciaFormateada.startsWith("-") ?
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.colorNegativo) :
+                    ContextCompat.getColor(holder.itemView.getContext(), R.color.colorPositivo);
+
+            // Establecer el color en el TextView del ViewHolder
+            databaseHolder.textViewDiferencia.setTextColor(colorTexto);
+
+            // Otros ajustes para el ViewHolder
             bdVentas.close();
             databaseHolder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
             databaseHolder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
-//            int colorFondo = R.color.fondoCAr;
-//            databaseHolder.cardView.setCardBackgroundColor(ContextCompat.getColor(holder.itemView.getContext(), colorFondo));
         } else if (holder instanceof EmptyViewHolder) {
             // No es necesario hacer nada aquí, ya que la vista EmptyViewHolder se configura en el layout XML.
         }
-
     }
 
     @Override
@@ -121,7 +129,7 @@ public class basesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         public DatabaseViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewDatabaseName = itemView.findViewById(R.id.textViewDatabaseName);
-            // Asegúrate de que estos IDs coincidan con los de tu layout itemdatabase.xml
+            // Asegúrate de que estos IDs coincidan con los de tu layout itembasedatos.xml
             textViewIngresos = itemView.findViewById(R.id.textViewIngresos);
             textViewEgresos = itemView.findViewById(R.id.textViewEgresos);
             textViewDiferencia = itemView.findViewById(R.id.textViewDiferencia);

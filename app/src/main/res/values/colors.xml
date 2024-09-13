@@ -15,7 +15,7 @@
     <color name="colorOnSecondary">#000000</color> <!-- Texto sobre el color secundario -->
 
     <color name="fondoCAr">#ED615B5B</color>
-    <color name="texcolor">#8C4A1D</color>
+    <color name="texcolor">#FFA900</color>
     <color name="colorNegativo">#D21616</color>
     <color name="colorPositivo">#4CAF50</color>
     <color name="colorFondoNegativo">#80FF0000</color>

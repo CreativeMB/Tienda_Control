@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -32,14 +31,12 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tiendacontrol.R;
-import com.example.tiendacontrol.adapter.basesAdapter;
+import com.example.tiendacontrol.adapter.BasesAdapter;
 import com.example.tiendacontrol.helper.ExcelExporter;
-import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
@@ -54,7 +51,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
-public class Database extends AppCompatActivity implements basesAdapter.OnDatabaseClickListener {
+public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatabaseClickListener {
     private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CODE_EXACT_ALARM = 1;
@@ -66,7 +63,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     private static final String PREFS_NAME = "MyPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     private List<String> databaseList;
-    private basesAdapter adapter;
+    private BasesAdapter adapter;
     private OnStoragePermissionResultListener storagePermissionResultListener;
 
     private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
@@ -107,7 +104,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.database);
+        setContentView(R.layout.basedatos);
         ImageView imageManual = findViewById(R.id.manual);
 
         ImageView iconRecordatorio = findViewById(R.id.recordatorio);
@@ -124,7 +121,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
         recyclerViewDatabases.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
 
         databaseList = new ArrayList<>();
-        adapter = new basesAdapter(this, databaseList, this);
+        adapter = new BasesAdapter(this, databaseList, this);
         recyclerViewDatabases.setAdapter(adapter);
 
 
@@ -162,17 +159,16 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 try {
-                    if (id == R.id.inicioItem) {
-                        // Acción para Inicio
-                        Intent intent = new Intent(Database.this, Database.class);
+                    if (id == R.id.loslirios) {
+                        Intent intent = new Intent(BaseDatos.this, LosLirios.class);
                         startActivity(intent);
                     } else if (id == R.id.codeItem) {
                         // Acción para Código
-                        Intent intent = new Intent(Database.this, SetCode.class);
+                        Intent intent = new Intent(BaseDatos.this, EdicionPin.class);
                         startActivity(intent);
                     } else if (id == R.id.donaItem) {
                         // Acción para Donar
-                        Intent intent = new Intent(Database.this, Donar.class);
+                        Intent intent = new Intent(BaseDatos.this, Donar.class);
                         startActivity(intent);
                     } else if (id == R.id.manual) {
                         // URL al que quieres dirigir al usuario
@@ -187,7 +183,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
-                    Toast.makeText(Database.this, "Ocurrió un error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(BaseDatos.this, "Ocurrió un error: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 }
 
                 // Cerrar el menú después de la selección
@@ -248,7 +244,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
 
             } catch (IOException e) {
                 showToast("Error al crear la base de datos: " + e.getMessage());
-                Log.e("Database", "Error al crear la base de datos: " + e.getMessage());
+                Log.e("BaseDatos", "Error al crear la base de datos: " + e.getMessage());
             }
         }
     }
@@ -256,12 +252,12 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     private void loadDatabases() {
         databaseList.clear();
         File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-        Log.d("Database", "Directorio de documentos: " + documentsFolder.getAbsolutePath());
+        Log.d("BaseDatos", "Directorio de documentos: " + documentsFolder.getAbsolutePath());
         if (documentsFolder.isDirectory()) {
             File[] dbFiles = documentsFolder.listFiles();
             if (dbFiles != null) {
                 for (File file : dbFiles) {
-                    Log.d("Database", "Archivo encontrado: " + file.getName());
+                    Log.d("BaseDatos", "Archivo encontrado: " + file.getName());
                     if (file.isFile() && file.getName().endsWith(".db")) {
                         String fileNameWithoutExtension = file.getName().replace(".db", "");
                         databaseList.add(fileNameWithoutExtension);
@@ -299,16 +295,18 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     private void showDatabaseOptionsDialog(String databaseName) {
         // Inflar el diseño personalizado
         LayoutInflater inflater = LayoutInflater.from(this);
-        View dialogView = inflater.inflate(R.layout.menudatabase, null);
+        View dialogView = inflater.inflate(R.layout.menubasedatos, null);
 
         // Encontrar los botones y elementos en el diseño inflado
-        Button btnEditar = dialogView.findViewById(R.id.btnEditar);
-        Button btnEliminar = dialogView.findViewById(R.id.btnEliminar);
-        Button btnExportar = dialogView.findViewById(R.id.btnExportar);
+        TextView btnEditar = dialogView.findViewById(R.id.btnEditar);
+        TextView btnEliminar = dialogView.findViewById(R.id.btnEliminar);
+        TextView btnExportar = dialogView.findViewById(R.id.btnExportar);
         TextView tvContabilidad = dialogView.findViewById(R.id.btnContabilidad);
 
+
+
         // Crear el AlertDialog con el diseño inflado
-        AlertDialog dialog = new AlertDialog.Builder(this)
+        AlertDialog dialog = new AlertDialog.Builder(this, R.style.TransparentDialogTheme)
                 .setView(dialogView)
                 .create();
 
@@ -339,18 +337,18 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
     }
 
     private void editDatabase(String databaseName) {
-        Log.d("Database", "editDatabase() ejecutado con databaseName: " + databaseName);
+        Log.d("BaseDatos", "editDatabase() ejecutado con databaseName: " + databaseName);
         if (databaseName != null && !databaseName.isEmpty()) {
             closeCurrentDatabase();
             SharedPreferences.Editor editor = sharedPreferences.edit();
             editor.putString(KEY_CURRENT_DATABASE, databaseName);
             editor.putBoolean("KEY_DATABASE_SELECTED", true);
             editor.apply();
-            Log.d("Database", "Nombre de la base de datos guardado en SharedPreferences: " + databaseName);
+            Log.d("BaseDatos", "Nombre de la base de datos guardado en SharedPreferences: " + databaseName);
             showToast("Base de datos actual: " + databaseName);
 
             // Abre la base de datos en la actividad correspondiente
-            Intent intent = new Intent(Database.this, MainActivity.class);
+            Intent intent = new Intent(BaseDatos.this, DatosDatos.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
         } else {
@@ -368,7 +366,7 @@ public class Database extends AppCompatActivity implements basesAdapter.OnDataba
             showToast("Base de datos actual: " + databaseName);
 
             // Abre la base de datos en la actividad correspondiente
-            Intent intent = new Intent(Database.this, FiltroDiaMesAno.class);
+            Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAno.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
         } else {

@@ -2,14 +2,11 @@ package com.example.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
 
-import static androidx.core.content.ContentProviderCompat.requireContext;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -18,6 +15,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,21 +24,15 @@ import com.example.tiendacontrol.adapter.DatosAdapter;
 import com.example.tiendacontrol.dialogFragment.IngresoDialogFragment;
 
 import com.example.tiendacontrol.helper.BdVentas;
-import java.text.NumberFormat;
-import java.util.Locale;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.example.tiendacontrol.helper.PuntoMil;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.FirebaseFirestore;
-import com.squareup.picasso.Picasso;
+
 import java.util.ArrayList;
 
-public class MainActivity extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener {
+public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener {
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
@@ -60,7 +52,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activitymain);
+        setContentView(R.layout.datosdatos);
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -107,7 +99,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         ImageView iconInicio = findViewById(R.id.inicio);
         // Inicializar el nuevo TextView
         textViewDatabaseName = findViewById(R.id.text_view_database_name);
-        iconInicio.setOnClickListener(view -> startActivity(new Intent(MainActivity.this, Database.class)));
+        iconInicio.setOnClickListener(view -> startActivity(new Intent(DatosDatos.this, BaseDatos.class)));
         iconLimpiar.setOnClickListener(view -> confirmarEliminarTodo());
         iconEgreso.setOnClickListener(view -> mostrarGastoDialogFragment());
         iconIngreso.setOnClickListener(view -> mostrarIngresoDialogFragment());
@@ -209,7 +201,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         editor.apply();
     }
 
-    @Override
     public void onDataChanged() {
         if (adapter != null) {
             listaArrayVentas.clear();
@@ -217,6 +208,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             adapter.ordenarPorFecha();
             adapter.setItems(listaArrayVentas);
             adapter.setBdVentas(bdVentas);
+
             // Obtener los valores para la base de datos ACTUAL después de actualizar el adaptador
             double ingresos = bdVentas.obtenerTotalVentas();
             double egresos = bdVentas.obtenerTotalEgresos();
@@ -230,8 +222,17 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
             textIngresos.setText(String.format("$%s", ingresosFormatted));
             textEgresos.setText(String.format("$%s", egresosFormatted));
             textDiferencia.setText(String.format("$%s", diferenciaFormateada));
+
+            // Cambiar el color del texto basado en el valor formateado
+            int colorTexto = diferenciaFormateada.startsWith("-") ?
+                    ContextCompat.getColor(this, R.color.colorNegativo) :
+                    ContextCompat.getColor(this, R.color.colorPositivo);
+            // Imprimir el color asignado para depuración
+            Log.d(TAG, "Color de texto: " + (diferenciaFormateada.startsWith("-") ? "Negativo" : "Positivo"));
+            textDiferencia.setTextColor(colorTexto);
+
             adapter.notifyDataSetChanged();
-//            mostrarValores();
+
             Log.d(TAG, "RecyclerView actualizado, tamaño de la lista: " + listaArrayVentas.size());
         }
     }
@@ -256,21 +257,5 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 .setIcon(R.drawable.eliminar)
                 .show();
     }
-
-//    private void mostrarValores() {
-//        // Obtener los valores de ingresos, egresos y diferencia
-//        double ingresos = bdVentas.obtenerTotalVentas();
-//        double egresos = bdVentas.obtenerTotalEgresos();
-//        String diferenciaFormateada = bdVentas.obtenerDiferencia();
-//
-//        // Convertir a long y formatear con punto de mil
-//        String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
-//        String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
-//
-//        // Mostrar los valores en los TextView
-//        textIngresos.setText(String.format("$%s", ingresosFormatted));
-//        textEgresos.setText(String.format("$%s", egresosFormatted));
-//        textDiferencia.setText(String.format("$%s", diferenciaFormateada));
-//    }
 
 }

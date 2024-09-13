@@ -34,7 +34,7 @@ public class Patron {
             if (resultCode == Activity.RESULT_OK) {
                 // Acción después de la autenticación exitosa
                 Toast.makeText(context, "Autenticación exitosa", Toast.LENGTH_SHORT).show();
-                Intent intent = new Intent(context, Database.class); // Cambia Database.class por la actividad deseada
+                Intent intent = new Intent(context, BaseDatos.class); // Cambia BaseDatos.class por la actividad deseada
                 context.startActivity(intent);
                 if (context instanceof Activity) {
                     ((Activity) context).finish(); // Cierra la actividad actual si es una instancia de Activity

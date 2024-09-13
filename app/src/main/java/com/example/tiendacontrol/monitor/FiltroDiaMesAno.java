@@ -22,14 +22,11 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.adapter.ItemsAdapter;
 
-import com.example.tiendacontrol.dialogFragment.CustomDatePickerDialog;
+import com.example.tiendacontrol.dialogFragment.FiltroDiaMesAnoDialogFragment;
 import com.example.tiendacontrol.helper.BdVentas;
 import com.example.tiendacontrol.helper.PuntoMil;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-
-import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -101,7 +98,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         txtBuscar.setOnQueryTextListener(this);
 
         iconDatabase.setOnClickListener(view -> {
-            Intent databaseIntent = new Intent(this, Database.class);
+            Intent databaseIntent = new Intent(this, BaseDatos.class);
             startActivity(databaseIntent);
         });
         iconFiltro.setOnClickListener(view -> {
@@ -179,7 +176,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        CustomDatePickerDialog startDatePickerDialog = new CustomDatePickerDialog(FiltroDiaMesAno.this,
+        FiltroDiaMesAnoDialogFragment startDatePickerDialog = new FiltroDiaMesAnoDialogFragment(FiltroDiaMesAno.this,
                 (view, year1, month1, dayOfMonth) -> {
                     String formattedMonth = String.format("%02d", month1 + 1);
                     String formattedDay = String.format("%02d", dayOfMonth);
@@ -196,7 +193,7 @@ public class FiltroDiaMesAno extends AppCompatActivity implements SearchView.OnQ
         int month = calendar.get(Calendar.MONTH);
         int day = calendar.get(Calendar.DAY_OF_MONTH);
 
-        CustomDatePickerDialog endDatePickerDialog = new CustomDatePickerDialog(FiltroDiaMesAno.this,
+        FiltroDiaMesAnoDialogFragment endDatePickerDialog = new FiltroDiaMesAnoDialogFragment(FiltroDiaMesAno.this,
                 (view, year1, month1, dayOfMonth) -> {
                     String formattedMonth = String.format("%02d", month1 + 1);
                     String formattedDay = String.format("%02d", dayOfMonth);

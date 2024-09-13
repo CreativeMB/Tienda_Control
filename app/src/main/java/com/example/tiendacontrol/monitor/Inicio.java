@@ -5,11 +5,7 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import com.example.tiendacontrol.R;
 
@@ -39,7 +35,7 @@ public class Inicio extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // Reemplaza con la actividad de configuración por PIN
-                Intent intent = new Intent(Inicio.this, EntraPin.class);
+                Intent intent = new Intent(Inicio.this, InicioPin.class);
                 startActivity(intent);
             }
         });

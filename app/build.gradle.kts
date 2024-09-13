@@ -52,26 +52,6 @@ dependencies {
     implementation("com.google.firebase:firebase-core:21.1.1")
     implementation("com.google.firebase:firebase-analytics")
 
-    // Firebase Authentication and Firestore
-    implementation("com.google.firebase:firebase-auth")
-    implementation("com.google.android.gms:play-services-auth:21.0.0")
-    implementation("com.google.firebase:firebase-firestore")
-    implementation("com.google.firebase:firebase-database:20.3.1")
-    implementation("com.google.firebase:firebase-database-ktx:20.2.2")
-    implementation("com.google.android.material:material:1.10.0")
-    implementation("androidx.navigation:navigation-ui-ktx:2.7.7")
-    implementation("androidx.navigation:navigation-fragment-ktx:2.7.7")
-    implementation("com.google.android.material:material:1.12.0")
-    implementation ("com.google.firebase:firebase-storage:20.0.0")
-    implementation ("com.squareup.picasso:picasso:2.8")
-    implementation ("com.google.android.gms:play-services-drive:17.0.0")
-    implementation ("com.google.android.gms:play-services-auth:21.2.0")
-    implementation ("androidx.recyclerview:recyclerview:1.2.1")
-    implementation ("androidx.recyclerview:recyclerview-selection:1.1.0")
-
-    // Dropbox Core API v2 para Android
-    implementation ("com.dropbox.core:dropbox-core-sdk:7.0.0")
-    implementation("com.dropbox.core:dropbox-android-sdk:7.0.0")
     //exel
     implementation ("org.apache.poi:poi:5.2.4")
     implementation ("org.apache.poi:poi-ooxml:5.2.4")

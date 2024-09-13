@@ -7,6 +7,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -14,6 +15,7 @@ import com.example.tiendacontrol.R;
 import com.example.tiendacontrol.helper.ItemManager;
 import com.example.tiendacontrol.helper.SpinnerManager;
 import com.example.tiendacontrol.helper.PuntoMil;
+import com.example.tiendacontrol.model.ControlCalculadora;
 import com.example.tiendacontrol.model.Items;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 import com.example.tiendacontrol.helper.BdVentas;
@@ -24,7 +26,8 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
     Button btnGuarda, btnSavePredefined, btnClearCustom;
     Spinner spinnerPredefined;
     ItemManager itemManager;
-    String currentDatabase; // Variable para almacenar el nombre de la base de datos actual
+    String currentDatabase;
+    TextView texEliminar, texGuardar, texGuardarPredefinido;
     private SpinnerManager itemManagerUtil;
     public interface OnDataChangedListener {
         void onDataChanged();
@@ -54,10 +57,10 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         txtValor = view.findViewById(R.id.txtValor);
         txtDetalles = view.findViewById(R.id.txtDetalles);
         txtCantidad = view.findViewById(R.id.txtCantidad);
-        btnGuarda = view.findViewById(R.id.btnGuarda);
-        btnSavePredefined = view.findViewById(R.id.btnSavePredefined);
+        texGuardar = view.findViewById(R.id.texGuardar);
+        texGuardarPredefinido = view.findViewById(R.id.texGuardarPredefinido);
         spinnerPredefined = view.findViewById(R.id.spinnerPredefined);
-        btnClearCustom = view.findViewById(R.id.btnClearCustom);
+        texEliminar = view.findViewById(R.id.texEliminar);
 
         // Aplicar el formato con separadores de mil
         PuntoMil.formatNumberWithThousandSeparator(txtValor);
@@ -73,19 +76,38 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             currentDatabase = getArguments().getString("databaseName");
         }
         // Configuración de los eventos para los botones
-        btnGuarda.setOnClickListener(view1 -> guardarIngreso());
+        texGuardar.setOnClickListener(view1 -> guardarIngreso());
 
-        btnSavePredefined.setOnClickListener(new View.OnClickListener() {
+        txtValor.setOnClickListener(v -> {
+            // Verifica si el diálogo ya está visible, para evitar múltiples aperturas
+            if (!ControlCalculadora.getInstance().isCalculadoraDialogVisible()) {
+                // Muestra el `CalculadoraDialogFragment`
+                CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
+
+                // Configura el listener para recibir el valor calculado
+                calculadoraDialog.setCalculadoraListener(valorCalculado -> {
+                    txtValor.setText(String.valueOf(valorCalculado)); // Establece el valor en el TextView
+                });
+
+                // Marca el diálogo como visible globalmente
+                ControlCalculadora.getInstance().setCalculadoraDialogVisible(true);
+
+                // Muestra el diálogo usando `getParentFragmentManager()` ya que estás dentro de un fragmento
+                calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
+            }
+        });
+
+        texGuardarPredefinido.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 itemManagerUtil.savePredefinedItem(); // Guardar un ítem predefinido
             }
         });
 
-        btnClearCustom.setOnClickListener(new View.OnClickListener() {
+        texEliminar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                itemManagerUtil.clearCustomItems(); // Limpiar ítems personalizados
+                itemManagerUtil.removeSelectedItem(); // Limpiar ítems personalizados
             }
         });
         itemManagerUtil = new SpinnerManager(getContext(), spinnerPredefined, txtProducto, txtValor, txtDetalles, txtCantidad);
@@ -123,7 +145,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
 
         // Verificar que todos los campos estén llenos
         if (producto.isEmpty() || valorStr.isEmpty() || detalles.isEmpty() || cantidadStr.isEmpty()) {
-            Toast.makeText(getContext(), "DEBE LLENAR TODOS LOS CAMPOS", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Todos los campos son Necesarios", Toast.LENGTH_LONG).show();
             return; // Salir del método si hay campos vacíos
         }
 
@@ -142,7 +164,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             long id = bdVentas.insertarVenta(producto, total, detalles, cantidad);
 
             if (id > 0) {
-                Toast.makeText(getContext(), "REGISTRO GUARDADO", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Nuevo item Registrado", Toast.LENGTH_SHORT).show();
                 limpiar();
                 dismiss();
                 if (dataChangedListener != null) {
@@ -164,4 +186,5 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         txtDetalles.setText("");
         txtCantidad.setText("");
     }
+
 }
