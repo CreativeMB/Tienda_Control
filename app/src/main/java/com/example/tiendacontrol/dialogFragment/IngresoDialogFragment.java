@@ -145,7 +145,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
 
         // Verificar que todos los campos estén llenos
         if (producto.isEmpty() || valorStr.isEmpty() || detalles.isEmpty() || cantidadStr.isEmpty()) {
-            Toast.makeText(getContext(), "DEBE LLENAR TODOS LOS CAMPOS", Toast.LENGTH_LONG).show();
+            Toast.makeText(getContext(), "Todos los campos son Necesarios", Toast.LENGTH_LONG).show();
             return; // Salir del método si hay campos vacíos
         }
 
@@ -164,7 +164,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             long id = bdVentas.insertarVenta(producto, total, detalles, cantidad);
 
             if (id > 0) {
-                Toast.makeText(getContext(), "REGISTRO GUARDADO", Toast.LENGTH_SHORT).show();
+                Toast.makeText(getContext(), "Nuevo item Registrado", Toast.LENGTH_SHORT).show();
                 limpiar();
                 dismiss();
                 if (dataChangedListener != null) {
