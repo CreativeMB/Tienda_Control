@@ -19,7 +19,6 @@
             android:focusable="true"
             android:src="@drawable/database" />
 
-        <!-- Título de la sección -->
         <TextView
             android:id="@+id/title"
             android:layout_width="wrap_content"
