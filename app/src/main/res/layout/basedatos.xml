@@ -16,7 +16,6 @@
             android:layout_height="match_parent"
             android:paddingTop="16dp" />
 
-        <!-- Iconos flotantes -->
         <ImageView
             android:id="@+id/recordatorio"
             android:layout_width="60dp"
