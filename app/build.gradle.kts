@@ -6,11 +6,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.tiendacontrol"
+    namespace = "com.creativem.tiendacontrol"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.tiendacontrol"
+        applicationId = "com.creativem.tiendacontrol"
         minSdk = 27
         targetSdk = 34
         versionCode = 1
