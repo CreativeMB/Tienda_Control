@@ -22,10 +22,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.creativem.tiendacontrol" />
+                  <option name="mobileSdkAppId" value="1:942582178550:android:8e209237cf3e0792cd02d7" />
+                  <option name="projectId" value="corario-16991" />
+                  <option name="projectNumber" value="942582178550" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
