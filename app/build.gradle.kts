@@ -47,10 +47,8 @@ dependencies {
 
     // Import the Firebase BoM
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
-
-    // Firebase Core and Analytics
     implementation("com.google.firebase:firebase-core:21.1.1")
-    implementation("com.google.firebase:firebase-analytics")
+
 
     //exel
     implementation ("org.apache.poi:poi:5.2.4")

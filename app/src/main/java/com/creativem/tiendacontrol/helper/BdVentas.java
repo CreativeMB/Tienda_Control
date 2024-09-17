@@ -22,6 +22,7 @@ import java.util.Locale;
 
 public class BdVentas extends SQLiteOpenHelper {
     private static final int DATABASE_VERSION = 2;
+    private static final String DATABASE_SUBFOLDER = "MisBasesDeDatos";
     public static final String TABLE_VENTAS = "Mi_Contabilidad";
     private static BdVentas instance;
     private SQLiteDatabase database;
@@ -41,12 +42,17 @@ public class BdVentas extends SQLiteOpenHelper {
             throw new IllegalArgumentException("El nombre de la base de datos no puede ser null o vacío.");
         }
 
-        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-        if (!documentsFolder.exists()) {
-            boolean result = documentsFolder.mkdirs(); // Crear el directorio si no existe
-            Log.d("BdVentas", "Creando directorio: " + result);
+        // Obtiene el directorio de bases de datos de la aplicación
+        File databaseDir = context.getDatabasePath("dummy.db").getParentFile();
+
+        // Crea la subcarpeta si no existe
+        File subfolder = new File(databaseDir, DATABASE_SUBFOLDER);
+        if (!subfolder.exists()) {
+            subfolder.mkdir();
         }
-        return new File(documentsFolder, databaseName + ".db").getAbsolutePath();
+
+        // Construye la ruta al archivo de la base de datos dentro de la subcarpeta
+        return new File(subfolder, databaseName + ".db").getAbsolutePath();
     }
 
     @Override
@@ -362,5 +368,8 @@ public class BdVentas extends SQLiteOpenHelper {
         String signo = diferencia >= 0 ? "" : "-";
         long diferenciaAbsoluta = (long) Math.abs(diferencia);
         return String.format("%s%s", signo, PuntoMil.getFormattedNumber(diferenciaAbsoluta));
+    }
+    public static String getDatabaseFilePath(Context context, @Nullable String databaseName) {
+        return getDatabasePath(context, databaseName); // Llama al método privado
     }
 }

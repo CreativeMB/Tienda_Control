@@ -33,7 +33,7 @@ import androidx.core.content.ContextCompat;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
+import com.creativem.tiendacontrol.helper.BdVentas;
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.adapter.BasesAdapter;
 import com.creativem.tiendacontrol.helper.ExcelExporter;
@@ -53,8 +53,8 @@ import java.util.TimeZone;
 
 public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatabaseClickListener {
     private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
-    private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CODE_EXACT_ALARM = 1;
+    private static final String DATABASE_SUBFOLDER = "MisBasesDeDatos"; // Nombre de la subcarpeta
     private Calendar selectedTime;
     private DrawerLayout drawerLayout;
     private NavigationView navView;
@@ -64,42 +64,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     private List<String> databaseList;
     private BasesAdapter adapter;
-    private OnStoragePermissionResultListener storagePermissionResultListener;
-
-    private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (Environment.isExternalStorageManager()) {
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(true);
-                            // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
-                            loadDatabases();
-
-                        }
-                    } else {
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(false);
-                        }
-                    }
-                }
-            }
-    );
-
-    private final ActivityResultLauncher<String> requestWritePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            granted -> {
-                if (granted) {
-                    if (storagePermissionResultListener != null) {
-                        storagePermissionResultListener.onPermissionResult(true);
-                    }
-                } else {
-                    if (storagePermissionResultListener != null) {
-                        storagePermissionResultListener.onPermissionResult(false);
-                    }
-                }
-            }
-    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -130,15 +94,12 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             startActivity(databaseIntent);
         });
 
-        imageManual.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // URL al que quieres dirigir al usuario
-                String url = "https://www.floristerialoslirios.com/tienda-control";
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(url));
-                startActivity(intent);
-            }
+        imageManual.setOnClickListener(v -> {
+            // URL al que quieres dirigir al usuario
+            String url = "https://www.floristerialoslirios.com/tienda-control";
+            Intent intent = new Intent(Intent.ACTION_VIEW);
+            intent.setData(Uri.parse(url));
+            startActivity(intent);
         });
 
         // Inicializa los componentes del layout
@@ -153,6 +114,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 drawerLayout.openDrawer(navView);
             }
         });
+
         // Configurar el Listener para NavigationView
         navView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -193,16 +155,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             }
         });
 
-        // Solicita permisos cuando se inicia la actividad
-        requestStoragePermission(granted -> {
-            if (granted) {
-                // Permiso concedido, puedes proceder con otras acciones si es necesario
-
-            } else {
-                showToast("Permiso de almacenamiento denegado");
-            }
-        });
-        // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
+        // Carga las bases de datos desde el almacenamiento interno
         loadDatabases();
     }
 
@@ -217,7 +170,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 .setPositiveButton("Crear", (dialog, which) -> {
                     String databaseName = input.getText().toString().trim();
                     if (!databaseName.isEmpty()) {
-                        checkAndCreateDatabase(databaseName);
+                        createDatabase(databaseName);
                     } else {
                         showToast("Ingrese un nombre de base de datos");
                     }
@@ -226,45 +179,46 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 .show();
     }
 
-    private void checkAndCreateDatabase(String databaseName) {
-        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-        if (!documentsFolder.exists() && !documentsFolder.mkdirs()) {
-            showToast("Error al crear la carpeta de documentos");
-            return;
-        }
+    // Crea la base de datos en el almacenamiento interno, dentro de la subcarpeta
+    private void createDatabase(String databaseName) {
+        // Usa el método getDatabasePath de la clase BdVentas
+        File dbFile = new File(BdVentas.getDatabaseFilePath(this, databaseName));
 
-        File dbFile = new File(documentsFolder, databaseName + ".db");
         if (dbFile.exists()) {
             showDatabaseExistsDialog();
         } else {
-            try (FileOutputStream out = new FileOutputStream(dbFile)) {
-                out.write(new byte[0]);
-                showToast("Guardada en: " + dbFile.getAbsolutePath());
-                loadDatabases();
+            try {
+                // Crea un archivo vacío para la base de datos
+                FileOutputStream out = new FileOutputStream(dbFile);
+                out.close();
 
+                showToast("Base de datos '" + databaseName + "' creada correctamente");
+                loadDatabases();
             } catch (IOException e) {
-                showToast("Error al crear la base de datos: " + e.getMessage());
-                Log.e("BaseDatos", "Error al crear la base de datos: " + e.getMessage());
+                Log.e("BaseDatos", "Error al crear la base de datos", e);
+                showToast("Error al crear la base de datos");
             }
         }
     }
 
     private void loadDatabases() {
         databaseList.clear();
-        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-        Log.d("BaseDatos", "Directorio de documentos: " + documentsFolder.getAbsolutePath());
-        if (documentsFolder.isDirectory()) {
-            File[] dbFiles = documentsFolder.listFiles();
+
+        // Obtiene el directorio de bases de datos de la aplicación
+        File databaseDir = getDatabasePath("dummy.db").getParentFile();
+
+        // Obtiene la subcarpeta
+        File subfolder = new File(databaseDir, DATABASE_SUBFOLDER);
+
+        if (subfolder.exists() && subfolder.isDirectory()) {
+            File[] dbFiles = subfolder.listFiles();
             if (dbFiles != null) {
                 for (File file : dbFiles) {
-                    Log.d("BaseDatos", "Archivo encontrado: " + file.getName());
                     if (file.isFile() && file.getName().endsWith(".db")) {
                         String fileNameWithoutExtension = file.getName().replace(".db", "");
                         databaseList.add(fileNameWithoutExtension);
                     }
                 }
-            } else {
-                showToast("No se encontraron bases de datos");
             }
         }
         adapter.notifyDataSetChanged();
@@ -293,25 +247,18 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     }
 
     private void showDatabaseOptionsDialog(String databaseName) {
-        // Inflar el diseño personalizado
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.menubasedatos, null);
 
-        // Encontrar los botones y elementos en el diseño inflado
         TextView btnEditar = dialogView.findViewById(R.id.btnEditar);
         TextView btnEliminar = dialogView.findViewById(R.id.btnEliminar);
         TextView btnExportar = dialogView.findViewById(R.id.btnExportar);
         TextView tvContabilidad = dialogView.findViewById(R.id.btnContabilidad);
 
-
-
-        // Crear el AlertDialog con el diseño inflado
         AlertDialog dialog = new AlertDialog.Builder(this, R.style.TransparentDialogTheme)
                 .setView(dialogView)
                 .create();
 
-
-        // Configurar los eventos de clic
         btnEditar.setOnClickListener(v -> {
             editDatabase(databaseName);
             dialog.dismiss();
@@ -323,7 +270,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         });
 
         btnExportar.setOnClickListener(v -> {
-            new ExcelExporter(databaseName).exportToExcel(this);
+            showProVersionDialog();
             dialog.dismiss();
         });
 
@@ -332,7 +279,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             dialog.dismiss();
         });
 
-        // Mostrar el diálogo
         dialog.show();
     }
 
@@ -347,7 +293,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             Log.d("BaseDatos", "Nombre de la base de datos guardado en SharedPreferences: " + databaseName);
             showToast("Base de datos actual: " + databaseName);
 
-            // Abre la base de datos en la actividad correspondiente
             Intent intent = new Intent(BaseDatos.this, DatosDatos.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
@@ -365,7 +310,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             editor.apply();
             showToast("Base de datos actual: " + databaseName);
 
-            // Abre la base de datos en la actividad correspondiente
             Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAno.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
@@ -399,23 +343,17 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         }
     }
 
+    // Elimina la base de datos del almacenamiento interno
     public void deleteCustomDatabase(String databaseName) {
-        File internalDbFile = getDatabasePath(databaseName + ".db");
-        boolean internalDeleted = internalDbFile.delete();
+        // Construye la ruta del archivo dentro de la subcarpeta
+        File dbFile = new File(BdVentas.getDatabaseFilePath(this, databaseName));
 
-        File externalDbFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl/" + databaseName + ".db");
-        boolean externalDeleted = externalDbFile.delete();
-
-        if (internalDeleted && externalDeleted) {
-            showToast("Base de datos " + databaseName + " eliminada correctamente");
-        } else if (internalDeleted) {
-            showToast("Base de datos interna " + databaseName + " eliminada correctamente");
-        } else if (externalDeleted) {
-            showToast("Base de datos externa " + databaseName + " eliminada correctamente");
+        boolean deleted = dbFile.delete();
+        if (deleted) {
+            showToast("Base de datos '" + databaseName + "' eliminada correctamente");
         } else {
-            showToast("Error al eliminar la base de datos " + databaseName);
+            showToast("Error al eliminar la base de datos '" + databaseName + "'");
         }
-
         loadDatabases();
     }
 
@@ -424,31 +362,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         editor.remove(KEY_CURRENT_DATABASE);
         editor.putBoolean("KEY_DATABASE_SELECTED", false);
         editor.apply();
-    }
-
-    private interface OnStoragePermissionResultListener {
-        void onPermissionResult(boolean granted);
-    }
-
-    private void requestStoragePermission(OnStoragePermissionResultListener listener) {
-        this.storagePermissionResultListener = listener;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                listener.onPermissionResult(true);
-
-            } else {
-                showToast("Tienes que dar permisos para comenzar");
-                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                manageAllFilesPermissionLauncher.launch(intent);
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                listener.onPermissionResult(true);
-
-            } else {
-                requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-        }
     }
 
     private void showTimePickerDialog() {
@@ -573,5 +486,12 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 Toast.makeText(this, "Se requiere permiso para programar la alarma", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+    private void showProVersionDialog() {
+        new AlertDialog.Builder(this)
+                .setTitle("Función Pro")
+                .setMessage("La exportación a Excel solo está disponible en la versión Pro de la aplicación.")
+                .setPositiveButton("Aceptar", (dialog, which) -> dialog.dismiss())
+                .show();
     }
 }

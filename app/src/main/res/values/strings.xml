@@ -14,7 +14,6 @@
     <string name="register_button">¿No tienes cuenta Registrate?</string>
     <string name="recuperar_button">¿Recuperar Contraseña?</string>
     <string name="home_view_title">Vista del Home</string>
-    <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
     <string name="guardar">Guardar</string>
     <string name="Edicion">Administra</string>
