@@ -24,7 +24,10 @@
         android:theme="@style/TiendaControl"
         tools:targetApi="31">
         <activity
-            android:name=".monitor.EntraPin"
+            android:name=".monitor.LosLirios"
+            android:exported="false" />
+        <activity
+            android:name=".monitor.InicioPin"
             android:exported="false" />
         <activity
             android:name=".monitor.Inicio"
@@ -33,24 +36,21 @@
         <receiver
             android:name=".monitor.Recordatorio"
             android:enabled="true"
-            android:exported="false">
-        </receiver>
+            android:exported="false"></receiver>
+
         <activity android:name=".model.Items" />
         <activity android:name=".dialogFragment.IngresoDialogFragment" />
         <activity android:name=".dialogFragment.GastoDialogFragment" />
         <activity android:name=".dialogFragment.MenuDialogFragment" />
-        <activity android:name=".monitor.VerActivity" />
-        <activity android:name=".monitor.SetCode" />
-        <activity android:name=".monitor.AccessCode" />
-        <activity android:name=".monitor.MainActivity" />
+        <activity android:name=".monitor.EdicionPin" />
+        <activity android:name=".monitor.DatosDatos" />
         <activity android:name=".monitor.FiltroDiaMesAno" />
-        <activity android:name=".login.Login" />
-        <activity android:name=".monitor.Database" />
+        <activity android:name=".monitor.BaseDatos" />
         <activity android:name=".monitor.Donar" />
         <activity android:name=".monitor.Patron" />
-        <activity android:name=".monitor.NavigationDrawerActivity" />
+        <activity android:name=".dialogFragment.CalculadoraDialogFragment" />
         <activity
-            android:name=".model.SplashActivity"
+            android:name=".model.AnimacionInicio"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

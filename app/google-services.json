@@ -84,7 +84,7 @@
       "client_info": {
         "mobilesdk_app_id": "1:942582178550:android:8e209237cf3e0792cd02d7",
         "android_client_info": {
-          "package_name": "com.example.tiendacontrol"
+          "package_name": "com.creativem.tiendacontrol"
         }
       },
       "oauth_client": [
@@ -92,7 +92,7 @@
           "client_id": "942582178550-6j0nr7shgdse7851ka26873nudpbl83o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.tiendacontrol",
+            "package_name": "com.creativem.tiendacontrol",
             "certificate_hash": "dba59efabad13af39a70c3b7d4bf13b297d9c406"
           }
         },

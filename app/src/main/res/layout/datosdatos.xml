@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fitsSystemWindows="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+            <android.widget.SearchView
+                android:id="@+id/txtBuscar"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:layout_margin="0dp"
+                android:background="@drawable/buscador" />
+
+            <TextView
+                android:id="@+id/textDiferencia"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="Ganancia"
+                android:textColor="#2196F3"
+                android:textSize="30sp" />
+        </LinearLayout>
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listaVentas"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="0dp">
+
+            <TextView
+                android:id="@+id/textIngresos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Ingreso"
+                android:textStyle="bold"
+                android:textColor="@color/colorPositivo"
+                android:textSize="30sp" />
+
+            <TextView
+                android:id="@+id/textEgresos"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:textStyle="bold"
+                android:text="Egreso"
+                android:textColor="@color/colorNegativo"
+                android:textSize="30sp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+            <TextView
+                android:id="@+id/textView1"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Total Ingreso"
+                android:textColor="#327A35"
+                android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="center"
+                android:text="Total Egreso"
+                android:textColor="@color/colorNegativo"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/text_view_database_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:text="Mi Base de datos"
+            android:textColor="@color/texcolor"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+    </LinearLayout>
+    <ImageView
+        android:id="@+id/ingreso"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="200dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/ingreso" />
+
+    <ImageView
+        android:id="@+id/egreso"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="120dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/egreso"/>
+
+    <ImageView
+        android:id="@+id/inicio"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="300dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginStart="-155dp"
+        android:src="@drawable/database" />
+    <ImageView
+        android:id="@+id/borrardados"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="bottom|end"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="380dp"
+        android:clickable="true"
+        android:focusable="true"
+        android:layout_marginStart="-155dp"
+        android:src="@drawable/eliminar" />
+
+
+</FrameLayout>
