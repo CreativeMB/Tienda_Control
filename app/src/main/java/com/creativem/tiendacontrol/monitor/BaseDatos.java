@@ -12,6 +12,7 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Handler;
 import android.provider.Settings;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -34,9 +35,13 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.creativem.tiendacontrol.Login;
 import com.creativem.tiendacontrol.R;
+import com.creativem.tiendacontrol.SessionManager;
 import com.creativem.tiendacontrol.adapter.BasesAdapter;
 import com.creativem.tiendacontrol.helper.ExcelExporter;
+import com.creativem.tiendacontrol.model.AnimacionInicio;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.timepicker.MaterialTimePicker;
 import com.google.android.material.timepicker.TimeFormat;
@@ -51,7 +56,21 @@ import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
 
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.firebase.auth.FirebaseAuth;
+
 public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatabaseClickListener {
+    private static final String LOGIN_STATUS = "loginStatus";
+    private static final String PREFS_NAME = "CodePrefs";
+
+
+    private static final String CODE_KEY = "accesscode"; // Añadimos la clave para el código
+    private static final String TAG = "BaseDatos";
+
+    private FirebaseAuth mAuth;
+    private GoogleSignInClient gso;
+    private SessionManager sessionManager;
     private static final int REQUEST_CODE_NOTIFICATION_PERMISSION = 1;
     private static final int PICK_IMAGE_REQUEST = 1;
     private static final int REQUEST_CODE_EXACT_ALARM = 1;
@@ -60,12 +79,11 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     private NavigationView navView;
     private RecyclerView recyclerViewDatabases;
     private SharedPreferences sharedPreferences;
-    private static final String PREFS_NAME = "MyPrefs";
+
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     private List<String> databaseList;
     private BasesAdapter adapter;
     private OnStoragePermissionResultListener storagePermissionResultListener;
-
     private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             result -> {
@@ -106,6 +124,17 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         super.onCreate(savedInstanceState);
         setContentView(R.layout.basedatos);
         ImageView imageManual = findViewById(R.id.manual);
+
+        mAuth = FirebaseAuth.getInstance();
+        // Configurar Google Sign-In
+        GoogleSignInOptions gsoOptions = new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestIdToken(getString(R.string.default_web_client_id))
+                .requestEmail()
+                .build();
+        gso = GoogleSignIn.getClient(this, gsoOptions);
+
+        sessionManager = new SessionManager(this);
+
 
         ImageView iconRecordatorio = findViewById(R.id.recordatorio);
         iconRecordatorio.setOnClickListener(view -> showTimePickerDialog());
@@ -178,8 +207,18 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         startActivity(intent);
                         return true;
                     } else if (id == R.id.salirItem) {
-                        // Acción para Salir
-                        finishAffinity();
+                        Log.d(TAG, "Cerrando sesion - Antes del mAuth.signOut()");
+                        mAuth.signOut();
+                        gso.signOut().addOnCompleteListener(task -> {
+                            Log.d(TAG, "Cerrando sesion - Dentro del OnCompleteListener");
+                            sessionManager.setLoggedIn(false);
+                            Log.d(TAG, "Cerrando sesion - Estado despues de guardar: " + sessionManager.isLoggedIn() );
+
+                            Intent intent = new Intent(BaseDatos.this, Login.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                            startActivity(intent);
+                            finish();
+                        });
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -574,4 +613,5 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             }
         }
     }
+
 }
