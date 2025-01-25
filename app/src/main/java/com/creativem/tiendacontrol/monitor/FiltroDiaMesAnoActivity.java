@@ -385,7 +385,7 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
 
         List<TotalesItem> totalesItems = new ArrayList<>(totalsMap.values());
         for(TotalesItem item : totalesItems){
-            item.setDiferencia(item.getIngresos() - item.getEgresos());
+            item.setDiferencia(item.getIngresos() + item.getEgresos());
             item.setDatabaseName(databaseName);
         }
         return totalesItems;
