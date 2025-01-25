@@ -398,7 +398,7 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
             TotalesItem grandTotalItem = totalsMap.getOrDefault(itemName, new TotalesItem(itemName, 0, 0));
             grandTotalItem.setIngresos(grandTotalItem.getIngresos() + totalesItem.getIngresos());
             grandTotalItem.setEgresos(grandTotalItem.getEgresos() + totalesItem.getEgresos());
-            grandTotalItem.setDiferencia(grandTotalItem.getDiferencia() - totalesItem.getDiferencia());
+            grandTotalItem.setDiferencia(grandTotalItem.getDiferencia() + totalesItem.getDiferencia());
             totalsMap.put(itemName, grandTotalItem);
         }
 
