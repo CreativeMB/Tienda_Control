@@ -2,27 +2,36 @@ package com.creativem.tiendacontrol.helper;
 
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.AsyncTask;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
+import com.creativem.tiendacontrol.model.Items;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
 public class ExcelExporter {
     private static final String TAG = "ExcelExporter";
     private String databaseName;
+    private DatabaseReference databaseReference;
 
-    public ExcelExporter(String databaseName) {
+    public ExcelExporter(String databaseName, String databasePath) {
         this.databaseName = databaseName;
+        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        databaseReference = database.getReferenceFromUrl(databasePath);
     }
 
     // Método público para iniciar la exportación a Excel
@@ -46,14 +55,36 @@ public class ExcelExporter {
 
         @Override
         protected Boolean doInBackground(Void... voids) {
-            BdVentas bdVentas = new BdVentas(context, databaseName);
-            SQLiteDatabase db = bdVentas.getReadableDatabase();
+            // Usar Firebase Database Reference en lugar de SQLiteDatabase
+            ArrayList<Items> itemsList = new ArrayList<>();
+            try {
+                databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            Items item = snapshot.getValue(Items.class);
+                            if (item != null) {
+                                itemsList.add(item);
+                            }
+                        }
+                    }
 
-            // Consulta para obtener todos los datos de la tabla de ventas
-            // Nota: Puedes ajustar la consulta para obtener solo las columnas
-            //       deseadas. Por ejemplo: SELECT id, producto, valor FROM ventas;
-            String query = "SELECT * FROM " + BdVentas.TABLE_VENTAS;
-            Cursor cursor = db.rawQuery(query, null);
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
+                        Log.e(TAG, "Error al obtener data de firebase", databaseError.toException());
+                    }
+                });
+
+
+                // Esperar a que la data se obtenga
+                while(itemsList.isEmpty()){
+                    Thread.sleep(20);
+                }
+            } catch (InterruptedException e) {
+                Log.e(TAG,"Error en Thread sleep: "+e.getMessage());
+            }
+
+
 
             // Crear el libro de trabajo de Excel
             Workbook workbook = new XSSFWorkbook();
@@ -62,49 +93,32 @@ public class ExcelExporter {
 
             // Escribir los encabezados en la primera fila
             Row headerRow = sheet.createRow(0);
-            // Asegúrate de que los nombres de las columnas coincidan con los de la base de datos
-            String[] headers = {"ID", "Producto", "Valor", "Detalles", "Cantidad", "Fecha Registro"};
+            // Asegúrate de que los nombres de las columnas coincidan con los campos de tu clase Item
+            String[] headers = {"ID", "Producto", "Valor", "Detalles", "Cantidad", "Fecha Registro","Tipo"};
             for (int i = 0; i < headers.length; i++) {
                 Cell cell = headerRow.createCell(i);
                 cell.setCellValue(headers[i]);
             }
-
-            // Escribir los datos obtenidos de la base de datos
             int rowNum = 1;
-            // Verifica si el cursor tiene filas
-            if (cursor.moveToFirst()) {
-                while (!cursor.isAfterLast()) {
+            if(!itemsList.isEmpty()) {
+                // Escribir los datos obtenidos de Firebase
+                for (Items item : itemsList) {
                     Row row = sheet.createRow(rowNum++);
 
-                    // Obtener los valores de las columnas de la base de datos
-                    // y escribirlos en la fila correspondiente
-                    // Verifica que las columnas existen en el cursor
-                    if (cursor.getColumnIndex("id") != -1) {
-                        row.createCell(0).setCellValue(cursor.getInt(cursor.getColumnIndex("id")));
-                    }
-                    if (cursor.getColumnIndex("producto") != -1) {
-                        row.createCell(1).setCellValue(cursor.getString(cursor.getColumnIndex("producto")));
-                    }
-                    if (cursor.getColumnIndex("valor") != -1) {
-                        row.createCell(2).setCellValue(cursor.getDouble(cursor.getColumnIndex("valor")));
-                    }
-                    if (cursor.getColumnIndex("detalles") != -1) {
-                        row.createCell(3).setCellValue(cursor.getString(cursor.getColumnIndex("detalles")));
-                    }
-                    if (cursor.getColumnIndex("cantidad") != -1) {
-                        row.createCell(4).setCellValue(cursor.getInt(cursor.getColumnIndex("cantidad")));
-                    }
-                    if (cursor.getColumnIndex("fecha_registro") != -1) {
-                        row.createCell(5).setCellValue(cursor.getString(cursor.getColumnIndex("fecha_registro")));
-                    }
-
-                    cursor.moveToNext();
+                    // Escribir los datos del Item en las celdas de la fila
+                    row.createCell(0).setCellValue(item.getId());
+                    row.createCell(1).setCellValue(item.getProducto());
+                    row.createCell(2).setCellValue(item.getValor());
+                    row.createCell(3).setCellValue(item.getDetalles());
+                    row.createCell(4).setCellValue(item.getCantidad());
+                    row.createCell(5).setCellValue(item.getFechaRegistro());
+                    row.createCell(6).setCellValue(item.getType());
                 }
             } else {
-                Log.e(TAG, "Cursor está vacío.");
+                Log.e(TAG, "Lista de Items vacía");
             }
-            cursor.close();
-            db.close();
+
+
 
             // Generar un nombre de archivo basado en el nombre de la base de datos
             // y una marca de tiempo
@@ -131,7 +145,6 @@ public class ExcelExporter {
                 }
             }
         }
-
 
         @Override
         protected void onPostExecute(Boolean success) {

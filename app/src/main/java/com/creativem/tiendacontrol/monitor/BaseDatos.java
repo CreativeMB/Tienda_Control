@@ -89,41 +89,8 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
     private List<String> databaseList;
     private BasesAdapter adapter;
-    private OnStoragePermissionResultListener storagePermissionResultListener;
-    private final ActivityResultLauncher<Intent> manageAllFilesPermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.StartActivityForResult(),
-            result -> {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                    if (Environment.isExternalStorageManager()) {
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(true);
-                            // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
-                            loadDatabases();
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-                        }
-                    } else {
-                        if (storagePermissionResultListener != null) {
-                            storagePermissionResultListener.onPermissionResult(false);
-                        }
-                    }
-                }
-            }
-    );
-
-    private final ActivityResultLauncher<String> requestWritePermissionLauncher = registerForActivityResult(
-            new ActivityResultContracts.RequestPermission(),
-            granted -> {
-                if (granted) {
-                    if (storagePermissionResultListener != null) {
-                        storagePermissionResultListener.onPermissionResult(true);
-                    }
-                } else {
-                    if (storagePermissionResultListener != null) {
-                        storagePermissionResultListener.onPermissionResult(false);
-                    }
-                }
-            }
-    );
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -242,15 +209,8 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 return true;
             }
         });
-        // Solicita permisos cuando se inicia la actividad
-        requestStoragePermission(granted -> {
-            if (granted) {
-                // Permiso concedido, puedes proceder con otras acciones si es necesario
 
-            } else {
-                showToast("Permiso de almacenamiento denegado");
-            }
-        });
+
         // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
         loadDatabases();
     }
@@ -304,7 +264,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         String pais = empresaSnapshot.child("pais").getValue(String.class);
                         String telefono = empresaSnapshot.child("telefono").getValue(String.class);
 
-
                         if (navHeaderName != null) navHeaderName.setText(nombreEmpresa != null ? nombreEmpresa : "");
                         if (navHeaderPerson != null) navHeaderPerson.setText(nombrePersona != null ? nombrePersona : "");
                         if (navHeaderAddress != null) navHeaderAddress.setText(direccion != null ? direccion : "");
@@ -344,49 +303,74 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
                 .show();
     }
+
     private void checkAndCreateDatabase(String databaseName) {
-        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-        if (!documentsFolder.exists() && !documentsFolder.mkdirs()) {
-            showToast("Error al crear la carpeta de documentos");
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user == null) {
+            Log.e(TAG, "Usuario no autenticado");
+            showToast("Usuario no autenticado");
             return;
         }
 
-        File dbFile = new File(documentsFolder, databaseName + ".db");
-        if (dbFile.exists()) {
-            showDatabaseExistsDialog();
-        } else {
-            try (FileOutputStream out = new FileOutputStream(dbFile)) {
-                out.write(new byte[0]);
-                showToast("Guardada en: " + dbFile.getAbsolutePath());
-                loadDatabases();
+        String userId = user.getUid();
 
-            } catch (IOException e) {
-                showToast("Error al crear la base de datos: " + e.getMessage());
-                Log.e(TAG, "Error al crear la base de datos: " + e.getMessage());
+        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
+        userDatabasesRef.child(databaseName).setValue("").addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                showToast("Base de datos creada en Firebase");
+                Log.d(TAG, "Base de datos creada en Firebase");
+                loadDatabases();
+            } else {
+                showToast("Error al crear base de datos en Firebase: " + task.getException());
+                Log.e(TAG, "Error al crear base de datos en Firebase: " + task.getException());
             }
-        }
+        });
+
+
     }
+
 
     private void loadDatabases() {
         databaseList.clear();
-        File documentsFolder = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl");
-        Log.d(TAG, "Directorio de documentos: " + documentsFolder.getAbsolutePath());
-        if (documentsFolder.isDirectory()) {
-            File[] dbFiles = documentsFolder.listFiles();
-            if (dbFiles != null) {
-                for (File file : dbFiles) {
-                    Log.d(TAG, "Archivo encontrado: " + file.getName());
-                    if (file.isFile() && file.getName().endsWith(".db")) {
-                        String fileNameWithoutExtension = file.getName().replace(".db", "");
-                        databaseList.add(fileNameWithoutExtension);
-                    }
-                }
-            } else {
-                showToast("No se encontraron bases de datos");
-            }
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
+
+        if (user == null) {
+            Log.e(TAG, "Usuario no autenticado");
+            showToast("Usuario no autenticado");
+            return;
         }
-        adapter.notifyDataSetChanged();
+
+        String userId = user.getUid();
+        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
+        userDatabasesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                databaseList.clear();
+                if (snapshot.exists()) {
+                    for (DataSnapshot databaseSnapshot : snapshot.getChildren()) {
+                        String databaseName = databaseSnapshot.getKey();
+                        databaseList.add(databaseName);
+                        Log.d(TAG, "Base de datos encontrada en Firebase: "+ databaseName);
+                    }
+                } else {
+                    showToast("No se encontraron bases de datos");
+                    Log.d(TAG, "No se encontraron bases de datos para el usuario");
+                }
+                adapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                showToast("Error al cargar bases de datos: " + error.getMessage());
+                Log.e(TAG, "Error al cargar bases de datos: " + error.getMessage());
+            }
+        });
+
     }
+
 
     private void showDatabaseExistsDialog() {
         new AlertDialog.Builder(this)
@@ -441,7 +425,18 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         });
 
         btnExportar.setOnClickListener(v -> {
-            new ExcelExporter(databaseName).exportToExcel(this);
+            FirebaseAuth auth = FirebaseAuth.getInstance();
+            FirebaseUser user = auth.getCurrentUser();
+
+            if (user == null) {
+                Log.e(TAG, "Usuario no autenticado");
+                showToast("Usuario no autenticado");
+                return;
+            }
+
+            String userId = user.getUid();
+            String databasePath = "https://tu-proyecto.firebaseio.com/users/" + userId + "/databases/" + databaseName; // Reemplaza con tu URL base
+            new ExcelExporter(databaseName, databasePath).exportToExcel(this);
             dialog.dismiss();
         });
 
@@ -518,23 +513,28 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     }
 
     public void deleteCustomDatabase(String databaseName) {
-        File internalDbFile = getDatabasePath(databaseName + ".db");
-        boolean internalDeleted = internalDbFile.delete();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        FirebaseUser user = auth.getCurrentUser();
 
-        File externalDbFile = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOCUMENTS), "TiendaControl/" + databaseName + ".db");
-        boolean externalDeleted = externalDbFile.delete();
-
-        if (internalDeleted && externalDeleted) {
-            showToast("Base de datos " + databaseName + " eliminada correctamente");
-        } else if (internalDeleted) {
-            showToast("Base de datos interna " + databaseName + " eliminada correctamente");
-        } else if (externalDeleted) {
-            showToast("Base de datos externa " + databaseName + " eliminada correctamente");
-        } else {
-            showToast("Error al eliminar la base de datos " + databaseName);
+        if (user == null) {
+            Log.e(TAG, "Usuario no autenticado");
+            showToast("Usuario no autenticado");
+            return;
         }
 
-        loadDatabases();
+        String userId = user.getUid();
+        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
+
+        userDatabasesRef.child(databaseName).removeValue().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                showToast("Base de datos eliminada de Firebase");
+                Log.d(TAG, "Base de datos eliminada en Firebase");
+                loadDatabases();
+            } else {
+                showToast("Error al eliminar base de datos en Firebase: " + task.getException());
+                Log.e(TAG, "Error al eliminar base de datos en Firebase: " + task.getException());
+            }
+        });
     }
     private void closeCurrentDatabase() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
@@ -546,25 +546,9 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     private interface OnStoragePermissionResultListener {
         void onPermissionResult(boolean granted);
     }
+
     private void requestStoragePermission(OnStoragePermissionResultListener listener) {
-        this.storagePermissionResultListener = listener;
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            if (Environment.isExternalStorageManager()) {
-                listener.onPermissionResult(true);
 
-            } else {
-                showToast("Tienes que dar permisos para comenzar");
-                Intent intent = new Intent(Settings.ACTION_MANAGE_ALL_FILES_ACCESS_PERMISSION);
-                manageAllFilesPermissionLauncher.launch(intent);
-            }
-        } else {
-            if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_GRANTED) {
-                listener.onPermissionResult(true);
-
-            } else {
-                requestWritePermissionLauncher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE);
-            }
-        }
     }
     private void showTimePickerDialog() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"));

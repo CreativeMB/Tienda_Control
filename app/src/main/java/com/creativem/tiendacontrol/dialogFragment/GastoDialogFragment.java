@@ -1,6 +1,7 @@
 package com.creativem.tiendacontrol.dialogFragment;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,41 +12,60 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import com.creativem.tiendacontrol.helper.SpinnerManager;
-import com.creativem.tiendacontrol.helper.BdVentas;
+import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.helper.ItemManager;
+import com.creativem.tiendacontrol.helper.SpinnerManager;
 import com.creativem.tiendacontrol.helper.PuntoMil;
 import com.creativem.tiendacontrol.model.ControlCalculadora;
 import com.creativem.tiendacontrol.model.Items;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.creativem.tiendacontrol.R;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class GastoDialogFragment extends BottomSheetDialogFragment {
     // Definición de las variables para los elementos de la interfaz de usuario
+    private static final String ARG_DATABASE_NAME = "databaseName";
+    private static final String ARG_DATABASE_PATH = "databasePath";
     private EditText editProducto, editValor, editDetalles, editCantidad;
     private Spinner spinnerPredefined;
     private ItemManager itemManager;
-    private String currentDatabase; // Variable para almacenar el nombre de la base de datos actual
+    private String currentDatabase;
     private SpinnerManager itemManagerUtil;
-    TextView texEliminar, texGuardar, texGuardarPredefinido;
+    private TextView texEliminar, texGuardar, texGuardarPredefinido;
+    private OnDataChangedListener dataChangedListener;
+    private DatabaseReference databaseReference;
+    private static final String TAG = "GastoDialogFragment";
+
     public interface OnDataChangedListener {
         void onDataChanged();
     }
 
-    private OnDataChangedListener dataChangedListener;
-
     public void setDataChangedListener(OnDataChangedListener listener) {
         this.dataChangedListener = listener;
     }
-
-
-    // Constructor estático para crear una nueva instancia del fragmento
-    public static GastoDialogFragment newInstance(String currentDatabase) {
+    public static GastoDialogFragment newInstance(String databaseName, String databasePath) {
         GastoDialogFragment fragment = new GastoDialogFragment();
         Bundle args = new Bundle();
-        args.putString("databaseName", currentDatabase);
+        args.putString(ARG_DATABASE_NAME, databaseName);
+        args.putString(ARG_DATABASE_PATH, databasePath);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            currentDatabase = getArguments().getString(ARG_DATABASE_NAME);
+            String databasePath = getArguments().getString(ARG_DATABASE_PATH);
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            databaseReference = database.getReferenceFromUrl(databasePath);
+        }
     }
 
     @Nullable
@@ -76,7 +96,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
 
         // Obtener el nombre de la base de datos actual desde los argumentos
         if (getArguments() != null) {
-            currentDatabase = getArguments().getString("databaseName");
+            currentDatabase = getArguments().getString(ARG_DATABASE_NAME);
         }
         // Configuración de los eventos para los botones
         texGuardar.setOnClickListener(view1 -> guardarEgreso());
@@ -113,6 +133,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
                 itemManagerUtil.removeSelectedItem(); // Limpiar ítems personalizados
             }
         });
+
         itemManagerUtil = new SpinnerManager(getContext(), spinnerPredefined,  editProducto, editValor, editDetalles, editCantidad);
         itemManagerUtil.loadPredefinedItems();
 
@@ -166,20 +187,34 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
             // Hacer que el total sea negativo para egresos
             double total = -1 * valor * cantidad; // Multiplicar por -1 para hacerlo negativo
 
-            // Guardar el registro en la base de datos
-            BdVentas bdVentas = new BdVentas(getContext(), currentDatabase);
-            long id = bdVentas.insertarVenta(producto, total, detalles, cantidad);
+            // Crear un mapa de datos que incluye la marca de tiempo
+            Map<String, Object> data = new HashMap<>();
+            data.put("producto", producto);
+            data.put("valor", total); // Guardar el total NEGATIVO
+            data.put("detalles", detalles);
+            data.put("cantidad", cantidad);
+            data.put("type", "Gasto");
+            data.put("timestamp", ServerValue.TIMESTAMP);
 
-            if (id > 0) {
-                Toast.makeText(getContext(), "Nuevo item Registrado", Toast.LENGTH_SHORT).show();
-                limpiar();
-                dismiss();
-                if (dataChangedListener != null) {
-                    dataChangedListener.onDataChanged();
+            DatabaseReference newItemRef = databaseReference.push();
+            String key = newItemRef.toString();
+            data.put("id", key);
+
+
+            newItemRef.setValue(data).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getContext(), "Gasto guardado en Firebase", Toast.LENGTH_SHORT).show();
+                    limpiar();
+                    dismiss();
+                    if (dataChangedListener != null) {
+                        dataChangedListener.onDataChanged();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error al guardar el gasto en Firebase", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error al guardar el gasto en Firebase: "+ task.getException());
                 }
-            } else {
-                Toast.makeText(getContext(), "ERROR AL GUARDAR REGISTRO", Toast.LENGTH_SHORT).show();
-            }
+            });
+
         } catch (NumberFormatException e) {
             Toast.makeText(getContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_SHORT).show();
         }

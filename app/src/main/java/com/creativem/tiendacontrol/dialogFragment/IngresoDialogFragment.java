@@ -1,5 +1,7 @@
 package com.creativem.tiendacontrol.dialogFragment;
+
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,32 +20,56 @@ import com.creativem.tiendacontrol.helper.PuntoMil;
 import com.creativem.tiendacontrol.model.ControlCalculadora;
 import com.creativem.tiendacontrol.model.Items;
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
-import com.creativem.tiendacontrol.helper.BdVentas;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.Map;
 
 public class IngresoDialogFragment extends BottomSheetDialogFragment {
     // Definición de las variables para los elementos de la interfaz de usuario
-    EditText txtProducto, txtValor, txtDetalles, txtCantidad;
-    Button btnGuarda, btnSavePredefined, btnClearCustom;
-    Spinner spinnerPredefined;
-    ItemManager itemManager;
-    String currentDatabase;
-    TextView texEliminar, texGuardar, texGuardarPredefinido;
+    private static final String ARG_DATABASE_NAME = "databaseName";
+    private static final String ARG_DATABASE_PATH = "databasePath";
+    private EditText txtProducto, txtValor, txtDetalles, txtCantidad;
+    private Button btnGuarda, btnSavePredefined, btnClearCustom;
+    private Spinner spinnerPredefined;
+    private ItemManager itemManager;
+    private String currentDatabase;
+    private TextView texEliminar, texGuardar, texGuardarPredefinido;
     private SpinnerManager itemManagerUtil;
+    private OnDataChangedListener dataChangedListener;
+    private DatabaseReference databaseReference;
+    private static final String TAG = "IngresoDialogFragment";
     public interface OnDataChangedListener {
         void onDataChanged();
     }
-    private OnDataChangedListener dataChangedListener;
 
     public void setDataChangedListener(OnDataChangedListener listener) {
         this.dataChangedListener = listener;
     }
+
+
     // Constructor estático para crear una nueva instancia del fragmento
-    public static IngresoDialogFragment newInstance(String currentDatabase) {
+    public static IngresoDialogFragment newInstance(String databaseName, String databasePath) {
         IngresoDialogFragment fragment = new IngresoDialogFragment();
         Bundle args = new Bundle();
-        args.putString("databaseName", currentDatabase);
+        args.putString(ARG_DATABASE_NAME, databaseName);
+        args.putString(ARG_DATABASE_PATH, databasePath);
         fragment.setArguments(args);
         return fragment;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            currentDatabase = getArguments().getString(ARG_DATABASE_NAME);
+            String databasePath = getArguments().getString(ARG_DATABASE_PATH);
+            FirebaseDatabase database = FirebaseDatabase.getInstance();
+            databaseReference = database.getReferenceFromUrl(databasePath);
+        }
     }
 
     @Nullable
@@ -62,6 +88,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         spinnerPredefined = view.findViewById(R.id.spinnerPredefined);
         texEliminar = view.findViewById(R.id.texEliminar);
 
+
         // Aplicar el formato con separadores de mil
         PuntoMil.formatNumberWithThousandSeparator(txtValor);
 
@@ -73,7 +100,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
 
         // Obtener el nombre de la base de datos actual desde los argumentos
         if (getArguments() != null) {
-            currentDatabase = getArguments().getString("databaseName");
+            currentDatabase = getArguments().getString(ARG_DATABASE_NAME);
         }
         // Configuración de los eventos para los botones
         texGuardar.setOnClickListener(view1 -> guardarIngreso());
@@ -110,6 +137,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
                 itemManagerUtil.removeSelectedItem(); // Limpiar ítems personalizados
             }
         });
+
         itemManagerUtil = new SpinnerManager(getContext(), spinnerPredefined, txtProducto, txtValor, txtDetalles, txtCantidad);
         itemManagerUtil.loadPredefinedItems();
 
@@ -133,6 +161,7 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             }
         });
 
+
         return view;
     }
 
@@ -148,7 +177,6 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             Toast.makeText(getContext(), "Todos los campos son Necesarios", Toast.LENGTH_LONG).show();
             return; // Salir del método si hay campos vacíos
         }
-
         try {
             // Eliminar separadores de miles (por ejemplo, comas o puntos)
             valorStr = valorStr.replace(",", "").replace(".", "");
@@ -159,25 +187,41 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
             int cantidad = Integer.parseInt(cantidadStr);
             double total = valor * cantidad;
 
-            // Crear una instancia de BdVentas y guardar el registro
-            BdVentas bdVentas = new BdVentas(getContext(), currentDatabase);
-            long id = bdVentas.insertarVenta(producto, total, detalles, cantidad);
+            // Crear un mapa de datos que incluye la marca de tiempo
+            Map<String, Object> data = new HashMap<>();
+            data.put("producto", producto);
+            data.put("valor", total);
+            data.put("detalles", detalles);
+            data.put("cantidad", cantidad);
+            data.put("type", "Ingreso");
+            data.put("timestamp", ServerValue.TIMESTAMP);
 
-            if (id > 0) {
-                Toast.makeText(getContext(), "Nuevo item Registrado", Toast.LENGTH_SHORT).show();
-                limpiar();
-                dismiss();
-                if (dataChangedListener != null) {
-                    dataChangedListener.onDataChanged();
+            DatabaseReference newItemRef = databaseReference.push();
+            String key = newItemRef.toString();
+            data.put("id", key);
+
+
+            newItemRef.setValue(data).addOnCompleteListener(task -> {
+                if (task.isSuccessful()) {
+                    Toast.makeText(getContext(), "Ingreso guardado en Firebase", Toast.LENGTH_SHORT).show();
+                    limpiar();
+                    dismiss();
+                    if (dataChangedListener != null) {
+                        dataChangedListener.onDataChanged();
+                    }
+                } else {
+                    Toast.makeText(getContext(), "Error al guardar el ingreso en Firebase", Toast.LENGTH_SHORT).show();
+                    Log.e(TAG, "Error al guardar el ingreso en Firebase: "+ task.getException());
                 }
-            } else {
-                Toast.makeText(getContext(), "ERROR AL GUARDAR REGISTRO", Toast.LENGTH_SHORT).show();
-                // Considera agregar un Log.e aquí para registrar el error en detalle
-            }
+            });
+
+
+
         } catch (NumberFormatException e) {
             Toast.makeText(getContext(), "VALOR O CANTIDAD NO SON VÁLIDOS", Toast.LENGTH_SHORT).show();
         }
     }
+
 
     private void limpiar() {
         // Limpiar los campos del formulario

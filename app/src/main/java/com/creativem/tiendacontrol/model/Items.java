@@ -1,19 +1,39 @@
 package com.creativem.tiendacontrol.model;
 
 public class Items {
-    private int id;
+    private String id;  // Ahora es String
     private String producto;
-    private double valor; // Cambiar a double
+    private double valor;
     private String detalles;
     private int cantidad;
     private String fechaRegistro;
     private boolean isPredefined;
+    private String type;
+    private Long timestamp;
+
+    public Items() {
+        // Constructor vacío necesario para Firebase
+    }
+
+    public Items(String id, String producto, double valor, String detalles, int cantidad, String fechaRegistro, boolean isPredefined, String type, Long timestamp) {
+        this.id = id;
+        this.producto = producto;
+        this.valor = valor;
+        this.detalles = detalles;
+        this.cantidad = cantidad;
+        this.fechaRegistro = fechaRegistro;
+        this.isPredefined = isPredefined;
+        this.type = type;
+        this.timestamp = timestamp;
+    }
+
+
     // Getters y Setters
-    public int getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -25,8 +45,8 @@ public class Items {
         this.producto = producto;
     }
 
-    public int getValor() {
-        return (int) valor;
+    public double getValor() {
+        return valor;
     }
 
     public void setValor(double valor) {
@@ -63,7 +83,7 @@ public class Items {
 
     @Override
     public String toString() {
-        return producto; // Esto hará que el Spinner muestre el nombre del producto
+        return producto;
     }
     public boolean isPredefined() {
         return isPredefined;
@@ -71,5 +91,21 @@ public class Items {
 
     public void setPredefined(boolean predefined) {
         isPredefined = predefined;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
+
+    public Long getTimestamp() {
+        return timestamp;
+    }
+
+    public void setTimestamp(Long timestamp) {
+        this.timestamp = timestamp;
     }
 }

@@ -13,6 +13,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
@@ -29,6 +30,13 @@ import com.creativem.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.creativem.tiendacontrol.helper.PuntoMil;
 import com.creativem.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
 
@@ -49,10 +57,16 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
     private String currentDatabase;
     private TextView textViewDatabaseName;
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private FirebaseAuth mAuth;
+    private String userId;
+    private DatabaseReference databaseReference;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.datosdatos);
+        mAuth = FirebaseAuth.getInstance();
 
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
@@ -66,24 +80,41 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             currentDatabase = obtenerNombreBaseDeDatos();
         }
 
+        FirebaseUser user = mAuth.getCurrentUser();
+        if(user != null) {
+            userId = user.getUid();
+            databaseReference = database.getReference("users").child(userId).child("databases").child(currentDatabase);
+        }
+
         // Inicializar BdVentas
-        bdVentas = new BdVentas(this, currentDatabase);
+        bdVentas = new BdVentas(this, currentDatabase, databaseReference);
+        bdVentas.setOnDataChangeListener(items -> {
+            if (adapter != null) {
+                adapter.setItems(items);
+                actualizarTotales();
+                Log.d(TAG, "RecyclerView actualizado desde BdVentas, tamaño de la lista: " + items.size());
+
+            }
+        });
+
 
         // Inicializar vistas
         inicializarVistas();
 
+
         // Configurar RecyclerView
         configurarRecyclerView();
+
         // Actualizar el TextView con el nombre de la base de datos actual
         textViewDatabaseName.setText("Cuenta: " + currentDatabase);
         // Configurar SearchView
         txtBuscar.setOnQueryTextListener(this);
 
+
         // Inicializar ActivityResultLauncher para permisos
         inicializarLauncherPermisos();
-
         // Actualizar UI
-        onDataChanged();
+        actualizarTotales();
 
     }
 
@@ -103,14 +134,12 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         iconLimpiar.setOnClickListener(view -> confirmarEliminarTodo());
         iconEgreso.setOnClickListener(view -> mostrarGastoDialogFragment());
         iconIngreso.setOnClickListener(view -> mostrarIngresoDialogFragment());
-
-
     }
 
     private void configurarRecyclerView() {
         listaVentas.setLayoutManager(new GridLayoutManager(this, 2));
         listaArrayVentas = new ArrayList<>();
-        adapter = new DatosAdapter(this, listaArrayVentas, bdVentas, this);
+        adapter = new DatosAdapter(this, listaArrayVentas, this);
         listaVentas.setAdapter(adapter);
     }
 
@@ -126,14 +155,14 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
     }
 
     private void mostrarGastoDialogFragment() {
-        GastoDialogFragment gastoDialogFragment = GastoDialogFragment.newInstance(currentDatabase);
+        GastoDialogFragment gastoDialogFragment = GastoDialogFragment.newInstance(currentDatabase,databaseReference.toString());
         gastoDialogFragment.setDataChangedListener(this);
         gastoDialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
     }
 
     private void mostrarIngresoDialogFragment() {
         FragmentManager fragmentManager = getSupportFragmentManager();
-        IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase);
+        IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase,databaseReference.toString());
         ingresoDialogFragment.setDataChangedListener(this);
         ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
     }
@@ -154,23 +183,49 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         if (bdVentas != null) {
             bdVentas.close();
         }
-        bdVentas = new BdVentas(this, currentDatabase);
-        onDataChanged();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            userId = user.getUid();
+            databaseReference = database.getReference("users").child(userId).child("databases").child(newDatabase);
+        }
+        bdVentas = new BdVentas(this, newDatabase, databaseReference);
+        bdVentas.setOnDataChangeListener(items -> {
+            if (adapter != null) {
+                adapter.setItems(items);
+                actualizarTotales();
+            }
+        });
+
+        textViewDatabaseName.setText("Cuenta: " + newDatabase);
     }
+
 
     @Override
     protected void onResume() {
         super.onResume();
-//        mostrarValores();
-        onDataChanged();
-        bdVentas = new BdVentas(this, currentDatabase);
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            userId = user.getUid();
+            databaseReference = database.getReference("users").child(userId).child("databases").child(currentDatabase);
+        }
+        if (bdVentas == null) {
+            bdVentas = new BdVentas(this, currentDatabase, databaseReference);
+            bdVentas.setOnDataChangeListener(items -> {
+                if (adapter != null) {
+                    adapter.setItems(items);
+                    actualizarTotales();
+                }
+            });
+        }
+
+
         if (adapter == null) {
             listaArrayVentas = new ArrayList<>();
-            adapter = new DatosAdapter(this, listaArrayVentas, bdVentas, this);
+            adapter = new DatosAdapter(this, listaArrayVentas,  this);
             listaVentas.setAdapter(adapter);
         }
-    }
 
+    }
     @Override
     protected void onDestroy() {
         if (bdVentas != null) {
@@ -179,7 +234,6 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         }
         super.onDestroy();
     }
-
     @Override
     public boolean onQueryTextSubmit(String query) {
         return false;
@@ -187,7 +241,9 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
     @Override
     public boolean onQueryTextChange(String newText) {
-        adapter.filtrado(newText);
+        if (adapter != null) {
+            adapter.filtrado(newText);
+        }
         return false;
     }
 
@@ -200,42 +256,39 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         editor.putString(KEY_CURRENT_DATABASE, dbName);
         editor.apply();
     }
-
-    public void onDataChanged() {
-        if (adapter != null) {
-            listaArrayVentas.clear();
-            listaArrayVentas.addAll(bdVentas.mostrarVentas());
-            adapter.ordenarPorFecha();
-            adapter.setItems(listaArrayVentas);
-            adapter.setBdVentas(bdVentas);
-
-            // Obtener los valores para la base de datos ACTUAL después de actualizar el adaptador
+    private void actualizarTotales() {
+        if (bdVentas != null) {
+            // Obtener valores desde la base de datos
             double ingresos = bdVentas.obtenerTotalVentas();
-            double egresos = bdVentas.obtenerTotalEgresos();
-            String diferenciaFormateada = bdVentas.obtenerDiferencia();
+            double egresos = bdVentas.obtenerTotalEgresos(); // Los egresos deben incluir el signo negativo
+            double diferencia = ingresos + egresos; // Calcular correctamente la diferencia
 
-            // Formatear los valores con PuntoMil
+            // Formatear los valores
             String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
-            String egresosFormatted = PuntoMil.getFormattedNumber((long) egresos);
+            String egresosFormatted = PuntoMil.getFormattedNumber((long) Math.abs(egresos)); // Mostrar egresos positivos
+            String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
 
-            // Mostrar los valores en los TextView
+            // Actualizar los TextViews
             textIngresos.setText(String.format("$%s", ingresosFormatted));
             textEgresos.setText(String.format("$%s", egresosFormatted));
-            textDiferencia.setText(String.format("$%s", diferenciaFormateada));
+            textDiferencia.setText(String.format("$%s", diferenciaFormatted));
 
-            // Cambiar el color del texto basado en el valor formateado
-            int colorTexto = diferenciaFormateada.startsWith("-") ?
-                    ContextCompat.getColor(this, R.color.colorNegativo) :
-                    ContextCompat.getColor(this, R.color.colorPositivo);
-            // Imprimir el color asignado para depuración
-            Log.d(TAG, "Color de texto: " + (diferenciaFormateada.startsWith("-") ? "Negativo" : "Positivo"));
+            // Cambiar el color del texto según el valor de la diferencia
+            int colorTexto = diferencia < 0
+                    ? ContextCompat.getColor(DatosDatos.this, R.color.colorNegativo)
+                    : ContextCompat.getColor(DatosDatos.this, R.color.colorPositivo);
             textDiferencia.setTextColor(colorTexto);
-
-            adapter.notifyDataSetChanged();
-
-            Log.d(TAG, "RecyclerView actualizado, tamaño de la lista: " + listaArrayVentas.size());
         }
     }
+
+
+
+
+    @Override
+    public void onDataChanged() {
+        actualizarTotales();
+    }
+
 
     private void confirmarEliminarTodo() {
         new AlertDialog.Builder(this)
@@ -243,12 +296,8 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
                 .setMessage("¿Estás seguro de que deseas limpiar toda la base de datos no se podrán recuperar en el futuro?")
                 .setPositiveButton("Sí", (dialog, which) -> {
                     boolean resultado = bdVentas.eliminarTodo();
-                    if (resultado) {
+                    if(resultado){
                         Toast.makeText(this, "Base de datos eliminada", Toast.LENGTH_SHORT).show();
-                        listaArrayVentas.clear();
-                        adapter.notifyDataSetChanged();
-//                        mostrarValores();
-                        onDataChanged();
                     } else {
                         Toast.makeText(this, "Error al eliminar la base de datos", Toast.LENGTH_SHORT).show();
                     }
@@ -257,5 +306,4 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
                 .setIcon(R.drawable.eliminar)
                 .show();
     }
-
 }
