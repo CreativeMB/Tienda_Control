@@ -21,6 +21,11 @@
         android:icon="@drawable/manual"
         android:titleTextAppearance="@style/MenuItemTextStyle"
         android:title="Manual"/>
+    <item
+        android:id="@+id/contabilidad"
+        android:icon="@drawable/manual"
+        android:titleTextAppearance="@style/MenuItemTextStyle"
+        android:title="Contabilidad"/>
 
     <item
         android:id="@+id/salirItem"

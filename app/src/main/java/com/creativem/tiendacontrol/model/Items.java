@@ -10,8 +10,10 @@ public class Items {
     private boolean isPredefined;
     private String type;
     private Long timestamp;
-
+    public String date;
+    public String fecha;
     public Items() {
+
         // Constructor vacío necesario para Firebase
     }
 
@@ -25,6 +27,7 @@ public class Items {
         this.isPredefined = isPredefined;
         this.type = type;
         this.timestamp = timestamp;
+
     }
 
 
@@ -107,5 +110,11 @@ public class Items {
 
     public void setTimestamp(Long timestamp) {
         this.timestamp = timestamp;
+    }
+    public String getDate() {
+        return date;
+    }
+    public String getFecha() {
+        return fecha;
     }
 }

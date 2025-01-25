@@ -23,9 +23,13 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 
-
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class GastoDialogFragment extends BottomSheetDialogFragment {
     // Definición de las variables para los elementos de la interfaz de usuario
@@ -187,6 +191,15 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
             // Hacer que el total sea negativo para egresos
             double total = -1 * valor * cantidad; // Multiplicar por -1 para hacerlo negativo
 
+            // Obtener la fecha y hora actual
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+            Date today = calendar.getTime();
+
+            // Formatear la fecha
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+            String dateString = sdf.format(today);
+
             // Crear un mapa de datos que incluye la marca de tiempo
             Map<String, Object> data = new HashMap<>();
             data.put("producto", producto);
@@ -195,6 +208,7 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
             data.put("cantidad", cantidad);
             data.put("type", "Gasto");
             data.put("timestamp", ServerValue.TIMESTAMP);
+            data.put("date", dateString);
 
             DatabaseReference newItemRef = databaseReference.push();
             String key = newItemRef.toString();

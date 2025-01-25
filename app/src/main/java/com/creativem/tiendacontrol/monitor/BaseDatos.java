@@ -53,8 +53,11 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
@@ -66,6 +69,7 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.Query;
+import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
 public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatabaseClickListener {
@@ -190,6 +194,10 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         intent.setData(Uri.parse(url));
                         startActivity(intent);
                         return true;
+                    } else if (id == R.id.contabilidad) {
+                        // Acción para Donar
+                        Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAnoActivity.class);
+                        startActivity(intent);
                     } else if (id == R.id.salirItem) {
                         mAuth.signOut();
                         gso.signOut().addOnCompleteListener(task -> {
@@ -315,9 +323,22 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         }
 
         String userId = user.getUid();
+        // Obtener la fecha y hora actual
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+        Date today = calendar.getTime();
+
+        // Formatear la fecha
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
+        String dateString = sdf.format(today);
+
 
         DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
-        userDatabasesRef.child(databaseName).setValue("").addOnCompleteListener(task -> {
+        Map<String,Object> databaseData = new HashMap<>();
+        databaseData.put("timestamp", ServerValue.TIMESTAMP);
+        databaseData.put("fechaCreacion", dateString);
+        userDatabasesRef.child(databaseName).setValue(databaseData).addOnCompleteListener(task -> {
+
             if (task.isSuccessful()) {
                 showToast("Base de datos creada en Firebase");
                 Log.d(TAG, "Base de datos creada en Firebase");
@@ -479,7 +500,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             showToast("Base de datos actual: " + databaseName);
 
             // Abre la base de datos en la actividad correspondiente
-            Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAno.class);
+            Intent intent = new Intent(BaseDatos.this, DatosDatos.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
         } else {

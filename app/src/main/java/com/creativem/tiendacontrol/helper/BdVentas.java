@@ -48,15 +48,27 @@ public class BdVentas {
                 @Override
                 public void onDataChange(DataSnapshot dataSnapshot) {
                     itemsList.clear();
-                    for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                        Items item = snapshot.getValue(Items.class);
-                        if(item != null){
-                            itemsList.add(item);
+                    if (dataSnapshot.exists()) {
+                        for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
+                            if(snapshot.getKey().equals("timestamp") || snapshot.getKey().equals("fechaCreacion")){
+                                continue; //No queremos convertir a tipo Item el nodo de fechaCreacion o timestamp
+                            }
+                            Items item = snapshot.getValue(Items.class);
+                            if(item != null){
+                                itemsList.add(item);
+                            }
+
                         }
+                        if(onDataChangeListener != null){
+                            onDataChangeListener.onDataChange(itemsList);
+                        }
+                    }else {
+                        if(onDataChangeListener != null){
+                            onDataChangeListener.onDataChange(itemsList);
+                        }
+                        Log.d(TAG, "No existen items en la base de datos");
                     }
-                    if(onDataChangeListener != null){
-                        onDataChangeListener.onDataChange(itemsList);
-                    }
+
 
 
                 }
@@ -81,7 +93,7 @@ public class BdVentas {
         double total = 0;
         if (itemsList != null) {
             for (Items items : itemsList) {
-                if (items.getType().equals("Ingreso"))
+                if (items.getType() != null && items.getType().equals("Ingreso"))
                     total += items.getValor();
             }
         }
@@ -92,7 +104,7 @@ public class BdVentas {
         double total = 0;
         if (itemsList != null) {
             for (Items items : itemsList) {
-                if (items.getType().equals("Gasto"))
+                if (items.getType() != null && items.getType().equals("Gasto"))
                     total += items.getValor();
             }
         }

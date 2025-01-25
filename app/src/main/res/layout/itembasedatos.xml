@@ -45,6 +45,14 @@
                     android:textStyle="bold"
                     android:padding="5dp"
                     android:textColor="@color/texcolor"/>
+                <TextView
+                    android:id="@+id/textViewFechaCreacion"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textSize="12sp"
+                    android:layout_marginBottom="8dp"
+                    android:text="Creado: -"
+                    />
 
                 <TextView
                     android:id="@+id/textViewDiferencia"
