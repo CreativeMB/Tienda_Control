@@ -31,6 +31,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -72,6 +73,8 @@ import com.google.firebase.database.Query;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
 public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatabaseClickListener {
     private static final String LOGIN_STATUS = "loginStatus";
     private static final String PREFS_NAME = "CodePrefs";
@@ -94,6 +97,8 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     private List<String> databaseList;
     private BasesAdapter adapter;
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private String databasePath;
+    private String userId;
 
 
     @Override
@@ -198,7 +203,10 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         // Acción para Donar
                         Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAnoActivity.class);
                         startActivity(intent);
-                    } else if (id == R.id.salirItem) {
+                    } else if (id == R.id.exel) {
+                        exportAllDatabasesSequentially();
+                    }
+                    else if (id == R.id.salirItem) {
                         mAuth.signOut();
                         gso.signOut().addOnCompleteListener(task -> {
                             sessionManager.setLoggedIn(false);
@@ -221,11 +229,15 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
 
         // Recarga la lista de bace de datos disponibles en le carpeta de la apliccion
         loadDatabases();
+        FirebaseUser user = mAuth.getCurrentUser();
+        if (user != null) {
+            userId = user.getUid();
+        } else {
+            Toast.makeText(this, "No se encuentra logueado el usuario", Toast.LENGTH_SHORT).show();
+        }
     }
-
     private void obtenerDatosEmpresa() {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser user = auth.getCurrentUser();
+        FirebaseUser user = mAuth.getCurrentUser();
 
         if (user == null) {
             Log.e(TAG, "Error: Usuario no autenticado.");
@@ -423,10 +435,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         // Encontrar los botones y elementos en el diseño inflado
         TextView btnEditar = dialogView.findViewById(R.id.btnEditar);
         TextView btnEliminar = dialogView.findViewById(R.id.btnEliminar);
-        TextView btnExportar = dialogView.findViewById(R.id.btnExportar);
-        TextView tvContabilidad = dialogView.findViewById(R.id.btnContabilidad);
-
-
 
         // Crear el AlertDialog con el diseño inflado
         AlertDialog dialog = new AlertDialog.Builder(this, R.style.TransparentDialogTheme)
@@ -445,30 +453,118 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             dialog.dismiss();
         });
 
-        btnExportar.setOnClickListener(v -> {
-            FirebaseAuth auth = FirebaseAuth.getInstance();
-            FirebaseUser user = auth.getCurrentUser();
-
-            if (user == null) {
-                Log.e(TAG, "Usuario no autenticado");
-                showToast("Usuario no autenticado");
-                return;
-            }
-
-            String userId = user.getUid();
-            String databasePath = "https://tu-proyecto.firebaseio.com/users/" + userId + "/databases/" + databaseName; // Reemplaza con tu URL base
-            new ExcelExporter(databaseName, databasePath).exportToExcel(this);
-            dialog.dismiss();
-        });
-
-        tvContabilidad.setOnClickListener(v -> {
-            editDatabase2(databaseName);
-            dialog.dismiss();
-        });
-
         // Mostrar el diálogo
         dialog.show();
     }
+
+    private void exportAllDatabasesSequentially() {
+        if (userId != null) {
+            DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
+            userDatabasesRef.addListenerForSingleValueEvent(new ValueEventListener() {
+                @Override
+                public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (snapshot.exists()) {
+                        List<String> databaseNames = new ArrayList<>();
+                        for (DataSnapshot databaseSnapshot : snapshot.getChildren()) {
+                            String databaseName = databaseSnapshot.getKey();
+                            databaseNames.add(databaseName);
+                        }
+                        XSSFWorkbook workbook = new XSSFWorkbook();
+                        exportDatabasesSequentially(databaseNames, workbook);
+                    } else {
+                        Log.e(TAG, "No se encontraron bases de datos para el usuario");
+                        Toast.makeText(BaseDatos.this, "No se encontraron bases de datos", Toast.LENGTH_SHORT).show();
+                    }
+                }
+
+                @Override
+                public void onCancelled(@NonNull DatabaseError error) {
+                    Log.e(TAG, "Error al obtener la referencia a la base de datos en firebase " + error.getMessage());
+                    Toast.makeText(BaseDatos.this, "Error al obtener bases de datos", Toast.LENGTH_SHORT).show();
+                }
+            });
+        } else {
+            Log.e(TAG, "Error: userId es null en exportAllDatabases");
+            Toast.makeText(this, "Error: No se pudo obtener el ID del usuario", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void exportDatabasesSequentially(List<String> databaseNames, XSSFWorkbook workbook) {
+        if (databaseNames.isEmpty()) {
+            Log.d(TAG, "Proceso de exportación secuencial completado");
+            //Compartir el archivo
+            String fileName = generateFileName("TodasLasBasesDeDatos");
+            // Obtener el directorio temporal de la app
+            File tempDir = getCacheDir();
+            File excelFile = null;
+            FileOutputStream outputStream = null;
+            try {
+                excelFile = new File(tempDir, fileName + ".xlsx");
+                outputStream = new FileOutputStream(excelFile);
+                workbook.write(outputStream);
+                Uri fileUri = FileProvider.getUriForFile(BaseDatos.this,
+                        getApplicationContext().getPackageName() + ".provider",
+                        excelFile);
+                shareExcelFile(fileUri);
+            } catch (IOException e) {
+                Log.e(TAG, "Error al crear o escribir el archivo: " + e.getMessage());
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        Log.e(TAG, "Error al cerrar el outputStream: " + e.getMessage());
+                    }
+                }
+                try {
+                    workbook.close();
+                } catch (IOException e) {
+                    Log.e(TAG, "Error al cerrar el workbook: " + e.getMessage());
+                }
+            }
+            return;
+        }
+
+        String databaseName = databaseNames.remove(0);
+        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
+        userDatabasesRef.child(databaseName).addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                if (snapshot.exists()) {
+                    String databasePath = snapshot.getRef().toString();
+                    ExcelExporter exporter = new ExcelExporter(BaseDatos.this, databaseName, databasePath);
+                    exporter.exportToExcel(workbook, new ExcelExporter.OnCompleteListener() {
+                        @Override
+                        public void onComplete(Uri fileUri) {
+                            exportDatabasesSequentially(databaseNames, workbook);
+                        }
+                    });
+                } else {
+                    Log.e(TAG, "No se encuentra la referencia para " + databaseName);
+                    exportDatabasesSequentially(databaseNames, workbook);
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e(TAG, "Error al obtener la referencia a la base de datos en firebase " + error.getMessage());
+                exportDatabasesSequentially(databaseNames, workbook);
+            }
+        });
+    }
+    private void shareExcelFile(Uri fileUri) {
+        Intent shareIntent = new Intent(Intent.ACTION_SEND);
+        shareIntent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+        startActivity(Intent.createChooser(shareIntent, "Compartir Excel"));
+    }
+    private String generateFileName(String baseName) {
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
+        return baseName + "_" + timeStamp;
+    }
+
+
 
     private void editDatabase(String databaseName) {
         Log.d(TAG, "editDatabase() ejecutado con databaseName: " + databaseName);

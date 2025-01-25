@@ -26,6 +26,11 @@
         android:icon="@drawable/manual"
         android:titleTextAppearance="@style/MenuItemTextStyle"
         android:title="Contabilidad"/>
+    <item
+        android:id="@+id/exel"
+        android:icon="@drawable/manual"
+        android:titleTextAppearance="@style/MenuItemTextStyle"
+        android:title="Compartir"/>
 
     <item
         android:id="@+id/salirItem"

@@ -76,14 +76,7 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
     }
     private void inicializarVistas() {
         listaTotales = findViewById(R.id.listaTotales);
-        ImageView iconInicio = findViewById(R.id.inicio);
-        if(iconInicio != null){
-            iconInicio.setOnClickListener(view -> startActivity(new Intent(FiltroDiaMesAnoActivity.this, BaseDatos.class)));
-        }else{
-            Log.e(TAG, "No se encontró la vista ImageView con el ID: inicio");
-        }
-
-        // Buttons for filter
+                // Buttons for filter
         filterByWeek = findViewById(R.id.filter_week);
         filterByMonth = findViewById(R.id.filter_month);
         filterByYear = findViewById(R.id.filter_year);
