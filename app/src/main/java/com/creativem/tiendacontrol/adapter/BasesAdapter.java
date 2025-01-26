@@ -147,8 +147,8 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error al obtener data de firebase", error.toException());
-                Toast.makeText(context, "Error al obtener data de firebase", Toast.LENGTH_SHORT).show();
+                Log.e(TAG, "Error al obtener datos", error.toException());
+                Toast.makeText(context, "Error al obtener datos", Toast.LENGTH_SHORT).show();
             }
         });
     }
