@@ -260,7 +260,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     private int calculateNoOfColumns() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        float columnWidth = 300; // Desired column width in dp (adjust as needed)
+        float columnWidth = 350; // Desired column width in dp (adjust as needed)
         return (int) (dpWidth / columnWidth);
     }
 
