@@ -18,17 +18,17 @@
         android:title="Donar"/>
     <item
         android:id="@+id/manual"
-        android:icon="@drawable/manual"
+        android:icon="@drawable/buscar"
         android:titleTextAppearance="@style/MenuItemTextStyle"
         android:title="Manual"/>
     <item
         android:id="@+id/contabilidad"
-        android:icon="@drawable/manual"
+        android:icon="@drawable/contabilidad"
         android:titleTextAppearance="@style/MenuItemTextStyle"
         android:title="Contabilidad"/>
     <item
         android:id="@+id/exel"
-        android:icon="@drawable/manual"
+        android:icon="@drawable/compartir"
         android:titleTextAppearance="@style/MenuItemTextStyle"
         android:title="Compartir"/>
 
