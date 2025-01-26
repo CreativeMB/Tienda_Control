@@ -160,7 +160,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
     private int calculateNoOfColumns() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
         float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        float columnWidth = 180; // Desired column width in dp (adjust as needed)
+        float columnWidth = 220; // Desired column width in dp (adjust as needed)
         return (int) (dpWidth / columnWidth);
     }
 
