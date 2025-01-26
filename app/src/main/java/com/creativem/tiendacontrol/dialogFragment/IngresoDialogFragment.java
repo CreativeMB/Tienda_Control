@@ -1,5 +1,7 @@
 package com.creativem.tiendacontrol.dialogFragment;
 
+import static com.creativem.tiendacontrol.dialogFragment.Utils.formatValor;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -24,6 +26,7 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
@@ -147,25 +150,24 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
 
         spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                Items selectedItem = (Items) parentView.getItemAtPosition(position);
-                if (selectedItem != null && !selectedItem.getProducto().equals("Seleccione un ítem")) {
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) { // Evitar el placeholder
+                    Items selectedItem = (Items) parent.getItemAtPosition(position);
+                    txtValor.setText(formatValor(selectedItem.getValor()));
                     txtProducto.setText(selectedItem.getProducto());
-                    txtValor.setText(String.valueOf(selectedItem.getValor()));
                     txtDetalles.setText(selectedItem.getDetalles());
                     txtCantidad.setText(String.valueOf(selectedItem.getCantidad()));
                 } else {
                     limpiar();
+
                 }
             }
 
             @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // No hacer nada aquí
+            public void onNothingSelected(AdapterView<?> parent) {
+                // No se necesita hacer nada aquí
             }
         });
-
-
         return view;
     }
 

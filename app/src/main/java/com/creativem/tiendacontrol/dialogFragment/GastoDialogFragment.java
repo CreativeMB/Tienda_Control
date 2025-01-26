@@ -1,5 +1,7 @@
 package com.creativem.tiendacontrol.dialogFragment;
 
+import static com.creativem.tiendacontrol.dialogFragment.Utils.formatValor;
+
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -143,27 +145,26 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
 
         spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
-            public void onItemSelected(AdapterView<?> parentView, View selectedItemView, int position, long id) {
-                Items selectedItem = (Items) parentView.getItemAtPosition(position);
-                if (selectedItem != null && !selectedItem.getProducto().equals("Seleccione un ítem")) {
-                    editProducto.setText(selectedItem.getProducto());
-                    editValor.setText(String.valueOf(selectedItem.getValor()));
-                    editDetalles.setText(selectedItem.getDetalles());
-                    editCantidad.setText(String.valueOf(selectedItem.getCantidad()));
-                } else {
-                    limpiar();
-                }
+                    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                        if (position > 0) { // Evitar el placeholder
+                            Items selectedItem = (Items) parent.getItemAtPosition(position);
+                            editValor.setText(formatValor(selectedItem.getValor()));
+                            editProducto.setText(selectedItem.getProducto());
+                            editDetalles.setText(selectedItem.getDetalles());
+                            editCantidad.setText(String.valueOf(selectedItem.getCantidad()));
+                        } else {
+                            limpiar();
+
+                        }
+                    }
+
+                    @Override
+                    public void onNothingSelected(AdapterView<?> parent) {
+                        // No se necesita hacer nada aquí
+                    }
+                });
+                return view;
             }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parentView) {
-                // No hacer nada aquí
-            }
-        });
-
-
-        return view;
-    }
 
     public void guardarEgreso() {
         // Obtener los datos de los campos
