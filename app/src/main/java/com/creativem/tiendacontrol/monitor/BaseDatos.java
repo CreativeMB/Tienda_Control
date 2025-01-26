@@ -8,12 +8,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
 import android.provider.Settings;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -33,6 +35,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -131,12 +134,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
 
         recyclerViewDatabases = findViewById(R.id.recyclerViewDatabases);
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-
-        recyclerViewDatabases.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
-
-        databaseList = new ArrayList<>();
-        adapter = new BasesAdapter(this, databaseList, this);
-        recyclerViewDatabases.setAdapter(adapter);
+        configurarRecyclerViewDatabases();
 
 
         iconDonacion.setOnClickListener(view -> {
@@ -241,6 +239,31 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             Toast.makeText(this, "No se encuentra logueado el usuario", Toast.LENGTH_SHORT).show();
         }
     }
+
+    private void configurarRecyclerViewDatabases() { // Renamed for clarity
+        int orientation = getResources().getConfiguration().orientation;
+        RecyclerView.LayoutManager layoutManager;
+
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            layoutManager = new LinearLayoutManager(this); // Vertical by default
+        } else { // Landscape orientation
+            layoutManager = new GridLayoutManager(this, calculateNoOfColumns());
+        }
+
+        recyclerViewDatabases.setLayoutManager(layoutManager); // Use recyclerViewDatabases here
+
+        databaseList = new ArrayList<>();
+        adapter = new BasesAdapter(this, databaseList, this);
+        recyclerViewDatabases.setAdapter(adapter);
+    }
+
+    private int calculateNoOfColumns() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        float columnWidth = 300; // Desired column width in dp (adjust as needed)
+        return (int) (dpWidth / columnWidth);
+    }
+
     private void obtenerDatosEmpresa() {
         FirebaseUser user = mAuth.getCurrentUser();
 

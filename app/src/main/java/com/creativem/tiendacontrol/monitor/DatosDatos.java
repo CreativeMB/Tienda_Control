@@ -5,7 +5,9 @@ import static android.content.ContentValues.TAG;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.widget.ImageView;
 import android.widget.SearchView;
@@ -19,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
 import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.adapter.DatosAdapter;
@@ -137,10 +140,28 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
     }
 
     private void configurarRecyclerView() {
-        listaVentas.setLayoutManager(new GridLayoutManager(this, 2));
+        RecyclerView.LayoutManager layoutManager;
+        int numColumns;
+
+        int orientation = getResources().getConfiguration().orientation;
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            numColumns = 2; // Two columns in portrait
+        } else { // Landscape orientation
+            numColumns = calculateNoOfColumns();
+        }
+
+        layoutManager = new GridLayoutManager(this, numColumns);
+        listaVentas.setLayoutManager(layoutManager);
         listaArrayVentas = new ArrayList<>();
         adapter = new DatosAdapter(this, listaArrayVentas, this);
         listaVentas.setAdapter(adapter);
+    }
+
+    private int calculateNoOfColumns() {
+        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
+        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
+        float columnWidth = 180; // Desired column width in dp (adjust as needed)
+        return (int) (dpWidth / columnWidth);
     }
 
     private void inicializarLauncherPermisos() {
