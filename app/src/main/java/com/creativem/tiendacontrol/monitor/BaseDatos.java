@@ -76,10 +76,15 @@ import com.google.firebase.database.ValueEventListener;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatabaseClickListener {
+
     private static final String LOGIN_STATUS = "loginStatus";
     private static final String PREFS_NAME = "CodePrefs";
     private static final String TAG = "BaseDatos";
-
+    private int completedTasks = 0;
+    private int totalTasks = 0;
+    private Uri fileUri;
+    private List<String> databaseNames = new ArrayList<>();
+    private boolean allTasksCompleted = false;
     private FirebaseAuth mAuth;
     private GoogleSignInClient gso;
     private SessionManager sessionManager;
@@ -456,21 +461,28 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         // Mostrar el diálogo
         dialog.show();
     }
-
     private void exportAllDatabasesSequentially() {
         if (userId != null) {
+            Log.d(TAG, "Iniciando exportación secuencial de todas las bases de datos");
             DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
             userDatabasesRef.addListenerForSingleValueEvent(new ValueEventListener() {
                 @Override
                 public void onDataChange(@NonNull DataSnapshot snapshot) {
                     if (snapshot.exists()) {
-                        List<String> databaseNames = new ArrayList<>();
+                        databaseNames.clear(); // Limpiar la lista antes de añadir nuevos nombres
                         for (DataSnapshot databaseSnapshot : snapshot.getChildren()) {
                             String databaseName = databaseSnapshot.getKey();
-                            databaseNames.add(databaseName);
+                            if (databaseName != null && !databaseName.isEmpty()) { //Comprobación de null y vacío
+                                databaseNames.add(databaseName);
+                            }
                         }
-                        XSSFWorkbook workbook = new XSSFWorkbook();
-                        exportDatabasesSequentially(databaseNames, workbook);
+                        if (!databaseNames.isEmpty()) { //Comprobación de lista vacía
+                            XSSFWorkbook workbook = new XSSFWorkbook();
+                            exportDatabasesSequentially(workbook);
+                        } else {
+                            Log.e(TAG, "No se encontraron bases de datos para el usuario");
+                            Toast.makeText(BaseDatos.this, "No se encontraron bases de datos", Toast.LENGTH_SHORT).show();
+                        }
                     } else {
                         Log.e(TAG, "No se encontraron bases de datos para el usuario");
                         Toast.makeText(BaseDatos.this, "No se encontraron bases de datos", Toast.LENGTH_SHORT).show();
@@ -484,17 +496,17 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 }
             });
         } else {
-            Log.e(TAG, "Error: userId es null en exportAllDatabases");
+            Log.e(TAG, "Error: userId es null en exportAllDatabasesSequentially");
             Toast.makeText(this, "Error: No se pudo obtener el ID del usuario", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void exportDatabasesSequentially(List<String> databaseNames, XSSFWorkbook workbook) {
+
+    private void exportDatabasesSequentially(XSSFWorkbook workbook) {
         if (databaseNames.isEmpty()) {
             Log.d(TAG, "Proceso de exportación secuencial completado");
-            //Compartir el archivo
+            //Compartir el archivo SOLO CUANDO SE TERMINE TODO
             String fileName = generateFileName("TodasLasBasesDeDatos");
-            // Obtener el directorio temporal de la app
             File tempDir = getCacheDir();
             File excelFile = null;
             FileOutputStream outputStream = null;
@@ -508,19 +520,10 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 shareExcelFile(fileUri);
             } catch (IOException e) {
                 Log.e(TAG, "Error al crear o escribir el archivo: " + e.getMessage());
+                Toast.makeText(this, "Error al generar el archivo", Toast.LENGTH_SHORT).show();
             } finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        Log.e(TAG, "Error al cerrar el outputStream: " + e.getMessage());
-                    }
-                }
-                try {
-                    workbook.close();
-                } catch (IOException e) {
-                    Log.e(TAG, "Error al cerrar el workbook: " + e.getMessage());
-                }
+                closeOutputStream(outputStream);
+                closeWorkbook(workbook);
             }
             return;
         }
@@ -536,35 +539,61 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                     exporter.exportToExcel(workbook, new ExcelExporter.OnCompleteListener() {
                         @Override
                         public void onComplete(Uri fileUri) {
-                            exportDatabasesSequentially(databaseNames, workbook);
+                            exportDatabasesSequentially(workbook);
                         }
                     });
                 } else {
                     Log.e(TAG, "No se encuentra la referencia para " + databaseName);
-                    exportDatabasesSequentially(databaseNames, workbook);
+                    exportDatabasesSequentially(workbook);
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "Error al obtener la referencia a la base de datos en firebase " + error.getMessage());
-                exportDatabasesSequentially(databaseNames, workbook);
+                exportDatabasesSequentially(workbook);
             }
         });
     }
+
     private void shareExcelFile(Uri fileUri) {
-        Intent shareIntent = new Intent(Intent.ACTION_SEND);
-        shareIntent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-        shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-        shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-        startActivity(Intent.createChooser(shareIntent, "Compartir Excel"));
+        if (fileUri != null) {
+            Intent shareIntent = new Intent(Intent.ACTION_SEND);
+            shareIntent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
+            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            startActivity(Intent.createChooser(shareIntent, "Compartir Excel"));
+        } else {
+            Log.e(TAG, "Error: fileUri es null en shareExcelFile");
+            Toast.makeText(this, "Error al compartir el archivo", Toast.LENGTH_SHORT).show();
+        }
     }
+
     private String generateFileName(String baseName) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
         return baseName + "_" + timeStamp;
     }
 
+    // Métodos auxiliares para cerrar streams y workbook de forma segura
+    private void closeOutputStream(FileOutputStream outputStream) {
+        if (outputStream != null) {
+            try {
+                outputStream.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Error al cerrar el outputStream: " + e.getMessage());
+            }
+        }
+    }
 
+    private void closeWorkbook(XSSFWorkbook workbook) {
+        if (workbook != null) {
+            try {
+                workbook.close();
+            } catch (IOException e) {
+                Log.e(TAG, "Error al cerrar el workbook: " + e.getMessage());
+            }
+        }
+    }
 
     private void editDatabase(String databaseName) {
         Log.d(TAG, "editDatabase() ejecutado con databaseName: " + databaseName);
