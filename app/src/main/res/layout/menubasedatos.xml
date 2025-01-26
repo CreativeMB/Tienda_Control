@@ -32,31 +32,6 @@
                 android:textStyle="bold"
                 android:layout_marginBottom="10dp"/>
 
-            <TextView
-                android:id="@+id/btnContabilidad"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:background="@drawable/selector_background"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:text="Contabilidad"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
-
-            <TextView
-                android:id="@+id/btnExportar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:gravity="center"
-                android:layout_gravity="center"
-                android:background="@drawable/selector_background"
-                android:layout_columnWeight="1"
-                android:layout_rowWeight="1"
-                android:text="Exportar Exel"
-                android:textStyle="bold"
-                android:layout_marginBottom="10dp" />
 
             <TextView
                 android:id="@+id/btnEliminar"
