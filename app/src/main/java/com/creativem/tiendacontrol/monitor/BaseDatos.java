@@ -334,22 +334,32 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     }
     private void showDatabaseNameDialog() {
         final EditText input = new EditText(this);
-        input.setHint("Nombre de la base de datos");
+        input.setHint("Nombre de la base de datos (sin espacios ni emojis)");
 
         new AlertDialog.Builder(this)
                 .setTitle("Crear Base de Datos")
-                .setMessage("Ingrese el nombre para la nueva base de datos:")
+                .setMessage("Ingrese el nombre para la nueva base de datos (sin espacios ni emojis):")
                 .setView(input)
                 .setPositiveButton("Crear", (dialog, which) -> {
                     String databaseName = input.getText().toString().trim();
-                    if (!databaseName.isEmpty()) {
+                    if (isValidDatabaseName(databaseName)) {
                         checkAndCreateDatabase(databaseName);
                     } else {
-                        showToast("Ingrese un nombre de base de datos");
+                        showToast("El nombre no debe contener espacios ni emojis.");
                     }
                 })
                 .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss())
                 .show();
+    }
+
+    private boolean isValidDatabaseName(String databaseName) {
+        //Expresión regular para detectar espacios o emojis
+        return !databaseName.isEmpty() && !databaseName.contains(" ") && !containsEmoji(databaseName);
+    }
+
+    private boolean containsEmoji(String text) {
+        //Expresión regular para detectar emojis
+        return text.matches(".*[\\p{Emoji}].*");
     }
 
     private void checkAndCreateDatabase(String databaseName) {
