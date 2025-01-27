@@ -2,17 +2,15 @@ package com.creativem.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
-import android.view.View;
-import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
+import androidx.core.util.Pair;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.creativem.tiendacontrol.R;
@@ -40,11 +38,14 @@ import java.util.Map;
 import java.util.TimeZone;
 import android.widget.CheckBox;
 
+import com.google.android.material.datepicker.MaterialDatePicker;
+
 public class FiltroDiaMesAnoActivity extends AppCompatActivity implements SearchView.OnQueryTextListener {
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
-
+    private MaterialDatePicker<Pair<Long, Long>> datePicker; //  Usamos Pair<Long,Long> para rango de fechas
+    private long startDate, endDate; // Almacenar fechas seleccionadas como longs (milisegundos desde la época)
     // Variables
     private SharedPreferences sharedPreferences;
     private RecyclerView listaTotales;
@@ -56,11 +57,30 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
     private String currentFilter = "Semana";
     private TotalesAdapter totalesAdapter;
     private TextView grandTotalIngresos, grandTotalEgresos, grandTotalDiferencia;
-
+    private TextView selectedDateRangeView;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_filtro_dia_mes_ano);
+
+
+        datePicker = MaterialDatePicker.Builder.dateRangePicker()
+                .setTitleText("Seleccionar rango de fechas")
+                .build();
+
+        // Asegúrate de tener un botón en tu layout XML con un ID, por ejemplo: button_select_dates
+        findViewById(R.id.button_select_dates).setOnClickListener(v -> datePicker.show(getSupportFragmentManager(), "DATE_PICKER"));
+
+        datePicker.addOnPositiveButtonClickListener(selection -> {
+            startDate = selection.first;
+            endDate = selection.second;
+            if (startDate != 0 && endDate != 0 && startDate <= endDate) {
+                filterByCustomDateRange(startDate, endDate);
+                actualizarFechaSeleccionada(startDate, endDate); // Update the TextView
+            }
+        });
+
+
         mAuth = FirebaseAuth.getInstance();
 
         // Inicializar SharedPreferences
@@ -73,8 +93,13 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
         }
         inicializarVistas();
         configurarRecyclerView();
+
     }
     private void inicializarVistas() {
+        selectedDateRangeView = findViewById(R.id.selected_date_range); // Inicialización de la variable
+        if (selectedDateRangeView == null) {
+        }
+
         listaTotales = findViewById(R.id.listaTotales);
                 // Buttons for filter
         filterByWeek = findViewById(R.id.filter_week);
@@ -85,10 +110,6 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
         grandTotalIngresos = findViewById(R.id.grand_total_ingresos);
         grandTotalEgresos = findViewById(R.id.grand_total_egresos);
         grandTotalDiferencia = findViewById(R.id.grand_total_diferencia);
-
-        // Inicializar el nuevo TextView
-        TextView textViewDatabaseName = findViewById(R.id.text_view_database_name);
-        textViewDatabaseName.setText("Todas las bases de datos");
 
         // Implement Filter Buttons
         filterByWeek.setOnClickListener(v -> {
@@ -111,6 +132,78 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
         });
         filterByPeriod(currentFilter);
     }
+
+    private void filterByCustomDateRange(long startDate, long endDate) {
+        if (allItems != null) {
+            List<TotalesItem> allTotalesItems = new ArrayList<>();
+            SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+            for (Map.Entry<String, List<Items>> entry : allItems.entrySet()) {
+                String databaseName = entry.getKey();
+                List<Items> items = entry.getValue();
+                if (items != null) {
+                    List<TotalesItem> totalesByRange = filterByDateRange(items, startDate, endDate, databaseName);
+                    if (totalesByRange != null) {
+                        allTotalesItems.addAll(totalesByRange);
+                        Log.d(TAG, "Totales filtrados por rango de fechas en la base de datos " + databaseName + ": " + totalesByRange.size() + " items");
+                    } else {
+                        Log.w(TAG, "No se encontraron datos en el rango de fechas para la base de datos: " + databaseName);
+                    }
+                } else {
+                    Log.e(TAG, "No hay items para filtrar en la base de datos: " + databaseName);
+                }
+            }
+            List<TotalesItem> totalesGenerales = calculateGrandTotals(allTotalesItems);
+            setGrandTotals(totalesGenerales, grandTotalIngresos, grandTotalEgresos, grandTotalDiferencia);
+            if (totalesAdapter != null) {
+                totalesAdapter.setTotalesItems(allTotalesItems);
+            }
+            Log.d(TAG, "Cantidad de TotalesItem después del filtrado: " + allTotalesItems.size());
+        } else {
+            Log.e(TAG, "No hay bases de datos para filtrar");
+        }
+    }
+
+    private void actualizarFechaSeleccionada(long startDate, long endDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+        if (selectedDateRangeView != null) {
+            selectedDateRangeView.setText("Periodo: " + sdf.format(new Date(startDate)) + " - " + sdf.format(new Date(endDate)));
+        } else {
+            Log.e("Error", "selected_date_range TextView not found.");
+        }
+    }
+    private List<TotalesItem> filterByDateRange(List<Items> items, long startDate, long endDate, String databaseName) {
+        List<TotalesItem> totalesItems = new ArrayList<>();
+        SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+
+        List<Items> filteredItems = new ArrayList<>();
+        for (Items item : items) {
+            Date itemDate;
+            try {
+                itemDate = sdfColombia.parse(item.date != null ? item.date : item.fecha);
+                if (itemDate != null) {
+                    long itemTimeInMillis = itemDate.getTime();
+                    if (itemTimeInMillis >= startDate && itemTimeInMillis <= endDate) {
+                        filteredItems.add(item);
+                    }
+                }
+            } catch (ParseException e) {
+                Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + (item.date != null ? item.date : item.fecha), e);
+            }
+        }
+
+        if (filteredItems.size() > 0) {
+            TotalesItem totalesItem = calculateTotals(filteredItems, databaseName).get(0);
+            Date startDateObj = new Date(startDate);
+            Date endDateObj = new Date(endDate);
+            totalesItem.setItemDate("Rango: " + sdfColombia.format(startDateObj) + " - " + sdfColombia.format(endDateObj));
+            totalesItem.setPeriod("Rango de fechas");
+            totalesItems.add(totalesItem);
+        }
+        return totalesItems;
+    }
+
     private void filterByPeriod(String period){
         if(allItems != null){
             List<TotalesItem> allTotalesItems = new ArrayList<>();
