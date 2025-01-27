@@ -243,108 +243,112 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
 
         return totalesItems;
     }
-    private List<TotalesItem> filterByMonth(List<Items> items, Date today,  SimpleDateFormat sdf, String databaseName){
+    private List<TotalesItem> filterByMonth(List<Items> items, Date today, SimpleDateFormat sdf, String databaseName) {
         List<TotalesItem> totalesItems = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);
+
+        // Se establece en el primer día del mes
         calendar.set(Calendar.DAY_OF_MONTH, 1);
         Date startOfMonth = calendar.getTime();
 
+        // Calcula el último día del mes con precisión
         Calendar endOfMonthCal = Calendar.getInstance();
-        endOfMonthCal.setTime(today);
-        while(startOfMonth.before(today) || startOfMonth.equals(today)){
-            Date endOfMonth = endOfMonthCal.getTime();
-            if(endOfMonthCal.get(Calendar.DAY_OF_MONTH) == endOfMonthCal.getActualMaximum(Calendar.DAY_OF_MONTH)){
-                endOfMonthCal.add(Calendar.DAY_OF_MONTH, 1);
-                endOfMonth = endOfMonthCal.getTime();
-            }else{
-                endOfMonthCal.add(Calendar.DAY_OF_MONTH, 1);
-            }
-            List<Items> filteredItems = new ArrayList<>();
-            for (Items item : items) {
-                if (item.date != null) {
-                    try {
-                        Date itemDate = sdf.parse(item.date);
-                        if(itemDate != null && (itemDate.after(startOfMonth) && itemDate.before(endOfMonth))){
-                            filteredItems.add(item);
-                        }
-                    }catch(ParseException e){
-                        Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + item.date, e);
-                    }
-                } else if (item.fecha != null) {
-                    try {
-                        Date itemDate = sdf.parse(item.fecha);
-                        if(itemDate != null && (itemDate.after(startOfMonth) && itemDate.before(endOfMonth))){
-                            filteredItems.add(item);
-                        }
-                    }catch(ParseException e){
-                        Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + item.fecha, e);
-                    }
-                }else {
-                    Log.w("WARN", "El item no contiene ninguna fecha");
+        endOfMonthCal.setTime(startOfMonth);
+        endOfMonthCal.add(Calendar.MONTH, 1); // Ir al mes siguiente
+        endOfMonthCal.add(Calendar.DAY_OF_YEAR, -1); // Restar un día para obtener el último día del mes actual.
+        endOfMonthCal.set(Calendar.HOUR_OF_DAY, 23);
+        endOfMonthCal.set(Calendar.MINUTE, 59);
+        endOfMonthCal.set(Calendar.SECOND, 59);
+        endOfMonthCal.set(Calendar.MILLISECOND, 999);
+        Date endOfMonth = endOfMonthCal.getTime();
+
+        // Crea SimpleDateFormat con la zona horaria de Colombia
+        SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+
+        // Ajusta startOfMonth a 00:00:00. Importante para la consistencia.
+        calendar.setTime(startOfMonth);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        startOfMonth = calendar.getTime();
+
+        List<Items> filteredItems = new ArrayList<>();
+        for (Items item : items) {
+            Date itemDate;
+            try {
+                itemDate = sdfColombia.parse(item.date != null ? item.date : item.fecha);
+                if (itemDate != null && !itemDate.before(startOfMonth) && !itemDate.after(endOfMonth)) {
+                    filteredItems.add(item);
                 }
+            } catch (ParseException e) {
+                Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + (item.date != null ? item.date : item.fecha), e);
             }
-            if (filteredItems.size() > 0){
-                TotalesItem totalesItem = calculateTotals(filteredItems, databaseName).get(0);
-                totalesItem.setItemDate("Mes del " + sdf.format(startOfMonth) + " al " + sdf.format(endOfMonth));
-                totalesItem.setPeriod("Mes"); //Añadir el periodo a la variable TotalesItem
-                totalesItems.add(totalesItem);
-            }
-            startOfMonth = endOfMonth;
         }
+
+        if (filteredItems.size() > 0) {
+            TotalesItem totalesItem = calculateTotals(filteredItems, databaseName).get(0);
+            totalesItem.setItemDate("Mes del " + sdfColombia.format(startOfMonth) + " al " + sdfColombia.format(endOfMonth));
+            totalesItem.setPeriod("Mes");
+            totalesItems.add(totalesItem);
+        }
+
         return totalesItems;
     }
-    private List<TotalesItem> filterByYear(List<Items> items, Date today, SimpleDateFormat sdf, String databaseName){
+    private List<TotalesItem> filterByYear(List<Items> items, Date today, SimpleDateFormat sdf, String databaseName) {
         List<TotalesItem> totalesItems = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);
+
+        // Se establece en el primer día del año
         calendar.set(Calendar.DAY_OF_YEAR, 1);
         Date startOfYear = calendar.getTime();
 
+        // Calcula el último día del año con precisión
         Calendar endOfYearCal = Calendar.getInstance();
-        endOfYearCal.setTime(today);
-        while (startOfYear.before(today) || startOfYear.equals(today)){
-            Date endOfYear = endOfYearCal.getTime();
-            if(endOfYearCal.get(Calendar.DAY_OF_YEAR) == endOfYearCal.getActualMaximum(Calendar.DAY_OF_YEAR)){
-                endOfYearCal.add(Calendar.DAY_OF_YEAR, 1);
-                endOfYear = endOfYearCal.getTime();
-            }else{
-                endOfYearCal.add(Calendar.DAY_OF_YEAR, 1);
-            }
-            List<Items> filteredItems = new ArrayList<>();
-            for (Items item : items) {
-                if (item.date != null) {
-                    try {
-                        Date itemDate = sdf.parse(item.date);
-                        if (itemDate != null && (itemDate.after(startOfYear) && itemDate.before(endOfYear))) {
-                            filteredItems.add(item);
-                        }
+        endOfYearCal.setTime(startOfYear);
+        endOfYearCal.add(Calendar.YEAR, 1); // Ir al año siguiente
+        endOfYearCal.add(Calendar.DAY_OF_YEAR, -1); // Restar un día para obtener el último día del año actual
+        endOfYearCal.set(Calendar.HOUR_OF_DAY, 23);
+        endOfYearCal.set(Calendar.MINUTE, 59);
+        endOfYearCal.set(Calendar.SECOND, 59);
+        endOfYearCal.set(Calendar.MILLISECOND, 999);
+        Date endOfYear = endOfYearCal.getTime();
 
-                    } catch (ParseException e) {
-                        Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + item.date, e);
-                    }
-                } else if (item.fecha != null) {
-                    try {
-                        Date itemDate = sdf.parse(item.fecha);
-                        if (itemDate != null && (itemDate.after(startOfYear) && itemDate.before(endOfYear))) {
-                            filteredItems.add(item);
-                        }
+        // Crea SimpleDateFormat con la zona horaria de Colombia
+        SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
 
-                    } catch (ParseException e) {
-                        Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + item.fecha, e);
-                    }
-                } else {
-                    Log.w("WARN", "El item no contiene ninguna fecha");
+        // Ajusta startOfYear a 00:00:00
+        calendar.setTime(startOfYear);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        startOfYear = calendar.getTime();
+
+        List<Items> filteredItems = new ArrayList<>();
+        for (Items item : items) {
+            Date itemDate;
+            try {
+                itemDate = sdfColombia.parse(item.date != null ? item.date : item.fecha);
+                if (itemDate != null && !itemDate.before(startOfYear) && !itemDate.after(endOfYear)) {
+                    filteredItems.add(item);
                 }
+            } catch (ParseException e) {
+                Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + (item.date != null ? item.date : item.fecha), e);
             }
-            if (filteredItems.size() > 0){
-                TotalesItem totalesItem = calculateTotals(filteredItems, databaseName).get(0);
-                totalesItem.setItemDate("Año del " + sdf.format(startOfYear) + " al " + sdf.format(endOfYear));
-                totalesItem.setPeriod("Año"); //Añadir el periodo a la variable TotalesItem
-                totalesItems.add(totalesItem);
-            }
-            startOfYear = endOfYear;
         }
+
+        if (filteredItems.size() > 0) {
+            TotalesItem totalesItem = calculateTotals(filteredItems, databaseName).get(0);
+            totalesItem.setItemDate("Año del " + sdfColombia.format(startOfYear) + " al " + sdfColombia.format(endOfYear));
+            totalesItem.setPeriod("Año");
+            totalesItems.add(totalesItem);
+        }
+
         return totalesItems;
     }
     private List<TotalesItem> calculateTotals(List<Items> items, String databaseName) {
