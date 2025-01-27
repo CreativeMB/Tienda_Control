@@ -181,56 +181,66 @@ public class FiltroDiaMesAnoActivity extends AppCompatActivity implements Search
             Log.e(TAG, "Textview para los totales null");
         }
     }
-    private List<TotalesItem> filterByWeek(List<Items> items, Date today, SimpleDateFormat sdf, String databaseName){
+    private List<TotalesItem> filterByWeek(List<Items> items, Date today, SimpleDateFormat sdf, String databaseName) {
         List<TotalesItem> totalesItems = new ArrayList<>();
         Calendar calendar = Calendar.getInstance();
         calendar.setTime(today);
-        calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek());
+
+        // Forzar el primer día de la semana a LUNES (2)  Independientemente de la configuración regional
+        int dayOfWeek = calendar.get(Calendar.DAY_OF_WEEK);
+        int diff = Calendar.MONDAY - dayOfWeek;
+        if (diff > 0) {
+            diff -= 7;
+        }
+        calendar.add(Calendar.DAY_OF_YEAR, diff);
         Date startOfWeek = calendar.getTime();
 
-        Calendar endOfWeekCal = Calendar.getInstance();
-        endOfWeekCal.setTime(today);
 
-        while(startOfWeek.before(today) || startOfWeek.equals(today)){
-            Date endOfWeek = endOfWeekCal.getTime();
-            if(endOfWeekCal.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY || endOfWeekCal.get(Calendar.DAY_OF_WEEK) == Calendar.SUNDAY){
-                endOfWeekCal.add(Calendar.DAY_OF_MONTH, 1);
-                endOfWeek = endOfWeekCal.getTime();
-            }else{
-                endOfWeekCal.add(Calendar.DAY_OF_MONTH, 1);
-            }
-            List<Items> filteredItems = new ArrayList<>();
-            for (Items item : items) {
-                if (item.date != null) {
-                    try {
-                        Date itemDate = sdf.parse(item.date);
-                        if (itemDate != null && (itemDate.after(startOfWeek) && itemDate.before(endOfWeek))) {
-                            filteredItems.add(item);
-                        }
-                    } catch (ParseException e) {
-                        Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + item.date, e);
-                    }
-                } else if (item.fecha != null) {
-                    try {
-                        Date itemDate = sdf.parse(item.fecha);
-                        if (itemDate != null && (itemDate.after(startOfWeek) && itemDate.before(endOfWeek))) {
-                            filteredItems.add(item);
-                        }
-                    } catch (ParseException e) {
-                        Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + item.fecha, e);
-                    }
-                } else {
-                    Log.w("WARN", "El item no contiene ninguna fecha");
+        // Calculate endOfWeek precisely (Sunday 11:59 PM)  Using Calendar for precision.
+        Calendar endOfWeekCal = Calendar.getInstance();
+        endOfWeekCal.setTime(startOfWeek);
+        endOfWeekCal.add(Calendar.DAY_OF_YEAR, 6); // Add 6 days to get to Sunday
+
+        // Set time to 11:59 PM
+        endOfWeekCal.set(Calendar.HOUR_OF_DAY, 23);
+        endOfWeekCal.set(Calendar.MINUTE, 59);
+        endOfWeekCal.set(Calendar.SECOND, 59);
+        endOfWeekCal.set(Calendar.MILLISECOND, 999);
+        Date endOfWeek = endOfWeekCal.getTime();
+
+        // Create SimpleDateFormat with Colombia's time zone
+        SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+
+        //Ajusta las horas a 00:00:00 para ambos límites para mayor precisión.  Important for consistency.
+        calendar.setTime(startOfWeek);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        startOfWeek = calendar.getTime();
+
+
+        List<Items> filteredItems = new ArrayList<>();
+        for (Items item : items) {
+            Date itemDate;
+            try {
+                itemDate = sdfColombia.parse(item.date != null ? item.date : item.fecha); // Use sdfColombia here!
+                if (itemDate != null && !itemDate.before(startOfWeek) && !itemDate.after(endOfWeek)) {
+                    filteredItems.add(item);
                 }
+            } catch (ParseException e) {
+                Log.e("ERROR PARSING DATE", "Error al parsear la fecha: " + (item.date != null ? item.date : item.fecha), e);
             }
-            if(filteredItems.size() > 0){
-                TotalesItem totalesItem = calculateTotals(filteredItems, databaseName).get(0);
-                totalesItem.setItemDate("Semana del " + sdf.format(startOfWeek) + " al " + sdf.format(endOfWeek));
-                totalesItem.setPeriod("Semana"); //Añadir el periodo a la variable TotalesItem
-                totalesItems.add(totalesItem);
-            }
-            startOfWeek = endOfWeek;
         }
+
+        if (filteredItems.size() > 0) {
+            TotalesItem totalesItem = calculateTotals(filteredItems, databaseName).get(0);
+            totalesItem.setItemDate("Semana del " + sdfColombia.format(startOfWeek) + " al " + sdfColombia.format(endOfWeek)); // Use sdfColombia here!
+            totalesItem.setPeriod("Semana");
+            totalesItems.add(totalesItem);
+        }
+
         return totalesItems;
     }
     private List<TotalesItem> filterByMonth(List<Items> items, Date today,  SimpleDateFormat sdf, String databaseName){
