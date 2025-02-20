@@ -192,14 +192,10 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
             // Hacer que el total sea negativo para egresos
             double total = -1 * valor * cantidad; // Multiplicar por -1 para hacerlo negativo
 
-            // Obtener la fecha y hora actual
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
-            Date today = calendar.getTime();
-
-            // Formatear la fecha
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
-            sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-            String dateString = sdf.format(today);
+            // Create date string in Colombia time zone
+            SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+            sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+            String dateString = sdfColombia.format(new Date()); // Use new Date() for current time
 
             // Crear un mapa de datos que incluye la marca de tiempo
             Map<String, Object> data = new HashMap<>();
