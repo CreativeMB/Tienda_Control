@@ -17,6 +17,7 @@ import android.os.Handler;
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.util.Pair;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -57,6 +58,7 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -411,20 +413,36 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
 
         String userId = user.getUid();
         DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
+
         userDatabasesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 databaseList.clear();
+                List<Pair<String, Long>> tempDatabaseList = new ArrayList<>();
+
                 if (snapshot.exists()) {
                     for (DataSnapshot databaseSnapshot : snapshot.getChildren()) {
                         String databaseName = databaseSnapshot.getKey();
-                        databaseList.add(databaseName);
-                        Log.d(TAG, "Base de datos encontrada en Firebase: "+ databaseName);
+                        Long timestamp = databaseSnapshot.child("timestamp").getValue(Long.class);
+
+                        if (timestamp == null) timestamp = 0L; // Si no hay timestamp, poner 0 por defecto
+                        tempDatabaseList.add(new Pair<>(databaseName, timestamp));
+
+                        Log.d(TAG, "Base de datos encontrada en Firebase: " + databaseName + " | Timestamp: " + timestamp);
+                    }
+
+                    // Ordenar por timestamp (de más reciente a más antigua)
+                    Collections.sort(tempDatabaseList, (db1, db2) -> Long.compare(db2.second, db1.second));
+
+                    // Agregar los nombres de las bases de datos en orden
+                    for (Pair<String, Long> database : tempDatabaseList) {
+                        databaseList.add(database.first);
                     }
                 } else {
                     showToast("No se encontraron bases de datos");
                     Log.d(TAG, "No se encontraron bases de datos para el usuario");
                 }
+
                 adapter.notifyDataSetChanged();
             }
 
@@ -434,20 +452,8 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                 Log.e(TAG, "Error al cargar bases de datos: " + error.getMessage());
             }
         });
-
     }
-
-
-    private void showDatabaseExistsDialog() {
-        new AlertDialog.Builder(this)
-                .setTitle("Base de datos existente")
-                .setMessage("La base de datos ya está creada.")
-                .setPositiveButton("Aceptar", (dialog, which) -> dialog.dismiss())
-                .setIcon(android.R.drawable.ic_dialog_alert)
-                .show();
-    }
-
-    private void showToast(String message) {
+        private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
