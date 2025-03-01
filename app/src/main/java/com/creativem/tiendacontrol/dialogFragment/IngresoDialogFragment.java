@@ -111,25 +111,24 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         }
         // Configuración de los eventos para los botones
         texGuardar.setOnClickListener(view1 -> guardarIngreso());
+
         txtValor.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
+            if ((actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
                     actionId == android.view.inputmethod.EditorInfo.IME_ACTION_NEXT ||
-                    actionId == android.view.inputmethod.EditorInfo.IME_ACTION_GO) {
+                    actionId == android.view.inputmethod.EditorInfo.IME_ACTION_GO) ||
+                    (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER &&
+                            event.getAction() == android.view.KeyEvent.ACTION_DOWN)) {
 
-                guardarIngreso(); // Llamar a la función para registrar el gasto
+                if (!v.isPressed()) { // Evita múltiples llamadas
+                    v.setPressed(true); // Marca como presionado
+                    guardarIngreso();
+                    v.postDelayed(() -> v.setPressed(false), 500); // Restablece el estado después de 500ms
+                }
                 return true;
             }
-
-            // Manejar el caso en el que se presiona ENTER físicamente
-            if (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER &&
-                    event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
-
-                guardarIngreso();
-                return true;
-            }
-
             return false;
         });
+
 
         texGuardarPredefinido.setOnClickListener(new View.OnClickListener() {
             @Override
