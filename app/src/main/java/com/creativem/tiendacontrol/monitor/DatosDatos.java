@@ -141,21 +141,16 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
     private void configurarRecyclerView() {
         RecyclerView.LayoutManager layoutManager;
-        int numColumns;
 
-        int orientation = getResources().getConfiguration().orientation;
-        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
-            numColumns = 2; // Two columns in portrait
-        } else { // Landscape orientation
-            numColumns = calculateNoOfColumns();
-        }
+        // Configurar un LinearLayoutManager en modo vertical
+        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
 
-        layoutManager = new GridLayoutManager(this, numColumns);
         listaVentas.setLayoutManager(layoutManager);
         listaArrayVentas = new ArrayList<>();
         adapter = new DatosAdapter(this, listaArrayVentas, this);
         listaVentas.setAdapter(adapter);
     }
+
 
     private int calculateNoOfColumns() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();

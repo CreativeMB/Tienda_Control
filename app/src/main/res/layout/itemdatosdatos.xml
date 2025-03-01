@@ -10,112 +10,67 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_margin="5dp"
-        android:padding="16dp"
-        app:cardCornerRadius="6dp"
-        android:background="@color/colorFondoPredeterminado"
-        app:cardElevation="2dp">
+        android:padding="10dp"
+        android:background="@color/colorFondoPredeterminado">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="wrap_content"
+            android:padding="5dp">
+
+            <!-- Imagen en miniatura antes del producto -->
+            <ImageView
+                android:id="@+id/imageItems"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_marginEnd="8dp"
+                android:src="@drawable/icono"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"/>
 
             <TextView
                 android:id="@+id/viewProducto"
                 android:layout_width="0dp"
-                android:textAlignment="center"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:paddingLeft="8dp"
-                android:text="Items"
-                android:textSize="15sp"
+                android:text="Producto"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-
-
-            <!-- Detalles -->
-            <ImageView
-                android:id="@+id/imageItems"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:src="@drawable/icono"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/viewProducto"
-                tools:srcCompat="@drawable/icono" />
-
-
-            <TextView
-                android:id="@+id/viewDetalles"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:paddingLeft="8dp"
-                android:text="@string/hint_Detalles"
-                android:textSize="15sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/imageItems" />
+                app:layout_constraintStart_toEndOf="@+id/imageItems"
+                app:layout_constraintEnd_toStartOf="@+id/viewValor"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="3"
+                android:layout_marginEnd="8dp"/>
 
             <TextView
                 android:id="@+id/viewValor"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="8dp"
-                android:layout_weight="1"
-                android:paddingLeft="8dp"
-                android:text="Precio"
-                android:textSize="16sp"
+                android:text="Valor"
+                android:textSize="20sp"
                 android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageItems"
-                app:layout_constraintTop_toBottomOf="@+id/viewProducto" />
-
-
-            <TextView
-                android:id="@+id/viewCantidad"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginEnd="8dp"
-                android:paddingLeft="8dp"
-                android:text="cantidad"
-                android:textSize="12sp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toEndOf="@+id/imageItems"
-                app:layout_constraintTop_toBottomOf="@+id/viewValor" />
-
+                app:layout_constraintStart_toEndOf="@+id/viewProducto"
+                app:layout_constraintEnd_toStartOf="@+id/viewFecha"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="3"
+                android:layout_marginEnd="8dp"/>
 
             <TextView
                 android:id="@+id/viewFecha"
-                android:layout_width="match_parent"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="4dp"
-                android:paddingLeft="8dp"
-                android:text="fecha"
+                android:text="Fecha"
                 android:textSize="12sp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/viewValor"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@+id/viewDetalles" />
-
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_weight="4"
+                android:layout_marginEnd="8dp"/>
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </androidx.cardview.widget.CardView>
-
 
 </RelativeLayout>
