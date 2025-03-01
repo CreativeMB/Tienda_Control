@@ -107,24 +107,26 @@ public class GastoDialogFragment extends BottomSheetDialogFragment {
         // Configuración de los eventos para los botones
         texGuardar.setOnClickListener(view1 -> guardarEgreso());
 
-//        editValor.setOnClickListener(v -> {
-//            // Verifica si el diálogo ya está visible, para evitar múltiples aperturas
-//            if (!ControlCalculadora.getInstance().isCalculadoraDialogVisible()) {
-//                // Muestra el `CalculadoraDialogFragment`
-//                CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
-//
-//                // Configura el listener para recibir el valor calculado
-//                calculadoraDialog.setCalculadoraListener(valorCalculado -> {
-//                    editValor.setText(String.valueOf(valorCalculado)); // Establece el valor en el TextView
-//                });
-//
-//                // Marca el diálogo como visible globalmente
-//                ControlCalculadora.getInstance().setCalculadoraDialogVisible(true);
-//
-//                // Muestra el diálogo usando `getParentFragmentManager()` ya que estás dentro de un fragmento
-//                calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
-//            }
-//        });
+        editValor.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == android.view.inputmethod.EditorInfo.IME_ACTION_DONE ||
+                    actionId == android.view.inputmethod.EditorInfo.IME_ACTION_NEXT ||
+                    actionId == android.view.inputmethod.EditorInfo.IME_ACTION_GO) {
+
+                guardarEgreso(); // Llamar a la función para registrar el gasto
+                return true;
+            }
+
+            // Manejar el caso en el que se presiona ENTER físicamente
+            if (event != null && event.getKeyCode() == android.view.KeyEvent.KEYCODE_ENTER &&
+                    event.getAction() == android.view.KeyEvent.ACTION_DOWN) {
+
+                guardarEgreso();
+                return true;
+            }
+
+            return false;
+        });
+
 
         texGuardarPredefinido.setOnClickListener(new View.OnClickListener() {
             @Override
