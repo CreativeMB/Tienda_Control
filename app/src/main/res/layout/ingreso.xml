@@ -46,8 +46,9 @@
                 android:layout_height="wrap_content"
                 android:ems="10"
                 android:inputType="text"
+                android:gravity="center"
                 android:labelFor="@+id/viewProducto"
-                android:textSize="18sp" />
+                android:textSize="25sp" />
 
             <TextView
                 android:id="@+id/viewValor"
@@ -60,11 +61,11 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
-                android:labelFor="@+id/viewValor"
-                android:focusable="false"
-                android:inputType="none"
-                android:clickable="true"
-                android:textSize="18sp" />
+                android:inputType="number"
+                android:labelFor="@+id/viewCantidad"
+                android:gravity="center"
+                android:textSize="50sp"
+                android:textStyle="bold"/>
 
             <TextView
                 android:id="@+id/viewDetalles"
@@ -77,9 +78,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:gravity="center"
                 android:inputType="text"
                 android:labelFor="@+id/viewDetalles"
-                android:textSize="18sp" />
+                android:textSize="25sp" />
 
             <TextView
                 android:id="@+id/viewCantidad"
@@ -92,9 +94,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:ems="10"
+                android:gravity="center"
                 android:inputType="number"
                 android:labelFor="@+id/viewCantidad"
-                android:textSize="18sp" />
+                android:textSize="25sp" />
 
 
             <View

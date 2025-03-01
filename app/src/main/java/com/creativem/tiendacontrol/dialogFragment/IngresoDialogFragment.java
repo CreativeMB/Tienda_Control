@@ -112,24 +112,24 @@ public class IngresoDialogFragment extends BottomSheetDialogFragment {
         // Configuración de los eventos para los botones
         texGuardar.setOnClickListener(view1 -> guardarIngreso());
 
-        txtValor.setOnClickListener(v -> {
-            // Verifica si el diálogo ya está visible, para evitar múltiples aperturas
-            if (!ControlCalculadora.getInstance().isCalculadoraDialogVisible()) {
-                // Muestra el `CalculadoraDialogFragment`
-                CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
-
-                // Configura el listener para recibir el valor calculado
-                calculadoraDialog.setCalculadoraListener(valorCalculado -> {
-                    txtValor.setText(String.valueOf(valorCalculado)); // Establece el valor en el TextView
-                });
-
-                // Marca el diálogo como visible globalmente
-                ControlCalculadora.getInstance().setCalculadoraDialogVisible(true);
-
-                // Muestra el diálogo usando `getParentFragmentManager()` ya que estás dentro de un fragmento
-                calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
-            }
-        });
+//        txtValor.setOnClickListener(v -> {
+//            // Verifica si el diálogo ya está visible, para evitar múltiples aperturas
+//            if (!ControlCalculadora.getInstance().isCalculadoraDialogVisible()) {
+//                // Muestra el `CalculadoraDialogFragment`
+//                CalculadoraDialogFragment calculadoraDialog = new CalculadoraDialogFragment();
+//
+//                // Configura el listener para recibir el valor calculado
+//                calculadoraDialog.setCalculadoraListener(valorCalculado -> {
+//                    txtValor.setText(String.valueOf(valorCalculado)); // Establece el valor en el TextView
+//                });
+//
+//                // Marca el diálogo como visible globalmente
+//                ControlCalculadora.getInstance().setCalculadoraDialogVisible(true);
+//
+//                // Muestra el diálogo usando `getParentFragmentManager()` ya que estás dentro de un fragmento
+//                calculadoraDialog.show(getParentFragmentManager(), "calculadoraDialog");
+//            }
+//        });
 
         texGuardarPredefinido.setOnClickListener(new View.OnClickListener() {
             @Override
