@@ -3,55 +3,45 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:id="@+id/root_layout"
-    android:padding="16dp">
+    android:padding="10dp">
 
     <ScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:padding="16dp">
+        android:layout_height="wrap_content">
         <LinearLayout
             android:id="@+id/content_layout"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
+
             <TextView
-                android:layout_width="match_parent"
+                android:id="@+id/texGuardar"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="Nuevo Egreso"
-                android:textColor="@color/Buton"
-                android:textSize="25dp" />
+                android:layout_gravity="center"
+                android:textSize="30sp"
+                android:background="@drawable/selector_background"
+                android:text="@string/registrar2" />
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="30dp" />
 
             <Spinner
                 android:id="@+id/spinnerPredefined"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:textSize="25dp"/>
+                android:padding="10dp"
+                android:textSize="30dp"/>
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="30dp" />
-
-            <TextView
-                android:id="@+id/viewProducto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="@string/hint_Producto" />
-
-            <EditText
-                android:id="@+id/editProducto"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:ems="10"
-                android:gravity="center"
-                android:inputType="text"
-                android:labelFor="@+id/viewProducto"
-                android:textSize="25sp" />
-
             <TextView
                 android:id="@+id/viewValor"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="@string/hint_Valor" />
 
             <EditText
@@ -66,9 +56,29 @@
                 android:textStyle="bold"/>
 
             <TextView
+                android:id="@+id/viewProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/hint_Producto" />
+
+            <EditText
+                android:id="@+id/editProducto"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:ems="10"
+                android:gravity="center"
+                android:inputType="text"
+                android:labelFor="@+id/viewProducto"
+                android:textSize="18sp" />
+
+
+
+            <TextView
                 android:id="@+id/viewDetalles"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="@string/hint_Detalles" />
 
             <EditText
@@ -79,12 +89,13 @@
                 android:gravity="center"
                 android:inputType="text"
                 android:labelFor="@+id/viewDetalles"
-                android:textSize="25sp" />
+                android:textSize="18sp" />
 
             <TextView
                 android:id="@+id/viewCantidad"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:gravity="center"
                 android:text="@string/hint_Cantidad" />
 
             <EditText
@@ -95,31 +106,12 @@
                 android:gravity="center"
                 android:inputType="number"
                 android:labelFor="@+id/viewCantidad"
-                android:textSize="25sp" />
+                android:textSize="18sp" />
 
             <View
                 android:layout_width="match_parent"
                 android:layout_height="5dp" />
 
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:padding="16dp">
-
-                <TextView
-                    android:id="@+id/texGuardar"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:gravity="center"
-                    android:layout_gravity="center"
-                    android:layout_marginTop="16dp"
-                    android:layout_weight="1"
-                    android:layout_marginEnd="16dp"
-                    android:background="@drawable/selector_background"
-                    android:text="@string/registrar"
-                    android:textStyle="bold"/>
 
                 <TextView
                     android:id="@+id/texGuardarPredefinido"
@@ -127,13 +119,9 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:layout_gravity="center"
-                    android:layout_marginTop="16dp"
-                    android:layout_weight="1"
                     android:background="@drawable/selector_background"
                     android:text="@string/guardar"
                     android:textStyle="bold"/>
-
-            </LinearLayout>
 
             <TextView
                 android:id="@+id/texEliminar"
@@ -141,7 +129,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center"
                 android:layout_gravity="center"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="25dp"
+                android:textSize="18sp"
                 android:text="Eliminar el Items Guardado" />
 
         </LinearLayout>

@@ -1,32 +1,28 @@
 package com.creativem.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentManager;
-import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.creativem.tiendacontrol.adapter.DatosAdapter;
 import com.creativem.tiendacontrol.dialogFragment.IngresoDialogFragment;
-
 import com.creativem.tiendacontrol.helper.BdVentas;
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.dialogFragment.GastoDialogFragment;
@@ -35,13 +31,13 @@ import com.creativem.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-
 import java.util.ArrayList;
+import android.view.KeyEvent;
+import android.view.inputmethod.EditorInfo;
+
+
 
 public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener {
     // Constantes
@@ -71,6 +67,8 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         setContentView(R.layout.datosdatos);
         mAuth = FirebaseAuth.getInstance();
 
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
+
         // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
@@ -99,7 +97,6 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
             }
         });
-
 
         // Inicializar vistas
         inicializarVistas();
@@ -131,14 +128,23 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         txtBuscar = findViewById(R.id.txtBuscar);
         ImageView iconLimpiar = findViewById(R.id.borrardados);
         ImageView iconInicio = findViewById(R.id.inicio);
-        // Inicializar el nuevo TextView
         textViewDatabaseName = findViewById(R.id.text_view_database_name);
+
+        // Evitar que el SearchView tenga foco
+        txtBuscar.clearFocus();
+        txtBuscar.setFocusable(false);
+        txtBuscar.setFocusableInTouchMode(true);
+
+        // Forzar el foco en el icono de ingreso
+        iconIngreso.setFocusable(true);
+        iconIngreso.setFocusableInTouchMode(true);
+        iconIngreso.requestFocus();
+
         iconInicio.setOnClickListener(view -> startActivity(new Intent(DatosDatos.this, BaseDatos.class)));
         iconLimpiar.setOnClickListener(view -> confirmarEliminarTodo());
         iconEgreso.setOnClickListener(view -> mostrarGastoDialogFragment());
         iconIngreso.setOnClickListener(view -> mostrarIngresoDialogFragment());
     }
-
     private void configurarRecyclerView() {
         RecyclerView.LayoutManager layoutManager;
 

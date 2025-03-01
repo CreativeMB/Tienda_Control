@@ -62,7 +62,7 @@
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:text="Fecha"
-                android:textSize="13sp"
+                android:textSize="12sp"
                 app:layout_constraintStart_toEndOf="@+id/viewValor"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"

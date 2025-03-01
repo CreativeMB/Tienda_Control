@@ -63,7 +63,8 @@
         <activity android:name=".dialogFragment.GastoDialogFragment" />
         <activity android:name=".dialogFragment.MenuDialogFragment" />
         <activity android:name=".monitor.EdicionPin" />
-        <activity android:name=".monitor.DatosDatos" />
+        <activity android:name=".monitor.DatosDatos"
+            android:windowSoftInputMode="stateHidden|adjustResize"/>
         <activity android:name=".monitor.FiltroDiaMesAno" />
         <activity android:name=".monitor.BaseDatos" />
         <activity android:name=".monitor.Donar" />
