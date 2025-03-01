@@ -5,10 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.WindowManager;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -34,32 +32,41 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import java.util.ArrayList;
-import android.view.KeyEvent;
-import android.view.inputmethod.EditorInfo;
+
+import android.view.Menu;
+import android.view.MenuItem;
+import android.widget.Spinner;
+import android.widget.ArrayAdapter;
+import android.widget.AdapterView;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 
-
-public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener {
+public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener, BdVentas.OnDataChangeListener {
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
-
-    // Variables
+    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
+    private Spinner spinnerFiltro;
+    private String filtroActual = "Día";
     private DatosAdapter adapter;
     private BdVentas bdVentas;
     private SharedPreferences sharedPreferences;
     private SearchView txtBuscar;
     private RecyclerView listaVentas;
-    private ArrayList<Items> listaArrayVentas;
-    private FloatingActionButton fabNuevo, fabGasto, fabMenu;
     private TextView textIngresos, textEgresos, textDiferencia;
-    private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
     private String currentDatabase;
     private TextView textViewDatabaseName;
-    private final FirebaseDatabase database = FirebaseDatabase.getInstance();
     private FirebaseAuth mAuth;
     private String userId;
     private DatabaseReference databaseReference;
+    private boolean datosCargados = false;
+    private FloatingActionButton fabNuevo, fabGasto, fabMenu;
+    private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
+    private ArrayList<Items> listaArrayVentas; // Mantén esta variable
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -69,10 +76,8 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
         getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_ALWAYS_HIDDEN);
 
-        // Inicializar SharedPreferences
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
 
-        // Obtener nombre de la base de datos desde Intent o SharedPreferences
         Intent intent = getIntent();
         if (intent != null && intent.hasExtra("databaseName")) {
             currentDatabase = intent.getStringExtra("databaseName");
@@ -87,38 +92,99 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             databaseReference = database.getReference("users").child(userId).child("databases").child(currentDatabase);
         }
 
-        // Inicializar BdVentas
         bdVentas = new BdVentas(this, currentDatabase, databaseReference);
-        bdVentas.setOnDataChangeListener(items -> {
-            if (adapter != null) {
-                adapter.setItems(items);
-                actualizarTotales();
-                Log.d(TAG, "RecyclerView actualizado desde BdVentas, tamaño de la lista: " + items.size());
+        bdVentas.setOnDataChangeListener(this);
+        bdVentas.cargarDatos();
 
+        inicializarVistas();
+        configurarRecyclerView();
+
+        spinnerFiltro = findViewById(R.id.spinner_filtro);
+        ArrayAdapter<CharSequence> adapterFiltro = ArrayAdapter.createFromResource(this, R.array.filtro_opciones, android.R.layout.simple_spinner_item);
+        adapterFiltro.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFiltro.setAdapter(adapterFiltro);
+
+        spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
+                filtroActual = parent.getItemAtPosition(position).toString();
+                aplicarFiltro();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
             }
         });
 
-        // Inicializar vistas
-        inicializarVistas();
-
-
-        // Configurar RecyclerView
-        configurarRecyclerView();
-
-        // Actualizar el TextView con el nombre de la base de datos actual
         textViewDatabaseName.setText("Cuenta: " + currentDatabase);
-        // Configurar SearchView
         txtBuscar.setOnQueryTextListener(this);
-
-
-        // Inicializar ActivityResultLauncher para permisos
         inicializarLauncherPermisos();
-        // Actualizar UI
-        actualizarTotales();
+
 
     }
 
-    private void inicializarVistas() {
+
+    private void aplicarFiltro() {
+        SimpleDateFormat dateFormat;
+        String fechaActual;
+        Calendar calendar = Calendar.getInstance();
+
+        switch (filtroActual) {
+            case "Día":
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                fechaActual = dateFormat.format(calendar.getTime());
+                break;
+            case "Semana":
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek()); // Inicio de la semana
+                Date inicioSemana = calendar.getTime();
+                calendar.add(Calendar.DAY_OF_YEAR, 6); // Fin de la semana
+                Date finSemana = calendar.getTime();
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                fechaActual = dateFormat.format(inicioSemana) + " - " + dateFormat.format(finSemana); // Rango de fechas
+                break;
+            case "Mes":
+                dateFormat = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
+                fechaActual = dateFormat.format(calendar.getTime());
+
+                break;
+            case "Año":
+                dateFormat = new SimpleDateFormat("yyyy", Locale.getDefault());
+                fechaActual = dateFormat.format(calendar.getTime());
+                break;
+            default:
+                dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                fechaActual = dateFormat.format(calendar.getTime());
+                break;
+
+        }
+
+        if (adapter != null) {
+            adapter.filtrarPorFecha(fechaActual, filtroActual);
+        }
+    }
+
+    @Override
+    public void onDataChange(ArrayList<Items> items) {
+        Log.d(TAG, "DatosDatos - onDataChange: tamaño de items = " + items.size());
+
+        if (!datosCargados || adapter == null) { // Inicializa si es null o primera vez.
+            adapter = new DatosAdapter(this, items, this);
+            listaVentas.setAdapter(adapter);
+            datosCargados = true;
+        } else {
+            adapter.setItems(items);
+        }
+        aplicarFiltro(); // Aplica filtro después de actualizar
+        actualizarTotales();
+    }
+
+    @Override
+    public void onDataChanged() {
+        Log.d(TAG, "DatosDatos - onDataChanged (DatosAdapter): Actualizando totales");
+        actualizarTotales();
+        aplicarFiltro();
+    }
+        private void inicializarVistas() {
         listaVentas = findViewById(R.id.listaVentas);
         ImageView iconIngreso = findViewById(R.id.ingreso);
         ImageView iconEgreso = findViewById(R.id.egreso);
@@ -146,25 +212,9 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         iconIngreso.setOnClickListener(view -> mostrarIngresoDialogFragment());
     }
     private void configurarRecyclerView() {
-        RecyclerView.LayoutManager layoutManager;
-
-        // Configurar un LinearLayoutManager en modo vertical
-        layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
-
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         listaVentas.setLayoutManager(layoutManager);
-        listaArrayVentas = new ArrayList<>();
-        adapter = new DatosAdapter(this, listaArrayVentas, this);
-        listaVentas.setAdapter(adapter);
     }
-
-
-    private int calculateNoOfColumns() {
-        DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
-        float dpWidth = displayMetrics.widthPixels / displayMetrics.density;
-        float columnWidth = 240; // Desired column width in dp (adjust as needed)
-        return (int) (dpWidth / columnWidth);
-    }
-
     private void inicializarLauncherPermisos() {
         requestStoragePermissionLauncher = registerForActivityResult(
                 new ActivityResultContracts.RequestMultiplePermissions(),
@@ -302,16 +352,6 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             textDiferencia.setTextColor(colorTexto);
         }
     }
-
-
-
-
-    @Override
-    public void onDataChanged() {
-        actualizarTotales();
-    }
-
-
     private void confirmarEliminarTodo() {
         new AlertDialog.Builder(this)
                 .setTitle("Eliminar Todos los Items")

@@ -117,4 +117,8 @@ public class Items {
     public String getFecha() {
         return fecha;
     }
+
+    public void setFecha(String fecha) {  // <-- Agrega este método
+        this.fecha = fecha;
+    }
 }

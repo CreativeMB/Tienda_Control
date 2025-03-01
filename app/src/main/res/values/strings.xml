@@ -57,5 +57,12 @@
     <string name="dona">Donar</string>
     <string name="salir">Salir</string>
 
+    <string-array name="filtro_opciones">
+        <item>Día</item>
+        <item>Semana</item>
+        <item>Mes</item>
+        <item>Año</item>
+    </string-array>
+
 
 </resources>

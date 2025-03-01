@@ -2,6 +2,9 @@ package com.creativem.tiendacontrol.helper;
 
 import android.content.Context;
 import android.util.Log;
+
+import androidx.annotation.NonNull;
+
 import com.creativem.tiendacontrol.model.Items;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -9,8 +12,12 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
 
 public class BdVentas {
     private static final String TAG = "BdVentas";
@@ -32,57 +39,68 @@ public class BdVentas {
     public BdVentas(Context context, String currentDatabase, DatabaseReference databaseReference) {
         this.currentDatabase = currentDatabase;
         this.databaseReference = databaseReference;
-        cargarDatos();
-
     }
-
-
-
     public void close() {
         // No es necesario cerrar nada con Firebase
     }
 
-    private void cargarDatos() {
+    public void cargarDatos() {
         if (databaseReference != null) {
-            databaseReference.addValueEventListener(new ValueEventListener() {
+            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() { // Usa addListenerForSingleValueEvent para una sola lectura
                 @Override
-                public void onDataChange(DataSnapshot dataSnapshot) {
+                public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     itemsList.clear();
-                    if (dataSnapshot.exists()) {
+                    if (dataSnapshot.exists() && dataSnapshot.hasChildren()) {
                         for (DataSnapshot snapshot : dataSnapshot.getChildren()) {
-                            if(snapshot.getKey().equals("timestamp") || snapshot.getKey().equals("fechaCreacion")){
-                                continue; //No queremos convertir a tipo Item el nodo de fechaCreacion o timestamp
-                            }
-                            Items item = snapshot.getValue(Items.class);
-                            if(item != null){
-                                itemsList.add(item);
+                            // Ignora nodos de metadatos como timestamp, fechaCreacion, etc.
+                            if (snapshot.getKey().equals("timestamp") || snapshot.getKey().equals("fechaCreacion") || snapshot.getKey().equals("databaseName")) {
+                                continue;
                             }
 
+                            try {
+                                Items item = snapshot.getValue(Items.class);
+                                if (item != null) {
+                                    long timestamp = snapshot.child("timestamp").getValue(Long.class);
+                                    Date fecha = new Date(timestamp);
+                                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                                    String fechaString = sdf.format(fecha);
+                                    item.setFecha(fechaString);
+                                    itemsList.add(item);
+                                    Log.d(TAG, "Item cargado: " + item.toString());
+                                }
+                            } catch (Exception e) {
+                                Log.e(TAG, "Error al convertir un item: " + e.getMessage(), e);
+                            }
                         }
-                        if(onDataChangeListener != null){
-                            onDataChangeListener.onDataChange(itemsList);
-                        }
-                    }else {
-                        if(onDataChangeListener != null){
-                            onDataChangeListener.onDataChange(itemsList);
-                        }
-                        Log.d(TAG, "No existen items en la base de datos");
+
+
+                    } else {
+                        Log.d(TAG, "No se encontraron datos o no hay hijos en la referencia.");
                     }
+                    // Llama a onDataChangeListener después de procesar todos los datos
+                    if (onDataChangeListener != null) {
+                        Log.d(TAG, "BdVentas - onDataChange: Llamando a onDataChangeListener con " + itemsList.size() + " items");
 
+                        onDataChangeListener.onDataChange(itemsList);
 
-
+                    }
                 }
 
+
                 @Override
-                public void onCancelled(DatabaseError databaseError) {
-                    Log.e(TAG, "Error al cargar datos desde Firebase: " + databaseError.getMessage());
+                public void onCancelled(@NonNull DatabaseError databaseError) {
+                    Log.e(TAG, "Error al cargar datos: " + databaseError.getMessage(), databaseError.toException());
+
                 }
             });
+
+
         } else {
-            Log.e(TAG,"databaseReference null");
+
+            Log.e(TAG, "databaseReference es null");
+
         }
     }
-
 
     public ArrayList<Items> mostrarVentas() {
         return itemsList;
