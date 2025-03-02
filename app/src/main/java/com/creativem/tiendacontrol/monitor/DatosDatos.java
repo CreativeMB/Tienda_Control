@@ -1,12 +1,20 @@
 package com.creativem.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
+import static java.security.AccessController.getContext;
+
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.InputType;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
@@ -25,12 +33,15 @@ import com.creativem.tiendacontrol.helper.BdVentas;
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.dialogFragment.GastoDialogFragment;
 import com.creativem.tiendacontrol.helper.PuntoMil;
+import com.creativem.tiendacontrol.helper.SpinnerManager;
 import com.creativem.tiendacontrol.model.Items;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ServerValue;
+
 import java.util.ArrayList;
 
 import android.view.Menu;
@@ -41,7 +52,10 @@ import android.widget.AdapterView;
 import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
+import java.util.TimeZone;
 
 
 public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener, BdVentas.OnDataChangeListener {
@@ -66,7 +80,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
     private FloatingActionButton fabNuevo, fabGasto, fabMenu;
     private ActivityResultLauncher<String[]> requestStoragePermissionLauncher;
     private ArrayList<Items> listaArrayVentas; // Mantén esta variable
-
+    private Handler mainHandler = new Handler(Looper.getMainLooper());
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -115,11 +129,11 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
+        spinnerFiltro.setSelection(0);
 
         textViewDatabaseName.setText("Cuenta: " + currentDatabase);
         txtBuscar.setOnQueryTextListener(this);
         inicializarLauncherPermisos();
-
 
     }
 
@@ -169,14 +183,15 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
         runOnUiThread(() -> {
             if (!datosCargados || adapter == null) {
-                adapter = new DatosAdapter(this, new ArrayList<>(items), this); // Copia la lista aquí también
+                // Crear un nuevo adaptador y asignarlo solo si no ha sido creado
+                adapter = new DatosAdapter(this, new ArrayList<>(items), this);
                 listaVentas.setAdapter(adapter);
                 datosCargados = true;
                 Log.d(TAG, "✅ Adapter creado y asignado");
             } else {
-                adapter.setItems(items);
-                // aplicarFiltro() - Si es necesario, llámalo antes de notifyDataSetChanged()
-                adapter.notifyDataSetChanged();
+                // Si el adaptador ya está creado, actualizar los elementos y notificar los cambios
+                adapter.setItems(new ArrayList<>(items)); // Asegúrate de copiar los datos para evitar referencias incorrectas
+                adapter.notifyDataSetChanged(); // Notificar que los datos han cambiado
                 Log.d(TAG, "🔄 Datos actualizados en el adaptador");
             }
 
@@ -187,10 +202,17 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
     @Override
     public void onDataChanged() {
         Log.d(TAG, "DatosDatos - onDataChanged (DatosAdapter): Actualizando totales");
-        actualizarTotales();
-        aplicarFiltro();
+
+        // Si ya tienes un adaptador y hay datos para actualizar, entonces notificar los cambios
+        if (adapter != null) {
+            adapter.notifyDataSetChanged();  // Notificar cambios si es necesario
+        }
+
+        actualizarTotales(); // Actualiza los totales
+        aplicarFiltro(); // Aplica el filtro después de la actualización
     }
-        private void inicializarVistas() {
+
+    private void inicializarVistas() {
         listaVentas = findViewById(R.id.listaVentas);
         ImageView iconIngreso = findViewById(R.id.ingreso);
         ImageView iconEgreso = findViewById(R.id.egreso);
@@ -215,8 +237,137 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         iconInicio.setOnClickListener(view -> startActivity(new Intent(DatosDatos.this, BaseDatos.class)));
         iconLimpiar.setOnClickListener(view -> confirmarEliminarTodo());
         iconEgreso.setOnClickListener(view -> mostrarGastoDialogFragment());
-        iconIngreso.setOnClickListener(view -> mostrarIngresoDialogFragment());
+        iconIngreso.setOnClickListener(view -> mostrarIngresoDialogo());
     }
+
+    public void mostrarIngresoDialogo() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Nuevo Ingreso");
+
+        // Inflar el layout personalizado
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.ingreso, null);
+        builder.setView(dialogView);
+
+        // Inicialización de los elementos de la interfaz
+        EditText txtProducto = dialogView.findViewById(R.id.txtProducto);
+        EditText txtValor = dialogView.findViewById(R.id.txtValor);
+        EditText txtDetalles = dialogView.findViewById(R.id.txtDetalles);
+        EditText txtCantidad = dialogView.findViewById(R.id.txtCantidad);
+        TextView texGuardar = dialogView.findViewById(R.id.texGuardar);
+        TextView texGuardarPredefinido = dialogView.findViewById(R.id.texGuardarPredefinido);
+        Spinner spinnerPredefined = dialogView.findViewById(R.id.spinnerPredefined);
+        TextView texEliminar = dialogView.findViewById(R.id.texEliminar);
+
+        // Aplicar el formato con separadores de mil
+        PuntoMil.formatNumberWithThousandSeparator(txtValor);
+
+        // Configurar campos numéricos
+        txtValor.setInputType(InputType.TYPE_CLASS_NUMBER);
+        txtCantidad.setInputType(InputType.TYPE_CLASS_NUMBER);
+
+        // Crear el objeto SpinnerManager
+        SpinnerManager spinnerManager = new SpinnerManager(this, spinnerPredefined, txtProducto, txtValor, txtDetalles, txtCantidad);
+        spinnerManager.loadPredefinedItems();
+
+        // Escuchar selección de Spinner y llenar campos automáticamente
+        spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                Items selectedItem = (Items) parent.getItemAtPosition(position);
+                if (selectedItem != null && position != 0) { // Evitar "Seleccione un ítem"
+                    txtProducto.setText(selectedItem.getProducto());
+                    txtValor.setText(String.valueOf(selectedItem.getValor()));
+                    txtDetalles.setText(selectedItem.getDetalles());
+                    txtCantidad.setText(String.valueOf(selectedItem.getCantidad()));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // Crear y mostrar el AlertDialog
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Acción del botón "Guardar"
+        texGuardar.setOnClickListener(v -> {
+            String producto = txtProducto.getText().toString().trim();
+            String valorStr = txtValor.getText().toString().trim();
+            String detalles = txtDetalles.getText().toString().trim();
+            String cantidadStr = txtCantidad.getText().toString().trim();
+            String categoriaSeleccionada = spinnerPredefined.getSelectedItem().toString();
+
+            // Verificar que todos los campos estén llenos
+            if (producto.isEmpty() || valorStr.isEmpty() || detalles.isEmpty() || cantidadStr.isEmpty()) {
+                Toast.makeText(this, "Todos los campos son Necesarios", Toast.LENGTH_LONG).show();
+                return; // Salir del método si hay campos vacíos
+            }
+            try {
+                // Eliminar separadores de miles (por ejemplo, comas o puntos)
+                valorStr = valorStr.replace(",", "").replace(".", "");
+                cantidadStr = cantidadStr.replace(",", "").replace(".", "");
+
+                // Convertir los datos a los tipos correctos
+                double valor = Double.parseDouble(valorStr);
+                int cantidad = Integer.parseInt(cantidadStr);
+                double total = valor * cantidad;
+
+                // Obtener fecha con formato colombiano
+                SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+                String dateString = sdfColombia.format(new Date());
+
+                // Crear un mapa de datos que incluye la marca de tiempo
+                Map<String, Object> data = new HashMap<>();
+                data.put("producto", producto);
+                data.put("valor", total);
+                data.put("detalles", detalles);
+                data.put("cantidad", cantidad);
+                data.put("type", "Ingreso");
+                data.put("timestamp", ServerValue.TIMESTAMP);
+                data.put("date", dateString);
+
+
+                DatabaseReference newItemRef = databaseReference.push();
+                String key = newItemRef.toString();
+                data.put("id", key);
+
+                // Guardar en Firebase con el ID generado
+                newItemRef.setValue(data).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+
+                        Toast.makeText(this, "Ingreso guardado", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();
+                    } else {
+                        Toast.makeText(this, "Error al guardar", Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Ingrese valores numéricos válidos", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Acción del botón "Guardar Predefinido"
+        texGuardarPredefinido.setOnClickListener(v -> {
+            spinnerManager.savePredefinedItem();
+            Toast.makeText(v.getContext(), "Guardado como predefinido", Toast.LENGTH_SHORT).show();
+            spinnerManager.loadPredefinedItems(); // Recargar lista en el Spinner
+        });
+
+        // Acción del botón "Eliminar"
+        texEliminar.setOnClickListener(v -> {
+            if (spinnerPredefined.getSelectedItemPosition() > 0) { // Verificar que no sea el primer ítem
+                spinnerManager.removeSelectedItem(); // Eliminar el ítem
+                Toast.makeText(v.getContext(), "Ítem eliminado correctamente", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(v.getContext(), "Seleccione un ítem válido para eliminar", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
     private void configurarRecyclerView() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         listaVentas.setLayoutManager(layoutManager);

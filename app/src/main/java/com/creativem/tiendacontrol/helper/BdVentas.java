@@ -120,13 +120,6 @@ public class BdVentas {
         return total;
     }
 
-
-    public String obtenerDiferencia() {
-        double diferencia = obtenerTotalVentas() - obtenerTotalEgresos();
-        return PuntoMil.getFormattedNumber((long) diferencia);
-    }
-
-
     public boolean eliminarTodo() {
         if (databaseReference != null) {
             databaseReference.removeValue().addOnCompleteListener(task -> {
