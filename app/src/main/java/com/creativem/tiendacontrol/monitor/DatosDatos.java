@@ -53,6 +53,7 @@ import java.util.Calendar;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
@@ -125,6 +126,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
                 filtroActual = parent.getItemAtPosition(position).toString();
                 aplicarFiltro();
+                actualizarTotales();
             }
 
             @Override
@@ -547,7 +549,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         bdVentas.setOnDataChangeListener(items -> {
             if (adapter != null) {
                 adapter.setItems(items);
-                actualizarTotales();
+//                actualizarTotales();
             }
         });
 
@@ -568,7 +570,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             bdVentas.setOnDataChangeListener(items -> {
                 if (adapter != null) {
                     adapter.setItems(items);
-                    actualizarTotales();
+//                    actualizarTotales();
                 }
             });
         }
@@ -612,15 +614,26 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         editor.apply();
     }
     private void actualizarTotales() {
-        if (bdVentas != null) {
-            // Obtener valores desde la base de datos
-            double ingresos = bdVentas.obtenerTotalVentas();
-            double egresos = bdVentas.obtenerTotalEgresos(); // Los egresos deben incluir el signo negativo
-            double diferencia = ingresos + egresos; // Calcular correctamente la diferencia
+        if (adapter != null) { // Verificar que el adaptador no sea nulo
+            List<Items> listaFiltrada = adapter.getItemsList(); // Obtener la lista filtrada del adaptador
+            double ingresos = 0;
+            double egresos = 0;
+
+            for (Items item : listaFiltrada) { // Iterar sobre la lista filtrada
+                if (item.getType() != null) {
+                    if (item.getType().equals("Ingreso")) {
+                        ingresos += item.getValor();
+                    } else if (item.getType().equals("Gasto")) {
+                        egresos += item.getValor(); // Los egresos ya deberían ser negativos
+                    }
+                }
+            }
+
+            double diferencia = ingresos + egresos;
 
             // Formatear los valores
             String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
-            String egresosFormatted = PuntoMil.getFormattedNumber((long) Math.abs(egresos)); // Mostrar egresos positivos
+            String egresosFormatted = PuntoMil.getFormattedNumber((long) Math.abs(egresos)); // Mostrar egresos como positivos
             String diferenciaFormatted = PuntoMil.getFormattedNumber((long) diferencia);
 
             // Actualizar los TextViews
@@ -628,11 +641,11 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             textEgresos.setText(String.format("$%s", egresosFormatted));
             textDiferencia.setText(String.format("$%s", diferenciaFormatted));
 
-            // Cambiar el color del texto según el valor de la diferencia
-            int colorTexto = diferencia < 0
-                    ? ContextCompat.getColor(DatosDatos.this, R.color.colorNegativo)
-                    : ContextCompat.getColor(DatosDatos.this, R.color.colorPositivo);
+            // Cambiar el color del texto de la diferencia
+            int colorTexto = diferencia < 0 ? ContextCompat.getColor(this, R.color.colorNegativo) : ContextCompat.getColor(this, R.color.colorPositivo);
             textDiferencia.setTextColor(colorTexto);
+
+
         }
     }
     private void confirmarEliminarTodo() {
