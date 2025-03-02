@@ -115,8 +115,10 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
         spinnerFiltro = findViewById(R.id.spinner_filtro);
         ArrayAdapter<CharSequence> adapterFiltro = ArrayAdapter.createFromResource(this, R.array.filtro_opciones, android.R.layout.simple_spinner_item);
-        adapterFiltro.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerFiltro.setAdapter(adapterFiltro);
+        spinnerFiltro.setAdapter(adapterFiltro); // ¡Configura el adaptador PRIMERO!
+
+        spinnerFiltro.setSelection(0);
+        filtroActual = "Día";
 
         spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -129,7 +131,6 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             public void onNothingSelected(AdapterView<?> parent) {
             }
         });
-        spinnerFiltro.setSelection(0);
 
         textViewDatabaseName.setText("Cuenta: " + currentDatabase);
         txtBuscar.setOnQueryTextListener(this);
@@ -189,12 +190,10 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
                 Log.d(TAG, "✅ Adapter creado y asignado");
             } else {
                 adapter.setItems(new ArrayList<>(items));
-                //  Only call notifyDataSetChanged() ONCE, after setting items
                 adapter.notifyDataSetChanged();
                 Log.d(TAG, "🔄 Datos actualizados en el adaptador");
             }
 
-            //  Now apply the filter and update totals *outside* the else block
             spinnerFiltro.setSelection(0);
             filtroActual = "Día";
             aplicarFiltro();
