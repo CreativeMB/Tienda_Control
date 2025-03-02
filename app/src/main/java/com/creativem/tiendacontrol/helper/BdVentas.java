@@ -43,10 +43,9 @@ public class BdVentas {
     public void close() {
         // No es necesario cerrar nada con Firebase
     }
-
     public void cargarDatos() {
         if (databaseReference != null) {
-            databaseReference.addListenerForSingleValueEvent(new ValueEventListener() { // Usa addListenerForSingleValueEvent para una sola lectura
+            databaseReference.addValueEventListener(new ValueEventListener() { // ⚡ Escucha cambios en tiempo real
                 @Override
                 public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                     itemsList.clear();
@@ -66,41 +65,33 @@ public class BdVentas {
                                     String fechaString = sdf.format(fecha);
                                     item.setFecha(fechaString);
                                     itemsList.add(item);
-                                    Log.d(TAG, "Item cargado: " + item.toString());
+                                    Log.d(TAG, "✅ Item cargado: " + item.toString());
                                 }
                             } catch (Exception e) {
-                                Log.e(TAG, "Error al convertir un item: " + e.getMessage(), e);
+                                Log.e(TAG, "⚠️ Error al convertir un item: " + e.getMessage(), e);
                             }
                         }
-
-
                     } else {
-                        Log.d(TAG, "No se encontraron datos o no hay hijos en la referencia.");
+                        Log.d(TAG, "❌ No se encontraron datos o no hay hijos en la referencia.");
                     }
-                    // Llama a onDataChangeListener después de procesar todos los datos
+
+                    // 🔄 Notificar cambio de datos
                     if (onDataChangeListener != null) {
-                        Log.d(TAG, "BdVentas - onDataChange: Llamando a onDataChangeListener con " + itemsList.size() + " items");
-
+                        Log.d(TAG, "📌 BdVentas - onDataChange: Llamando a onDataChangeListener con " + itemsList.size() + " items");
                         onDataChangeListener.onDataChange(itemsList);
-
                     }
                 }
-
 
                 @Override
                 public void onCancelled(@NonNull DatabaseError databaseError) {
-                    Log.e(TAG, "Error al cargar datos: " + databaseError.getMessage(), databaseError.toException());
-
+                    Log.e(TAG, "❌ Error al cargar datos: " + databaseError.getMessage(), databaseError.toException());
                 }
             });
-
-
         } else {
-
-            Log.e(TAG, "databaseReference es null");
-
+            Log.e(TAG, "⚠️ databaseReference es null");
         }
     }
+
 
     public ArrayList<Items> mostrarVentas() {
         return itemsList;

@@ -165,18 +165,28 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
     @Override
     public void onDataChange(ArrayList<Items> items) {
-        Log.d(TAG, "DatosDatos - onDataChange: tamaño de items = " + items.size());
+        Log.d(TAG, "📌 onDataChange() - Recibidos " + items.size() + " elementos");
 
-        if (!datosCargados || adapter == null) { // Inicializa si es null o primera vez.
-            adapter = new DatosAdapter(this, items, this);
-            listaVentas.setAdapter(adapter);
-            datosCargados = true;
-        } else {
-            adapter.setItems(items);
-        }
-        aplicarFiltro(); // Aplica filtro después de actualizar
+        runOnUiThread(() -> {
+            if (!datosCargados || adapter == null) {
+                adapter = new DatosAdapter(this, items, this);
+                listaVentas.setAdapter(adapter);
+                datosCargados = true;
+                Log.d(TAG, "✅ Adapter creado y asignado");
+            } else {
+                adapter.setItems(items);
+                Log.d(TAG, "🔄 Datos actualizados en el adaptador");
+            }
+
+            listaVentas.post(() -> adapter.notifyDataSetChanged()); // 🔄 Forzar actualización de UI
+            Log.d(TAG, "🛠 RecyclerView forzado a actualizar");
+        });
+
         actualizarTotales();
+        aplicarFiltro();
     }
+
+
 
     @Override
     public void onDataChanged() {
@@ -247,6 +257,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
         if (newDatabase != null && !newDatabase.equals(currentDatabase)) {
             actualizarBaseDeDatos(newDatabase);
+
         }
     }
 
