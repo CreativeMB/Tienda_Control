@@ -169,24 +169,20 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
         runOnUiThread(() -> {
             if (!datosCargados || adapter == null) {
-                adapter = new DatosAdapter(this, items, this);
+                adapter = new DatosAdapter(this, new ArrayList<>(items), this); // Copia la lista aquí también
                 listaVentas.setAdapter(adapter);
                 datosCargados = true;
                 Log.d(TAG, "✅ Adapter creado y asignado");
             } else {
                 adapter.setItems(items);
+                // aplicarFiltro() - Si es necesario, llámalo antes de notifyDataSetChanged()
+                adapter.notifyDataSetChanged();
                 Log.d(TAG, "🔄 Datos actualizados en el adaptador");
             }
 
-            listaVentas.post(() -> adapter.notifyDataSetChanged()); // 🔄 Forzar actualización de UI
-            Log.d(TAG, "🛠 RecyclerView forzado a actualizar");
+            actualizarTotales(); // Llama después de actualizar el adaptador
         });
-
-        actualizarTotales();
-        aplicarFiltro();
     }
-
-
 
     @Override
     public void onDataChanged() {
