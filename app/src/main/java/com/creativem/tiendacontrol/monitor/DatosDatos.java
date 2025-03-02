@@ -11,9 +11,11 @@ import android.os.Handler;
 import android.os.Looper;
 import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.SearchView;
@@ -121,6 +123,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         spinnerFiltro.setSelection(0);
         filtroActual = "Día";
 
+
         spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, android.view.View view, int position, long id) {
@@ -137,6 +140,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         textViewDatabaseName.setText("Cuenta: " + currentDatabase);
         txtBuscar.setOnQueryTextListener(this);
         inicializarLauncherPermisos();
+
 
     }
 
@@ -239,9 +243,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
     public void mostrarIngresoDialogo() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Nuevo Ingreso");
-
-        // Inflar el layout personalizado
+               // Inflar el layout personalizado
         LayoutInflater inflater = LayoutInflater.from(this);
         View dialogView = inflater.inflate(R.layout.ingreso, null);
         builder.setView(dialogView);
