@@ -183,19 +183,22 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
         runOnUiThread(() -> {
             if (!datosCargados || adapter == null) {
-                // Crear un nuevo adaptador y asignarlo solo si no ha sido creado
                 adapter = new DatosAdapter(this, new ArrayList<>(items), this);
                 listaVentas.setAdapter(adapter);
                 datosCargados = true;
                 Log.d(TAG, "✅ Adapter creado y asignado");
             } else {
-                // Si el adaptador ya está creado, actualizar los elementos y notificar los cambios
-                adapter.setItems(new ArrayList<>(items)); // Asegúrate de copiar los datos para evitar referencias incorrectas
-                adapter.notifyDataSetChanged(); // Notificar que los datos han cambiado
+                adapter.setItems(new ArrayList<>(items));
+                //  Only call notifyDataSetChanged() ONCE, after setting items
+                adapter.notifyDataSetChanged();
                 Log.d(TAG, "🔄 Datos actualizados en el adaptador");
             }
 
-            actualizarTotales(); // Llama después de actualizar el adaptador
+            //  Now apply the filter and update totals *outside* the else block
+            spinnerFiltro.setSelection(0);
+            filtroActual = "Día";
+            aplicarFiltro();
+            actualizarTotales();
         });
     }
 
@@ -203,13 +206,6 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
     public void onDataChanged() {
         Log.d(TAG, "DatosDatos - onDataChanged (DatosAdapter): Actualizando totales");
 
-        // Si ya tienes un adaptador y hay datos para actualizar, entonces notificar los cambios
-        if (adapter != null) {
-            adapter.notifyDataSetChanged();  // Notificar cambios si es necesario
-        }
-
-        actualizarTotales(); // Actualiza los totales
-        aplicarFiltro(); // Aplica el filtro después de la actualización
     }
 
     private void inicializarVistas() {
@@ -236,7 +232,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
 
         iconInicio.setOnClickListener(view -> startActivity(new Intent(DatosDatos.this, BaseDatos.class)));
         iconLimpiar.setOnClickListener(view -> confirmarEliminarTodo());
-        iconEgreso.setOnClickListener(view -> mostrarGastoDialogFragment());
+        iconEgreso.setOnClickListener(view -> mostrarEgresoDialog());
         iconIngreso.setOnClickListener(view -> mostrarIngresoDialogo());
     }
 
@@ -368,9 +364,139 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         });
     }
 
+    public void mostrarEgresoDialog() {
+        // Crear un AlertDialog.Builder
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Nuevo Egreso");
+
+        // Inflar el layout personalizado
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View dialogView = inflater.inflate(R.layout.egreso, null);  // Asegúrate de usar el layout adecuado
+        builder.setView(dialogView);
+
+        // Inicialización de los elementos de la interfaz
+        EditText editProducto = dialogView.findViewById(R.id.editProducto);
+        EditText editValor = dialogView.findViewById(R.id.editValor);
+        EditText editDetalles = dialogView.findViewById(R.id.editDetalles);
+        EditText editCantidad = dialogView.findViewById(R.id.editCantidad);
+        Spinner spinnerPredefined = dialogView.findViewById(R.id.spinnerPredefined);
+        TextView texGuardar = dialogView.findViewById(R.id.texGuardar);
+        TextView texGuardarPredefinido = dialogView.findViewById(R.id.texGuardarPredefinido);
+        TextView texEliminar = dialogView.findViewById(R.id.texEliminar);
+
+        // Aplicar el formato con separadores de mil
+        PuntoMil.formatNumberWithThousandSeparator(editValor);
+
+        // Configuración del SpinnerManager
+        SpinnerManager spinnerManager = new SpinnerManager(this, spinnerPredefined, editProducto, editValor, editDetalles, editCantidad);
+        spinnerManager.loadPredefinedItems();
+
+        // Configurar el evento para la selección del Spinner
+        spinnerPredefined.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (position > 0) { // Evitar "Seleccione un ítem"
+                    Items selectedItem = (Items) parent.getItemAtPosition(position);
+                    editProducto.setText(selectedItem.getProducto());
+                    editValor.setText(String.valueOf(selectedItem.getValor()));
+                    editDetalles.setText(selectedItem.getDetalles());
+                    editCantidad.setText(String.valueOf(selectedItem.getCantidad()));
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+        // Crear el AlertDialog
+        AlertDialog dialog = builder.create();  // Aquí se crea el dialog
+
+        // Mostrar el diálogo
+        dialog.show();
+
+        texGuardar.setOnClickListener(v -> {
+            String producto = editProducto.getText().toString().trim();
+            String valorStr = editValor.getText().toString().trim();
+            String detalles = editDetalles.getText().toString().trim();
+            String cantidadStr = editCantidad.getText().toString().trim();
+
+            // Verificar si los campos están vacíos
+            if (producto.isEmpty() || valorStr.isEmpty() || detalles.isEmpty() || cantidadStr.isEmpty()) {
+                Toast.makeText(this, "Todos los campos son Necesarios", Toast.LENGTH_LONG).show();
+                return; // Salir si hay campos vacíos
+            }
+
+            try {
+                // Eliminar separadores de miles
+                valorStr = valorStr.replace(",", "").replace(".", "");
+                cantidadStr = cantidadStr.replace(",", "").replace(".", "");
+
+                // Convertir los valores
+                double valor = Double.parseDouble(valorStr);
+                int cantidad = Integer.parseInt(cantidadStr);
+
+                // El valor total se multiplica por -1 para los egresos (debe ser negativo)
+                double total = -valor * cantidad;  // Aquí se pone el signo negativo
+
+                // Obtener fecha con formato colombiano
+                SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+                String dateString = sdfColombia.format(new Date());
+
+                // Crear el mapa de datos
+                Map<String, Object> data = new HashMap<>();
+                data.put("producto", producto);
+                data.put("valor", total);  // Aquí se guarda el valor negativo
+                data.put("detalles", detalles);
+                data.put("cantidad", cantidad);
+                data.put("type", "Gasto");  // Para asegurarse de que es un egreso
+                data.put("timestamp", ServerValue.TIMESTAMP);
+                data.put("date", dateString);
+
+                // Referencia a la base de datos de Firebase
+                DatabaseReference newItemRef = databaseReference.push();
+                String key = newItemRef.toString();
+                data.put("id", key);
+
+                // Guardar el gasto en Firebase
+                newItemRef.setValue(data).addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Gasto guardado", Toast.LENGTH_SHORT).show();
+                        dialog.dismiss();  // Ahora puedes cerrar el diálogo correctamente
+                    } else {
+                        Toast.makeText(this, "Error al guardar el gasto", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "Ingrese valores numéricos válidos", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Acción para guardar un gasto como predefinido
+        texGuardarPredefinido.setOnClickListener(v -> {
+            spinnerManager.savePredefinedItem();
+            Toast.makeText(v.getContext(), "Guardado como predefinido", Toast.LENGTH_SHORT).show();
+            spinnerManager.loadPredefinedItems(); // Recargar lista en el Spinner
+        });
+
+        // Acción para eliminar el ítem predefinido
+        texEliminar.setOnClickListener(v -> {
+            if (spinnerPredefined.getSelectedItemPosition() > 0) {
+                spinnerManager.removeSelectedItem();
+                Toast.makeText(v.getContext(), "Ítem eliminado correctamente", Toast.LENGTH_SHORT).show();
+            } else {
+                Toast.makeText(v.getContext(), "Seleccione un ítem válido para eliminar", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+
+
     private void configurarRecyclerView() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         listaVentas.setLayoutManager(layoutManager);
+
     }
     private void inicializarLauncherPermisos() {
         requestStoragePermissionLauncher = registerForActivityResult(
