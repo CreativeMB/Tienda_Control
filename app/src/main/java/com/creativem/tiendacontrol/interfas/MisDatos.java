@@ -4,7 +4,6 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -17,9 +16,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.ValueEventListener;
+import com.creativem.tiendacontrol.model.ProductoModel;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -32,11 +31,12 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
     private ProductoAdapter adapter;
     private List<ProductoModel> productoList;
     private FirebaseHelper firebaseHelper;
+    private SharedPreferences sharedPreferences;
 
     private static final String PREFS_NAME = "CodePrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
-    private SharedPreferences sharedPreferences;
 
+    private String userId;
     private String baseDatosSeleccionada;
 
     @Override
@@ -48,10 +48,9 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(this));
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        firebaseHelper = new FirebaseHelper();
         productoList = new ArrayList<>();
 
-        // Obtener la base de datos seleccionada del Intent o SharedPreferences
+        userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         baseDatosSeleccionada = getIntent().getStringExtra("databaseName");
         if (baseDatosSeleccionada == null || baseDatosSeleccionada.isEmpty()) {
             baseDatosSeleccionada = obtenerBaseDatosSeleccionada();
@@ -61,10 +60,10 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             Toast.makeText(this, "⚠️ No hay base de datos seleccionada.", Toast.LENGTH_LONG).show();
         } else {
             guardarBaseDatosSeleccionada(baseDatosSeleccionada);
+            firebaseHelper = new FirebaseHelper(userId, baseDatosSeleccionada);
             cargarProductos();
         }
 
-        // Configurar el botón "Ventas" para abrir el diálogo
         TextView textVentas = findViewById(R.id.Venta);
         textVentas.setOnClickListener(v -> mostrarDialogoCrearProducto(null));
     }
@@ -84,67 +83,43 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
     @Override
     public void onDeleteClick(ProductoModel producto) {
-        if (baseDatosSeleccionada.isEmpty()) {
-            Toast.makeText(this, "⚠️ No hay base de datos seleccionada.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        firebaseHelper.eliminarProducto(baseDatosSeleccionada, producto.getId(), (error, ref) -> {
+        firebaseHelper.eliminarProducto(producto.getId(), (error, ref) -> {
             if (error == null) {
-                Toast.makeText(this, "✅ Producto eliminado", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MisDatos.this, "✅ Producto eliminado", Toast.LENGTH_SHORT).show();
                 cargarProductos();
             } else {
-                Toast.makeText(this, "❌ Error al eliminar producto", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MisDatos.this, "❌ Error al eliminar producto", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
     private void cargarProductos() {
-        Log.d("BaseDatos", "Base de datos seleccionada: " + baseDatosSeleccionada);
-
-        if (baseDatosSeleccionada.isEmpty()) {
-            Toast.makeText(this, "⚠️ No hay base de datos seleccionada.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        firebaseHelper.obtenerProductos(baseDatosSeleccionada, new ValueEventListener() {
+        firebaseHelper.obtenerProductos(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 productoList.clear();
-                Log.d("BaseDatos", "Productos encontrados: " + snapshot.getChildrenCount());
-
                 for (DataSnapshot data : snapshot.getChildren()) {
                     ProductoModel producto = data.getValue(ProductoModel.class);
-                    Log.d("BaseDatos", "Producto cargado: " + producto.getNombre()); // Asegúrate de que `getNombre()` existe
-                    productoList.add(producto);
+                    if (producto != null) {
+                        productoList.add(producto);
+                    }
                 }
-
                 if (adapter == null) {
                     adapter = new ProductoAdapter(MisDatos.this, productoList, MisDatos.this);
                     recyclerViewProductos.setAdapter(adapter);
-                    Log.d("BaseDatos", "Adapter asignado al RecyclerView");
                 } else {
                     adapter.notifyDataSetChanged();
-                    Log.d("BaseDatos", "Adapter actualizado con nuevos datos");
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("BaseDatos", "Error al cargar productos: " + error.getMessage());
                 Toast.makeText(MisDatos.this, "❌ Error al cargar productos", Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-
-
     private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
-        if (baseDatosSeleccionada.isEmpty()) {
-            Toast.makeText(this, "⚠️ No hay base de datos seleccionada.", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(productoExistente == null ? "Nuevo Producto" : "Editar Producto");
 
@@ -165,7 +140,13 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             switchTipo.setChecked(false);
         }
 
-        builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar", (dialog, which) -> {
+        builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar", null);
+        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String nombre = inputNombre.getText().toString().trim();
             String precioStr = inputPrecio.getText().toString().trim();
             String nota = inputNota.getText().toString().trim();
@@ -180,32 +161,46 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 precio = -Math.abs(precio);
             }
 
-            if (productoExistente == null) {
-                String idProducto = firebaseHelper.obtenerReferenciaProductos(baseDatosSeleccionada).push().getKey();
-                String fechaHoraActual = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
-                ProductoModel nuevoProducto = new ProductoModel(idProducto, nombre, precio, nota, fechaHoraActual);
+            if (productoExistente == null) { // **Creación de producto nuevo**
+                String id = firebaseHelper.getDatabaseReference().push().getKey(); // Genera ID único
 
-                firebaseHelper.agregarProducto(baseDatosSeleccionada, idProducto, nuevoProducto, (error, ref) -> {
-                    if (error == null) {
-                        cargarProductos();
-                        Toast.makeText(this, "✅ Producto guardado", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "❌ Error al guardar producto", Toast.LENGTH_SHORT).show();
-                    }
-                });
-            } else {
-                firebaseHelper.editarProducto(baseDatosSeleccionada, productoExistente.getId(), nombre, precio, nota, (error, ref) -> {
-                    if (error == null) {
-                        cargarProductos();
-                        Toast.makeText(this, "✅ Producto actualizado", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Toast.makeText(this, "❌ Error al actualizar producto", Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (id != null) { // Verifica que el ID no sea null
+                    ProductoModel nuevoProducto = new ProductoModel(id, nombre, precio, nota, obtenerFechaHoraActual());
+
+                    firebaseHelper.agregarProducto(id, nuevoProducto, (error, ref) -> {
+                        if (error == null) {
+                            dialog.dismiss();
+                            cargarProductos(); // Refresca la lista de productos
+                        } else {
+                            Toast.makeText(MisDatos.this, "❌ Error al agregar producto", Toast.LENGTH_SHORT).show();
+                        }
+                    });
+                } else {
+                    Toast.makeText(this, "⚠️ No se pudo generar un ID único", Toast.LENGTH_SHORT).show();
+                }
+
+            } else { // **Edición de producto existente**
+                firebaseHelper.editarProducto(
+                        productoExistente.getId(),
+                        productoExistente.getNombre(),
+                        productoExistente.getPrecio(),
+                        productoExistente.getNota(),
+                        (error, ref) -> {
+                            if (error == null) {
+                                dialog.dismiss();
+                                cargarProductos();
+                            } else {
+                                Toast.makeText(MisDatos.this, "❌ Error al actualizar producto", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
             }
         });
-
-        builder.setNegativeButton("Cancelar", null);
-        builder.show();
     }
+
+    private String obtenerFechaHoraActual() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
+        return sdf.format(new Date());
+    }
+
 }

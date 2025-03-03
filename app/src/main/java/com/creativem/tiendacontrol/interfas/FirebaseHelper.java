@@ -1,4 +1,6 @@
 package com.creativem.tiendacontrol.interfas;
+
+import com.creativem.tiendacontrol.model.ProductoModel;
 import com.google.firebase.database.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -9,55 +11,52 @@ import java.util.Map;
 public class FirebaseHelper {
     private DatabaseReference databaseReference;
 
-    public FirebaseHelper() {
-        databaseReference = FirebaseDatabase.getInstance().getReference("productos");
+    public FirebaseHelper(String userId, String newDatabase) {
+        databaseReference = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(userId)
+                .child("databases")
+                .child(newDatabase)
+                .child("productos");
     }
 
-    // Obtener fecha y hora actual en un solo campo
+    // Obtener fecha y hora actual
     private String obtenerFechaHora() {
         return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
     }
 
+    // Obtener referencia de productos
+    public DatabaseReference obtenerReferenciaProductos() {
+        return databaseReference;
+    }
+
     // Leer productos
-    public void obtenerProductos(String baseDatosSeleccionada, ValueEventListener listener) {
-        DatabaseReference ref = FirebaseDatabase.getInstance().getReference()
-                .child("bases_de_datos") // Ajusta según tu estructura en Firebase
-                .child(baseDatosSeleccionada)
-                .child("productos");
-
-        ref.addListenerForSingleValueEvent(listener);
+    public void obtenerProductos(ValueEventListener listener) {
+        databaseReference.addListenerForSingleValueEvent(listener);
     }
 
-
-    public DatabaseReference obtenerReferenciaProductos(String baseDatosSeleccionada) {
-        return FirebaseDatabase.getInstance().getReference()
-                .child("bases_de_datos")  // Asegura que esta estructura sea la correcta
-                .child(baseDatosSeleccionada)
-                .child("productos");
+    // Agregar producto
+    public void agregarProducto(String idProducto, ProductoModel producto, DatabaseReference.CompletionListener listener) {
+        databaseReference.child(idProducto).setValue(producto, listener);
     }
 
-
-    public void agregarProducto(String databaseName, String idProducto, ProductoModel producto, DatabaseReference.CompletionListener listener) {
-        obtenerReferenciaProductos(databaseName).child(idProducto).setValue(producto, listener);
-    }
-
-
-    // Editar producto (actualiza nombre, precio, nota y fechaHora)
-    public void editarProducto(String databaseName, String idProducto, String nombre, double precio, String nota, DatabaseReference.CompletionListener listener) {
+    // Editar producto
+    public void editarProducto(String idProducto, String nombre, double precio, String nota, DatabaseReference.CompletionListener listener) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("nombre", nombre);
         updates.put("precio", precio);
         updates.put("nota", nota);
+        updates.put("fechaHora", obtenerFechaHora());
 
-        obtenerReferenciaProductos(databaseName).child(idProducto).updateChildren(updates, listener);
+        databaseReference.child(idProducto).updateChildren(updates, listener);
     }
-
 
     // Eliminar producto
-    public void eliminarProducto(String baseDatosSeleccionada, String productoId, DatabaseReference.CompletionListener completionListener) {
-        DatabaseReference ref = obtenerReferenciaProductos(baseDatosSeleccionada).child(productoId);
-        ref.removeValue(completionListener);
+    public void eliminarProducto(String idProducto, DatabaseReference.CompletionListener completionListener) {
+        databaseReference.child(idProducto).removeValue(completionListener);
     }
-
+    public DatabaseReference getDatabaseReference() {
+        return databaseReference; // Asegúrate de que databaseReference está inicializado correctamente
+    }
 
 }

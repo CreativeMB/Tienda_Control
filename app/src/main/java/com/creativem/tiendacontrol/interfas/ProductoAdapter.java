@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
+import com.creativem.tiendacontrol.model.ProductoModel;
 
 import java.util.List;
 
