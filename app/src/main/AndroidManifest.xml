@@ -37,6 +37,9 @@
             android:name=".PerfilEmpresa"
             android:exported="false" />
         <activity
+            android:name=".interfas.MisDatos"
+            android:exported="false" />
+        <activity
             android:name=".monitor.FiltroDiaMesAnoActivity"
             android:exported="false"/>
 

@@ -46,6 +46,7 @@ import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.SessionManager;
 import com.creativem.tiendacontrol.adapter.BasesAdapter;
 import com.creativem.tiendacontrol.helper.ExcelExporter;
+import com.creativem.tiendacontrol.interfas.MisDatos;
 import com.creativem.tiendacontrol.model.AnimacionInicio;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.material.navigation.NavigationView;
@@ -641,7 +642,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             showToast("Base de datos actual: " + databaseName);
 
             // Abre la base de datos en la actividad correspondiente
-            Intent intent = new Intent(BaseDatos.this, DatosDatos.class);
+            Intent intent = new Intent(BaseDatos.this, MisDatos.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
         } else {

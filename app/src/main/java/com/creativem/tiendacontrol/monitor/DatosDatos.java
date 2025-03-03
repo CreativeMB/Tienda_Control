@@ -26,14 +26,14 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.ContextCompat;
-import androidx.fragment.app.FragmentManager;
+
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.creativem.tiendacontrol.adapter.DatosAdapter;
-import com.creativem.tiendacontrol.dialogFragment.IngresoDialogFragment;
+
 import com.creativem.tiendacontrol.helper.BdVentas;
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.dialogFragment.GastoDialogFragment;
+
 import com.creativem.tiendacontrol.helper.PuntoMil;
 import com.creativem.tiendacontrol.helper.SpinnerManager;
 import com.creativem.tiendacontrol.model.Items;
@@ -61,7 +61,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 
-public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, IngresoDialogFragment.OnDataChangedListener, GastoDialogFragment.OnDataChangedListener, DatosAdapter.OnDataChangedListener, BdVentas.OnDataChangeListener {
+public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryTextListener, DatosAdapter.OnDataChangedListener, BdVentas.OnDataChangeListener {
     // Constantes
     private static final String PREFS_NAME = "TiendaControlPrefs";
     private static final String KEY_CURRENT_DATABASE = "currentDatabase";
@@ -492,11 +492,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             }
         });
     }
-
-
-
-
-    private void configurarRecyclerView() {
+       private void configurarRecyclerView() {
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false);
         listaVentas.setLayoutManager(layoutManager);
 
@@ -510,19 +506,6 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
                     }
                 }
         );
-    }
-
-    private void mostrarGastoDialogFragment() {
-        GastoDialogFragment gastoDialogFragment = GastoDialogFragment.newInstance(currentDatabase,databaseReference.toString());
-        gastoDialogFragment.setDataChangedListener(this);
-        gastoDialogFragment.show(getSupportFragmentManager(), "GastoDialogFragment");
-    }
-
-    private void mostrarIngresoDialogFragment() {
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        IngresoDialogFragment ingresoDialogFragment = IngresoDialogFragment.newInstance(currentDatabase,databaseReference.toString());
-        ingresoDialogFragment.setDataChangedListener(this);
-        ingresoDialogFragment.show(fragmentManager, "ingreso_dialog");
     }
 
     @Override
@@ -551,7 +534,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
         bdVentas.setOnDataChangeListener(items -> {
             if (adapter != null) {
                 adapter.setItems(items);
-//                actualizarTotales();
+                actualizarTotales();
             }
         });
 
@@ -572,7 +555,7 @@ public class DatosDatos extends AppCompatActivity implements SearchView.OnQueryT
             bdVentas.setOnDataChangeListener(items -> {
                 if (adapter != null) {
                     adapter.setItems(items);
-//                    actualizarTotales();
+                    actualizarTotales();
                 }
             });
         }
