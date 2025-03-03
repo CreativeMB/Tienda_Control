@@ -7,7 +7,9 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
@@ -188,7 +190,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 for (DataSnapshot data : snapshot.getChildren()) {
                     ProductoModel producto = data.getValue(ProductoModel.class);
                     if (producto != null) {
-                        productoList.add(producto);
+                        productoList.add(0,producto);
                     }
                 }
                 if (adapter == null) {
@@ -208,7 +210,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
     private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(productoExistente == null ? "" : "Editar Producto");
+        builder.setTitle(productoExistente == null ? "Crear Producto" : "Editar Producto");
 
         View vista = getLayoutInflater().inflate(R.layout.productos_nuevos, null);
         builder.setView(vista);
@@ -227,7 +229,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             switchTipo.setChecked(false);
         }
 
-        // Agregar TextWatcher para formatear correctamente el número sin duplicación
+        // Formatear el input de precio con TextWatcher
         inputPrecio.addTextChangedListener(new TextWatcher() {
             private boolean isEditing = false;
 
@@ -253,7 +255,6 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                         inputPrecio.setText("");
                     }
                 }
-
                 isEditing = false;
             }
         });
@@ -264,72 +265,85 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         AlertDialog dialog = builder.create();
         dialog.show();
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String nombre = inputNombre.getText().toString().trim();
-            String precioStr = inputPrecio.getText().toString().trim().replace(",", ""); // Eliminar comas
-            String nota = inputNota.getText().toString().trim();
+        // Manejo de tecla Enter en inputPrecio
+        inputPrecio.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE ||
+                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
+                guardarActualizarProducto(dialog, inputNombre, inputPrecio, inputNota, switchTipo, productoExistente);
+                return true;
+            }
+            return false;
+        });
 
-            if (nombre.isEmpty() || precioStr.isEmpty()) {
-                Toast.makeText(this, "⚠️ Nombre y precio son obligatorios", Toast.LENGTH_SHORT).show();
-                return;
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v ->
+                guardarActualizarProducto(dialog, inputNombre, inputPrecio, inputNota, switchTipo, productoExistente));
+    }
+
+    // Método que maneja tanto "Guardar" como "Actualizar"
+    private void guardarActualizarProducto(AlertDialog dialog, EditText inputNombre, EditText inputPrecio, EditText inputNota, Switch switchTipo, ProductoModel productoExistente) {
+        String nombre = inputNombre.getText().toString().trim();
+        String precioStr = inputPrecio.getText().toString().trim().replace(",", ""); // Eliminar comas
+        String nota = inputNota.getText().toString().trim();
+
+        if (nombre.isEmpty() || precioStr.isEmpty()) {
+            Toast.makeText(this, "⚠️ Nombre y precio son obligatorios", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        double precio;
+        try {
+            precio = Double.parseDouble(precioStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "⚠️ Precio no válido", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (switchTipo.isChecked()) {
+            precio = -Math.abs(precio);
+        }
+
+        if (productoExistente == null) { // **Creación de producto nuevo**
+            String id = firebaseHelper.getDatabaseReference().push().getKey(); // Genera ID único
+
+            if (id != null) { // Verifica que el ID no sea null
+                String fechaHora = new SimpleDateFormat("yy-MM-dd HH", Locale.getDefault()).format(new Date());
+
+                ProductoModel nuevoProducto = new ProductoModel(id, nombre, precio, nota, fechaHora);
+
+                firebaseHelper.agregarProducto(id, nuevoProducto, (error, ref) -> {
+                    if (error == null) {
+                        dialog.dismiss();
+                        cargarProductos();
+                    } else {
+                        Toast.makeText(MisDatos.this, "❌ Error al agregar producto", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            } else {
+                Toast.makeText(this, "⚠️ No se pudo generar un ID único", Toast.LENGTH_SHORT).show();
             }
 
-            double precio;
-            try {
-                precio = Double.parseDouble(precioStr);
-            } catch (NumberFormatException e) {
-                Toast.makeText(this, "⚠️ Precio no válido", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        } else { // **Edición de producto existente**
+            productoExistente.setNombre(nombre);
+            productoExistente.setPrecio(precio);
+            productoExistente.setNota(nota);
 
-            if (switchTipo.isChecked()) {
-                precio = -Math.abs(precio);
-            }
-
-            if (productoExistente == null) { // **Creación de producto nuevo**
-                String id = firebaseHelper.getDatabaseReference().push().getKey(); // Genera ID único
-
-                if (id != null) { // Verifica que el ID no sea null
-                    // Formatear la fecha y hora antes de pasarla al constructor de ProductoModel
-                    String fechaHora = new SimpleDateFormat("yy-MM-dd HH", Locale.getDefault()).format(new Date());
-
-                    // Crear el nuevo producto con la fecha ya formateada
-                    ProductoModel nuevoProducto = new ProductoModel(id, nombre, precio, nota, fechaHora);
-
-                    firebaseHelper.agregarProducto(id, nuevoProducto, (error, ref) -> {
+            firebaseHelper.editarProducto(
+                    productoExistente.getId(),
+                    nombre,
+                    precio,
+                    nota,
+                    (error, ref) -> {
                         if (error == null) {
                             dialog.dismiss();
-                            cargarProductos(); // Refresca la lista de productos
+                            cargarProductos();
                         } else {
-                            Toast.makeText(MisDatos.this, "❌ Error al agregar producto", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(MisDatos.this, "❌ Error al actualizar producto", Toast.LENGTH_SHORT).show();
                         }
-                    });
-                } else {
-                    Toast.makeText(this, "⚠️ No se pudo generar un ID único", Toast.LENGTH_SHORT).show();
-                }
-
-            } else { // **Edición de producto existente**
-                productoExistente.setNombre(nombre);
-                productoExistente.setPrecio(precio);
-                productoExistente.setNota(nota);
-
-                firebaseHelper.editarProducto(
-                        productoExistente.getId(),
-                        nombre,
-                        precio,
-                        nota,
-                        (error, ref) -> {
-                            if (error == null) {
-                                dialog.dismiss();
-                                cargarProductos();
-                            } else {
-                                Toast.makeText(MisDatos.this, "❌ Error al actualizar producto", Toast.LENGTH_SHORT).show();
-                            }
-                        }
-                );
-            }
-        });
+                    }
+            );
+        }
     }
+
 
 
 }
