@@ -6,20 +6,45 @@
     android:layout_height="match_parent"
     tools:context=".MisDatos">
 
-    <!-- Título "Venta" para la sección -->
-    <TextView
-        android:id="@+id/Venta"
-        android:layout_width="wrap_content"
+    <!-- Contenedor horizontal para "Productos" y el Spinner -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/layout_encabezado"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Productos"
-        android:textSize="30sp"
-        android:textStyle="bold"
-        android:padding="5dp"
-        android:background="#1D000000"
+        android:padding="16dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        />
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <!-- Título "Venta" para la sección -->
+        <TextView
+            android:id="@+id/Venta"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Productos"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:padding="5dp"
+            android:textColor="@android:color/black"
+            android:background="#1D000000"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <!-- Spinner para filtro -->
+        <Spinner
+            android:id="@+id/spinner_filtro"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:minHeight="48dp"
+            android:paddingHorizontal="16dp"
+            style="@style/SpinnerPersonalisado"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toEndOf="@id/Venta"
+            android:layout_marginStart="16dp"/>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <!-- RecyclerView para mostrar productos -->
     <androidx.recyclerview.widget.RecyclerView
@@ -27,7 +52,7 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:padding="8dp"
-        app:layout_constraintTop_toBottomOf="@id/Venta"
+        app:layout_constraintTop_toBottomOf="@id/layout_encabezado"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />

@@ -14,7 +14,13 @@ import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.helper.PuntoMil;
 import com.creativem.tiendacontrol.interfas.ProductoModel;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHolder> {
     private Context context;
@@ -83,4 +89,67 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
             Eliminar = itemView.findViewById(R.id.EliminarProducto);
         }
     }
+    public void filtrarPorFecha(String fecha, String tipoFiltro) {
+        List<ProductoModel> listaFiltrada = new ArrayList<>();
+
+        SimpleDateFormat dateFormatDia = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat dateFormatMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
+        SimpleDateFormat dateFormatAño = new SimpleDateFormat("yyyy", Locale.getDefault());
+
+        for (ProductoModel producto : productoList) {
+            if (producto.getFechaHora() != null) {
+                try {
+                    Date fechaProducto = dateFormatDia.parse(producto.getFechaHora());
+                    String fechaProductoFormateada = "";
+
+                    switch (tipoFiltro) {
+                        case "Día":
+                            fechaProductoFormateada = dateFormatDia.format(fechaProducto);
+                            break;
+                        case "Semana":
+                            Calendar calProducto = Calendar.getInstance();
+                            calProducto.setTime(fechaProducto);
+                            String[] rangoFechas = fecha.split(" - ");
+
+                            try {
+                                Date inicioSemana = dateFormatDia.parse(rangoFechas[0]);
+                                Date finSemana = dateFormatDia.parse(rangoFechas[1]);
+
+                                if (fechaProducto.compareTo(inicioSemana) >= 0 && fechaProducto.compareTo(finSemana) <= 0) {
+                                    fechaProductoFormateada = fecha;
+                                } else {
+                                    continue;
+                                }
+                            } catch (ParseException e) {
+                                e.printStackTrace();
+                                continue;
+                            }
+                            break;
+                        case "Mes":
+                            fechaProductoFormateada = dateFormatMes.format(fechaProducto);
+                            break;
+                        case "Año":
+                            fechaProductoFormateada = dateFormatAño.format(fechaProducto);
+                            break;
+                        default:
+                            break;
+                    }
+
+                    if (fechaProductoFormateada.equals(fecha)) {
+                        listaFiltrada.add(producto);
+                    }
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        // Actualizar la lista de productos y notificar cambios
+        actualizarLista(listaFiltrada);
+    }
+    public void actualizarLista(List<ProductoModel> nuevaLista) {
+        this.productoList = nuevaLista;
+        notifyDataSetChanged();
+    }
+
 }

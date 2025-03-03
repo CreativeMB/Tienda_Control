@@ -6,8 +6,12 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,9 +29,11 @@ import com.google.firebase.database.*;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+
 
 public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnProductoClickListener {
     private RecyclerView recyclerViewProductos;
@@ -42,10 +48,33 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
     private String userId;
     private String baseDatosSeleccionada;
 
+    private Spinner spinnerFiltro;
+    private ProductoAdapter miAdaptador;
+    private Context context;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mis_datos);
+
+
+        context = this; // Ahora Android puede instanciarla sin problemas
+        productoList = new ArrayList<>();
+
+        miAdaptador = new ProductoAdapter(context, productoList, new ProductoAdapter.OnProductoClickListener() {
+            @Override
+            public void onEditClick(ProductoModel producto) {
+
+            }
+
+            @Override
+            public void onDeleteClick(ProductoModel producto) {
+
+            }
+
+        });
+
+
 
         recyclerViewProductos = findViewById(R.id.recyclerViewProductos);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(this));
@@ -64,13 +93,68 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         } else {
             guardarBaseDatosSeleccionada(baseDatosSeleccionada);
             firebaseHelper = new FirebaseHelper(userId, baseDatosSeleccionada);
+
+
             cargarProductos();
+
         }
 
         TextView textVentas = findViewById(R.id.Venta);
         textVentas.setOnClickListener(v -> mostrarDialogoCrearProducto(null));
-    }
 
+        Spinner spinnerFiltro = findViewById(R.id.spinner_filtro);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
+                this, R.array.filtro_opciones, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerFiltro.setAdapter(adapter);
+
+        spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String tipoFiltro = parent.getItemAtPosition(position).toString();
+                String fechaSeleccionada = obtenerFechaSegunFiltro(tipoFiltro);
+                if (miAdaptador != null) {
+                    miAdaptador.filtrarPorFecha(fechaSeleccionada, tipoFiltro);
+                } else {
+                    Log.e("Filtro", "El adaptador no está inicializado.");
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {}
+        });
+
+
+    }
+    private String obtenerFechaSegunFiltro(String tipoFiltro) {
+        SimpleDateFormat dateFormatDia = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        SimpleDateFormat dateFormatMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
+        SimpleDateFormat dateFormatAño = new SimpleDateFormat("yyyy", Locale.getDefault());
+
+        Calendar calendar = Calendar.getInstance();
+
+        switch (tipoFiltro) {
+            case "Día":
+                return dateFormatDia.format(calendar.getTime());
+
+            case "Semana":
+                calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
+                String inicioSemana = dateFormatDia.format(calendar.getTime());
+                calendar.add(Calendar.DATE, 6);
+                String finSemana = dateFormatDia.format(calendar.getTime());
+                return inicioSemana + " - " + finSemana;
+
+            case "Mes":
+                return dateFormatMes.format(calendar.getTime());
+
+            case "Año":
+                return dateFormatAño.format(calendar.getTime());
+
+            default:
+                return "";
+        }
+    }
     private void guardarBaseDatosSeleccionada(String nombreBase) {
         sharedPreferences.edit().putString(KEY_CURRENT_DATABASE, nombreBase).apply();
     }
