@@ -187,12 +187,33 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 productoList.clear();
+                double totalIngresos = 0;
+                double totalEgresos = 0;
+
                 for (DataSnapshot data : snapshot.getChildren()) {
                     ProductoModel producto = data.getValue(ProductoModel.class);
                     if (producto != null) {
-                        productoList.add(0,producto);
+                        productoList.add(0, producto);
+
+                        if (producto.getPrecio() > 0) {
+                            totalIngresos += producto.getPrecio();
+                        } else {
+                            totalEgresos += producto.getPrecio();
+                        }
                     }
                 }
+
+                double diferencia = totalIngresos + totalEgresos;
+
+                // Actualizar los TextView con los valores calculados
+                TextView textIngresos = findViewById(R.id.textIngresos);
+                TextView textEgresos = findViewById(R.id.textEgresos);
+                TextView textDiferencia = findViewById(R.id.textDiferencia);
+
+                textIngresos.setText("Ingresos: $" + String.format(Locale.getDefault(), "%,.2f", totalIngresos));
+                textEgresos.setText("Egresos: $" + String.format(Locale.getDefault(), "%,.2f", Math.abs(totalEgresos)));
+                textDiferencia.setText("Diferencia: $" + String.format(Locale.getDefault(), "%,.2f", diferencia));
+
                 if (adapter == null) {
                     adapter = new ProductoAdapter(MisDatos.this, productoList, MisDatos.this);
                     recyclerViewProductos.setAdapter(adapter);
