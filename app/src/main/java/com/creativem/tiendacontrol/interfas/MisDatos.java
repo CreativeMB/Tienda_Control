@@ -19,7 +19,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.helper.PuntoMil;
-import com.creativem.tiendacontrol.model.ProductoModel;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 
@@ -206,7 +206,11 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 String id = firebaseHelper.getDatabaseReference().push().getKey(); // Genera ID único
 
                 if (id != null) { // Verifica que el ID no sea null
-                    ProductoModel nuevoProducto = new ProductoModel(id, nombre, precio, nota, obtenerFechaHoraActual());
+                    // Formatear la fecha y hora antes de pasarla al constructor de ProductoModel
+                    String fechaHora = new SimpleDateFormat("yy-MM-dd HH", Locale.getDefault()).format(new Date());
+
+                    // Crear el nuevo producto con la fecha ya formateada
+                    ProductoModel nuevoProducto = new ProductoModel(id, nombre, precio, nota, fechaHora);
 
                     firebaseHelper.agregarProducto(id, nuevoProducto, (error, ref) -> {
                         if (error == null) {
@@ -242,12 +246,6 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             }
         });
     }
-
-    private String obtenerFechaHoraActual() {
-        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
-        return sdf.format(new Date());
-    }
-
 
 
 }

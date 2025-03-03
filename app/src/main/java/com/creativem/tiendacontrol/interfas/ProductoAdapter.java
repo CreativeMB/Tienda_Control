@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.helper.PuntoMil;
-import com.creativem.tiendacontrol.model.ProductoModel;
+import com.creativem.tiendacontrol.interfas.ProductoModel;
 
 import java.util.List;
 
@@ -43,13 +43,15 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ProductoModel producto = productoList.get(position);
 
-        // Convertir el precio de double a long antes de formatear
-        String precioFormateado = "COP " + PuntoMil.getFormattedNumber((long) producto.getPrecio());
-
+        // Si producto.getFechaHora() ya está en formato correcto (sin segundos) lo mostramos directamente
         holder.nombre.setText(producto.getNombre());
+
+        // Convertir el precio de double a long antes de formatear
+        String precioFormateado = PuntoMil.getFormattedNumber((long) producto.getPrecio());
         holder.precio.setText(precioFormateado);
-        holder.nota.setText(producto.getNota());
-        holder.fechaHora.setText("Última edición: " + producto.getFechaHora());
+
+        // Mostrar la fecha formateada sin segundos
+        holder.fechaHora.setText(producto.getFechaHora()); // Asegúrate de que esto es una fecha formateada correctamente
 
         // Diferenciar productos negativos y positivos
         if (producto.getPrecio() < 0) {
@@ -64,7 +66,6 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
         holder.Eliminar.setOnClickListener(v -> listener.onDeleteClick(producto));
     }
 
-
     @Override
     public int getItemCount() {
         return productoList.size();
@@ -77,7 +78,6 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
             super(itemView);
             nombre = itemView.findViewById(R.id.NombreProducto);
             precio = itemView.findViewById(R.id.PrecioProducto);
-            nota = itemView.findViewById(R.id.NotaProducto);
             fechaHora = itemView.findViewById(R.id.FechaHoraProducto);
             Editar = itemView.findViewById(R.id.EditarProducto);
             Eliminar = itemView.findViewById(R.id.EliminarProducto);

@@ -1,6 +1,6 @@
 package com.creativem.tiendacontrol.interfas;
 
-import com.creativem.tiendacontrol.model.ProductoModel;
+import com.creativem.tiendacontrol.interfas.ProductoModel;
 import com.google.firebase.database.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -21,9 +21,11 @@ public class FirebaseHelper {
     }
 
     // Obtener fecha y hora actual
-    private String obtenerFechaHora() {
-        return new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).format(new Date());
+    public String obtenerFechaHora() {
+        return new SimpleDateFormat("yy-MM-dd HH", Locale.getDefault()).format(new Date());
     }
+
+
 
     // Obtener referencia de productos
     public DatabaseReference obtenerReferenciaProductos() {

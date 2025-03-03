@@ -11,60 +11,60 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp"
-        android:orientation="vertical">
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
 
         <TextView
             android:id="@+id/NombreProducto"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
             android:layout_height="wrap_content"
             android:text="Nombre del Producto"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:textColor="@android:color/black"/>
+            android:textColor="@android:color/black" />
 
         <TextView
             android:id="@+id/PrecioProducto"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="2"
             android:layout_height="wrap_content"
             android:text="Precio: $0.00"
             android:textSize="16sp"
-            android:textColor="@android:color/darker_gray"/>
-
-        <TextView
-            android:id="@+id/NotaProducto"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Nota del producto"
-            android:textSize="14sp"
-            android:textColor="@android:color/darker_gray"/>
+            android:textColor="@android:color/darker_gray" />
 
         <TextView
             android:id="@+id/FechaHoraProducto"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="4"
             android:layout_height="wrap_content"
             android:text="Fecha y Hora"
             android:textSize="12sp"
             android:textColor="@android:color/holo_blue_dark"
-            android:layout_marginTop="4dp"/>
+            android:gravity="end"/>
 
         <TextView
             android:id="@+id/EditarProducto"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="1.5"
             android:layout_height="wrap_content"
             android:text="Editar"
             android:textSize="12sp"
             android:textColor="@android:color/holo_blue_dark"
-            android:layout_marginTop="4dp"/>
+            android:gravity="center"
+            android:layout_marginStart="8dp"/>
+
         <TextView
             android:id="@+id/EliminarProducto"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            android:layout_weight="0.5"
             android:layout_height="wrap_content"
-            android:text="Eliminar"
+            android:text="X"
             android:textSize="12sp"
-            android:textColor="@android:color/holo_blue_dark"
-            android:layout_marginTop="4dp"/>
-
-
+            android:textColor="@android:color/holo_red_dark"
+            android:gravity="center"
+            android:layout_marginStart="8dp"/>
 
     </LinearLayout>
+
 </androidx.cardview.widget.CardView>
