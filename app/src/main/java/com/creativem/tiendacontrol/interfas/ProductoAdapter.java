@@ -55,7 +55,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
 
         // Diferenciar productos negativos y positivos
         if (producto.getPrecio() < 0) {
-            holder.precio.setTextColor(context.getResources().getColor(R.color.buttonTextColor)); // Rojo
+            holder.precio.setTextColor(context.getResources().getColor(R.color.endColor)); // Rojo
             holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.colorFondoNegativo)); // Fondo rojizo
         } else {
             holder.precio.setTextColor(context.getResources().getColor(R.color.Buton)); // Verde
