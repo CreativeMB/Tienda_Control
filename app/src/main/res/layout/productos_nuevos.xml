@@ -9,16 +9,16 @@
         android:id="@+id/inputNombre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="30dp"
+        android:textSize="50dp"
         android:gravity="center"
-        android:hint="Nombre del producto"
+        android:hint="Nombre"
         android:inputType="textCapWords" />
 
     <EditText
         android:id="@+id/inputPrecio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="50dp"
+        android:textSize="70dp"
         android:gravity="center"
         android:hint="Precio"
         android:inputType="numberDecimal" />

@@ -210,7 +210,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
     private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(productoExistente == null ? "Crear Producto" : "Editar Producto");
+        builder.setTitle(productoExistente == null ? "" : "");
 
         View vista = getLayoutInflater().inflate(R.layout.productos_nuevos, null);
         builder.setView(vista);
