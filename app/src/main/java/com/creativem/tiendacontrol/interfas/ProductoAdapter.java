@@ -11,6 +11,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
+import com.creativem.tiendacontrol.helper.PuntoMil;
 import com.creativem.tiendacontrol.model.ProductoModel;
 
 import java.util.List;
@@ -41,17 +42,21 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         ProductoModel producto = productoList.get(position);
+
+        // Convertir el precio de double a long antes de formatear
+        String precioFormateado = "COP " + PuntoMil.getFormattedNumber((long) producto.getPrecio());
+
         holder.nombre.setText(producto.getNombre());
-        holder.precio.setText(String.format("COP %.2f", producto.getPrecio()));
+        holder.precio.setText(precioFormateado);
         holder.nota.setText(producto.getNota());
         holder.fechaHora.setText("Última edición: " + producto.getFechaHora());
 
         // Diferenciar productos negativos y positivos
         if (producto.getPrecio() < 0) {
-            holder.precio.setTextColor(context.getResources().getColor(R.color.buttonTextColor)); // Precio en rojo
+            holder.precio.setTextColor(context.getResources().getColor(R.color.buttonTextColor)); // Rojo
             holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.colorFondoNegativo)); // Fondo rojizo
         } else {
-            holder.precio.setTextColor(context.getResources().getColor(R.color.Buton)); // Precio en verde
+            holder.precio.setTextColor(context.getResources().getColor(R.color.Buton)); // Verde
             holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.colorFondoPositivo)); // Fondo verdoso
         }
 

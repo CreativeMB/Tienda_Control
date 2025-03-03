@@ -4,6 +4,8 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Switch;
@@ -16,6 +18,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
+import com.creativem.tiendacontrol.helper.PuntoMil;
 import com.creativem.tiendacontrol.model.ProductoModel;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
@@ -140,6 +143,37 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             switchTipo.setChecked(false);
         }
 
+        // Agregar TextWatcher para formatear correctamente el número sin duplicación
+        inputPrecio.addTextChangedListener(new TextWatcher() {
+            private boolean isEditing = false;
+
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                if (isEditing) return;
+                isEditing = true;
+
+                String originalString = s.toString().replaceAll(",", ""); // Quitar comas previas
+                if (!originalString.isEmpty()) {
+                    try {
+                        double value = Double.parseDouble(originalString);
+                        String formattedString = PuntoMil.getFormattedNumber((long) value);
+                        inputPrecio.setText(formattedString);
+                        inputPrecio.setSelection(formattedString.length()); // Mantener cursor al final
+                    } catch (NumberFormatException e) {
+                        inputPrecio.setText("");
+                    }
+                }
+
+                isEditing = false;
+            }
+        });
+
         builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar", null);
         builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
 
@@ -148,7 +182,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
             String nombre = inputNombre.getText().toString().trim();
-            String precioStr = inputPrecio.getText().toString().trim();
+            String precioStr = inputPrecio.getText().toString().trim().replace(",", ""); // Eliminar comas
             String nota = inputNota.getText().toString().trim();
 
             if (nombre.isEmpty() || precioStr.isEmpty()) {
@@ -156,7 +190,14 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 return;
             }
 
-            double precio = Double.parseDouble(precioStr);
+            double precio;
+            try {
+                precio = Double.parseDouble(precioStr);
+            } catch (NumberFormatException e) {
+                Toast.makeText(this, "⚠️ Precio no válido", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
             if (switchTipo.isChecked()) {
                 precio = -Math.abs(precio);
             }
@@ -180,11 +221,15 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 }
 
             } else { // **Edición de producto existente**
+                productoExistente.setNombre(nombre);
+                productoExistente.setPrecio(precio);
+                productoExistente.setNota(nota);
+
                 firebaseHelper.editarProducto(
                         productoExistente.getId(),
-                        productoExistente.getNombre(),
-                        productoExistente.getPrecio(),
-                        productoExistente.getNota(),
+                        nombre,
+                        precio,
+                        nota,
                         (error, ref) -> {
                             if (error == null) {
                                 dialog.dismiss();
@@ -202,5 +247,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm", Locale.getDefault());
         return sdf.format(new Date());
     }
+
+
 
 }
