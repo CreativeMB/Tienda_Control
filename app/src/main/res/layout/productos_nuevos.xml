@@ -9,6 +9,8 @@
         android:id="@+id/inputNombre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="30dp"
+        android:gravity="center"
         android:hint="Nombre del producto"
         android:inputType="textCapWords" />
 
@@ -16,6 +18,8 @@
         android:id="@+id/inputPrecio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:textSize="50dp"
+        android:gravity="center"
         android:hint="Precio"
         android:inputType="numberDecimal" />
 
