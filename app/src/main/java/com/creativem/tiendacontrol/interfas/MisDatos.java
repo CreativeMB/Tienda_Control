@@ -238,7 +238,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
     private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle(productoExistente == null ? "" : "");
+        builder.setTitle(productoExistente == null ? "Nuevo Producto" : "Editar Producto");
 
         View vista = getLayoutInflater().inflate(R.layout.productos_nuevos, null);
         builder.setView(vista);
@@ -250,14 +250,18 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
         if (productoExistente != null) {
             inputNombre.setText(productoExistente.getNombre());
-            inputValor.setText(String.valueOf(Math.abs(productoExistente.getValor())));
+
+            // **Se convierte el valor a entero sin decimales**
+            long valorEntero = (long) Math.abs(productoExistente.getValor());
+            inputValor.setText(String.valueOf(valorEntero));
+
             inputNota.setText(productoExistente.getNota());
             switchTipo.setChecked(productoExistente.getValor() < 0);
         } else {
             switchTipo.setChecked(false);
         }
 
-        // Formatear el input de valor con TextWatcher
+        // **Manejo de formateo del valor**
         inputValor.addTextChangedListener(new TextWatcher() {
             private boolean isEditing = false;
 
@@ -272,11 +276,11 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 if (isEditing) return;
                 isEditing = true;
 
-                String originalString = s.toString().replaceAll(",", "");
+                String originalString = s.toString().replaceAll("[^\\d]", ""); // Solo números
                 if (!originalString.isEmpty()) {
                     try {
-                        double value = Double.parseDouble(originalString);
-                        String formattedString = PuntoMil.getFormattedNumber((long) value);
+                        long value = Long.parseLong(originalString);
+                        String formattedString = PuntoMil.getFormattedNumber(value);
                         inputValor.setText(formattedString);
                         inputValor.setSelection(formattedString.length());
                     } catch (NumberFormatException e) {
@@ -287,45 +291,63 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             }
         });
 
+        // **Corrección de enfoque**
+        inputNombre.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                inputValor.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
+        inputValor.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                inputNota.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
+        inputNota.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_NEXT) {
+                switchTipo.requestFocus();
+                return true;
+            }
+            return false;
+        });
+
         builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar", null);
         builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
 
         AlertDialog dialog = builder.create();
         dialog.show();
 
-        inputValor.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE ||
-                    (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-                return true;
-            }
-            return false;
-        });
-
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v ->
                 guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente));
     }
 
+
+
     private void guardarActualizarProducto(AlertDialog dialog, EditText inputNombre, EditText inputValor, EditText inputNota, Switch switchTipo, ProductoModel productoExistente) {
         String nombre = inputNombre.getText().toString().trim();
-        String valorStr = inputValor.getText().toString().trim().replace(",", "");
         String nota = inputNota.getText().toString().trim();
+        String valorStr = inputValor.getText().toString().trim().replaceAll("[^\\d]", ""); // Solo números
 
         if (nombre.isEmpty() || valorStr.isEmpty()) {
             Toast.makeText(this, "⚠️ Nombre y valor son obligatorios", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        double valor;
+        long valor;
         try {
-            valor = Double.parseDouble(valorStr);
+            valor = Long.parseLong(valorStr); // Convertir directamente sin usar decimales
         } catch (NumberFormatException e) {
             Toast.makeText(this, "⚠️ Valor no válido", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (switchTipo.isChecked()) {
-            valor = -Math.abs(valor);
+            valor = -Math.abs(valor); // Asegurar que sea negativo si corresponde
         }
 
         if (productoExistente == null) { // **Creación de producto nuevo**
@@ -369,6 +391,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             );
         }
     }
+
 
 
 
