@@ -50,13 +50,13 @@
         android:layout_height="wrap_content"
         android:text="¿Es un gasto (negativo)?"
         android:imeOptions="actionDone"
-        android:nextFocusDown="@id/textGuardar"
+        android:nextFocusDown="@id/inputGuardar"
         android:nextFocusUp="@id/inputNota"
         android:layout_below="@id/inputNota"
         android:layout_marginTop="10dp" />
 
     <TextView
-        android:id="@+id/textGuardar"
+        android:id="@+id/inputGuardar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Guardar"

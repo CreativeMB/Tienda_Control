@@ -252,6 +252,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         EditText inputValor = vista.findViewById(R.id.inputValor);
         EditText inputNombre = vista.findViewById(R.id.inputNombre);
         EditText inputNota = vista.findViewById(R.id.inputNota);
+        TextView inputGuardar = vista.findViewById(R.id.inputGuardar);
         Switch switchTipo = vista.findViewById(R.id.switchTipo);
 
         inputNombre.setImeOptions(EditorInfo.IME_ACTION_DONE);
@@ -263,6 +264,20 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
             }
             return false;
+        });
+        inputGuardar.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                // Llamar a la misma función para guardar o actualizar
+                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
+                return true; // Se maneja la acción, no pasa más
+            }
+            return false; // Si no es "DONE", no hacer nada
+        });
+
+// También manejar el clic en el botón
+        inputGuardar.setOnClickListener(v -> {
+            // Llamar a la misma función para guardar o actualizar cuando el usuario hace clic en el botón
+            guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
         });
 
         inputValor.addTextChangedListener(new TextWatcher() {
