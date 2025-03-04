@@ -13,29 +13,23 @@
         android:textSize="70dp"
         android:gravity="center"
         android:hint="Precio"
-        android:imeOptions="actionNext"
         android:inputType="number" />
     <EditText
         android:id="@+id/inputNombre"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:imeOptions="actionDone"
         android:textSize="50dp"
         android:gravity="center"
         android:hint="Nombre"
         android:inputType="text"/>
-
-
-
-
 
     <EditText
         android:id="@+id/inputNota"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Nota"
-        android:imeOptions="actionNext"
     android:inputType="textMultiLine" />
+
 
     <Switch
         android:id="@+id/switchTipo"
@@ -43,4 +37,16 @@
         android:layout_height="wrap_content"
         android:text="¿Es un gasto (negativo)?"
         android:imeOptions="actionDone"/>
+    <TextView
+        android:id="@+id/textGuardar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Guardar"
+        android:textColor="#007BFF"
+        android:gravity="center"
+        android:padding="10dp"
+        android:textSize="18sp"
+        android:clickable="true"
+        android:focusable="true"/>
+
 </LinearLayout>

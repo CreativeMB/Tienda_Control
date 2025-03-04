@@ -235,7 +235,6 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         });
     }
 
-
     private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(productoExistente == null ? "Nuevo Producto" : "Editar Producto");
@@ -243,25 +242,22 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         View vista = getLayoutInflater().inflate(R.layout.productos_nuevos, null);
         builder.setView(vista);
 
-        EditText inputNombre = vista.findViewById(R.id.inputNombre);
         EditText inputValor = vista.findViewById(R.id.inputValor);
+        EditText inputNombre = vista.findViewById(R.id.inputNombre);
         EditText inputNota = vista.findViewById(R.id.inputNota);
         Switch switchTipo = vista.findViewById(R.id.switchTipo);
 
-        if (productoExistente != null) {
-            inputNombre.setText(productoExistente.getNombre());
+        inputNombre.setImeOptions(EditorInfo.IME_ACTION_DONE);
 
-            // **Se convierte el valor a entero sin decimales**
-            long valorEntero = (long) Math.abs(productoExistente.getValor());
-            inputValor.setText(String.valueOf(valorEntero));
+        final AlertDialog dialog = builder.create();
 
-            inputNota.setText(productoExistente.getNota());
-            switchTipo.setChecked(productoExistente.getValor() < 0);
-        } else {
-            switchTipo.setChecked(false);
-        }
+        inputNombre.setOnEditorActionListener((v, actionId, event) -> {
+            if (actionId == EditorInfo.IME_ACTION_DONE) {
+                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
+            }
+            return false;
+        });
 
-        // **Manejo de formateo del valor**
         inputValor.addTextChangedListener(new TextWatcher() {
             private boolean isEditing = false;
 
@@ -276,11 +272,11 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 if (isEditing) return;
                 isEditing = true;
 
-                String originalString = s.toString().replaceAll("[^\\d]", ""); // Solo números
+                String originalString = s.toString().replaceAll("[^\\d]", "");
                 if (!originalString.isEmpty()) {
                     try {
                         long value = Long.parseLong(originalString);
-                        String formattedString = PuntoMil.getFormattedNumber(value);
+                        String formattedString = PuntoMil.getFormattedNumber(value); // Asumiendo que PuntoMil existe
                         inputValor.setText(formattedString);
                         inputValor.setSelection(formattedString.length());
                     } catch (NumberFormatException e) {
@@ -291,39 +287,31 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             }
         });
 
-        // **Corrección de enfoque**
-        inputNombre.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                inputValor.requestFocus();
-                return true;
+        // Agregar el TextView para "Guardar" en lugar del setPositiveButton
+        TextView textGuardar = vista.findViewById(R.id.textGuardar);
+        textGuardar.setOnClickListener(v -> {
+            // Si el campo "Nombre" tiene datos, guardar o actualizar el producto
+            if (!inputNombre.getText().toString().isEmpty()) {
+                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
+
+                // Cerrar el diálogo después de guardar o actualizar
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss(); // Cierra el AlertDialog
+                }
             }
-            return false;
         });
 
-        inputValor.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                inputNota.requestFocus();
-                return true;
-            }
-            return false;
-        });
-
-        inputNota.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_NEXT) {
-                switchTipo.requestFocus();
-                return true;
-            }
-            return false;
-        });
-
-        builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar", null);
-        builder.setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
-
-        AlertDialog dialog = builder.create();
         dialog.show();
 
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v ->
-                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente));
+        if (productoExistente != null) {
+            inputNombre.setText(productoExistente.getNombre());
+            long valorEntero = (long) Math.abs(productoExistente.getValor());
+            inputValor.setText(String.valueOf(valorEntero));
+            inputNota.setText(productoExistente.getNota());
+            switchTipo.setChecked(productoExistente.getValor() < 0);
+        } else {
+            switchTipo.setChecked(false);
+        }
     }
 
 
