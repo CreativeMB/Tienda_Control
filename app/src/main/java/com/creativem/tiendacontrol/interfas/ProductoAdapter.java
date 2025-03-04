@@ -96,9 +96,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
         SimpleDateFormat dateFormatMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
         SimpleDateFormat dateFormatAño = new SimpleDateFormat("yyyy", Locale.getDefault());
         SimpleDateFormat dateFormatSemana = new SimpleDateFormat("yyyy-'W'ww", Locale.getDefault());
-        SimpleDateFormat dateFormatBD = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()); // Formato de tu base de datos
-
-
+        SimpleDateFormat dateFormatBD = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault());
         try {
             Date fechaFiltroDate;
             switch (tipoFiltro) {
@@ -129,7 +127,17 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
                 }
 
             }
-
+            // Ordena la lista filtrada por fecha de publicación (más reciente primero)
+            listaFiltrada.sort((p1, p2) -> {
+                try {
+                    Date fecha1 = dateFormatBD.parse(p1.getFechaHora());
+                    Date fecha2 = dateFormatBD.parse(p2.getFechaHora());
+                    return fecha2.compareTo(fecha1); // Ordena descendentemente (más reciente primero)
+                } catch (ParseException e) {
+                    Log.e("filtrarPorFecha", "Error al ordenar por fecha: " + e.getMessage());
+                    return 0; // En caso de error, mantiene el orden original
+                }
+            });
             filteredProductList.clear();
             filteredProductList.addAll(listaFiltrada);
             notifyDataSetChanged();
