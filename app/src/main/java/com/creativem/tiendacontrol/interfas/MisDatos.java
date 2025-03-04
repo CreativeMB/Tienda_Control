@@ -276,7 +276,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 if (!originalString.isEmpty()) {
                     try {
                         long value = Long.parseLong(originalString);
-                        String formattedString = PuntoMil.getFormattedNumber(value); // Asumiendo que PuntoMil existe
+                        String formattedString = PuntoMil.getFormattedNumber(value); //  Asumiendo que PuntoMil existe
                         inputValor.setText(formattedString);
                         inputValor.setSelection(formattedString.length());
                     } catch (NumberFormatException e) {
@@ -287,19 +287,11 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             }
         });
 
-        // Agregar el TextView para "Guardar" en lugar del setPositiveButton
-        TextView textGuardar = vista.findViewById(R.id.textGuardar);
-        textGuardar.setOnClickListener(v -> {
-            // Si el campo "Nombre" tiene datos, guardar o actualizar el producto
-            if (!inputNombre.getText().toString().isEmpty()) {
-                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-
-                // Cerrar el diálogo después de guardar o actualizar
-                if (dialog != null && dialog.isShowing()) {
-                    dialog.dismiss(); // Cierra el AlertDialog
-                }
-            }
+        builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar", (dialogInterface, which) -> {
+            guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
         });
+
+        builder.setNegativeButton("Cancelar", (dialogInterface, which) -> {}); // No necesita acción aquí
 
         dialog.show();
 
@@ -313,7 +305,6 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             switchTipo.setChecked(false);
         }
     }
-
 
 
     private void guardarActualizarProducto(AlertDialog dialog, EditText inputNombre, EditText inputValor, EditText inputNota, Switch switchTipo, ProductoModel productoExistente) {

@@ -38,6 +38,7 @@
             android:exported="false" />
         <activity
             android:name=".interfas.MisDatos"
+            android:windowSoftInputMode="stateHidden|adjustResize"
             android:exported="false" />
         <activity
             android:name=".monitor.FiltroDiaMesAnoActivity"
