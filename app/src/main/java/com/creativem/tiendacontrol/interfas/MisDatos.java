@@ -1,5 +1,6 @@
 package com.creativem.tiendacontrol.interfas;
 
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -52,38 +53,26 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
     private Spinner spinnerFiltro;
     private ProductoAdapter miAdaptador;
-    private Context context;
-
+//    private Context context;
+    public static Context context;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.mis_datos);
 
-
-        context = this; // Ahora Android puede instanciarla sin problemas
+        context = this;
         productoList = new ArrayList<>();
 
-        miAdaptador = new ProductoAdapter(context, productoList, new ProductoAdapter.OnProductoClickListener() {
-            @Override
-            public void onEditClick(ProductoModel producto) {
-
-            }
-
-            @Override
-            public void onDeleteClick(ProductoModel producto) {
-
-            }
-
-        });
-
-
+        adapter = new ProductoAdapter(context, productoList, this); // Initialize adapter here
 
         recyclerViewProductos = findViewById(R.id.recyclerViewProductos);
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(this));
+        recyclerViewProductos.setAdapter(adapter); // Set adapter to RecyclerView
+
+        TextView  textVentas = findViewById(R.id.Venta); //Get TextView AFTER setContentView
+        textVentas.setOnClickListener(v -> mostrarDialogoCrearProducto(null));
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
-        productoList = new ArrayList<>();
-
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         baseDatosSeleccionada = getIntent().getStringExtra("databaseName");
         if (baseDatosSeleccionada == null || baseDatosSeleccionada.isEmpty()) {
@@ -95,40 +84,32 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         } else {
             guardarBaseDatosSeleccionada(baseDatosSeleccionada);
             firebaseHelper = new FirebaseHelper(userId, baseDatosSeleccionada);
-
-
             cargarProductos();
-
         }
 
-        TextView textVentas = findViewById(R.id.Venta);
-        textVentas.setOnClickListener(v -> mostrarDialogoCrearProducto(null));
+        spinnerFiltro = findViewById(R.id.spinner_filtro); //Get Spinner AFTER setContentView
+        if (spinnerFiltro != null) {
+            ArrayAdapter<CharSequence> spinnerAdapter = ArrayAdapter.createFromResource(
+                    this, R.array.filtro_opciones, android.R.layout.simple_spinner_item);
+            spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerFiltro.setAdapter(spinnerAdapter);
+            spinnerFiltro.setSelection(0); // Set default selection (Día)
 
-        Spinner spinnerFiltro = findViewById(R.id.spinner_filtro);
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
-                this, R.array.filtro_opciones, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerFiltro.setAdapter(adapter);
-
-        spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String tipoFiltro = parent.getItemAtPosition(position).toString();
-                String fechaSeleccionada = obtenerFechaSegunFiltro(tipoFiltro);
-                if (miAdaptador != null) {
-                    miAdaptador.filtrarPorFecha(fechaSeleccionada, tipoFiltro);
-                } else {
-                    Log.e("Filtro", "El adaptador no está inicializado.");
+            spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+                @Override
+                public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                    String tipoFiltro = parent.getItemAtPosition(position).toString();
+                    adapter.filtrarPorFecha(obtenerFechaSegunFiltro(tipoFiltro), tipoFiltro); // Update adapter filter
                 }
 
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {}
-        });
-
-
+                @Override
+                public void onNothingSelected(AdapterView<?> parent) {}
+            });
+        } else {
+            Log.e("MisDatos", "spinnerFiltro is NULL! Check your layout file.");
+        }
     }
+
     private String obtenerFechaSegunFiltro(String tipoFiltro) {
         SimpleDateFormat dateFormatDia = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat dateFormatMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
@@ -139,20 +120,16 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         switch (tipoFiltro) {
             case "Día":
                 return dateFormatDia.format(calendar.getTime());
-
             case "Semana":
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 String inicioSemana = dateFormatDia.format(calendar.getTime());
                 calendar.add(Calendar.DATE, 6);
                 String finSemana = dateFormatDia.format(calendar.getTime());
                 return inicioSemana + " - " + finSemana;
-
             case "Mes":
                 return dateFormatMes.format(calendar.getTime());
-
             case "Año":
                 return dateFormatAño.format(calendar.getTime());
-
             default:
                 return "";
         }
@@ -187,52 +164,82 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 productoList.clear();
-                double totalIngresos = 0;
-                double totalEgresos = 0;
 
+                // Carga los datos de Firebase (sin cambios)
                 for (DataSnapshot data : snapshot.getChildren()) {
                     try {
-                        // Intenta convertir cada entrada en un ProductoModel
                         ProductoModel producto = data.getValue(ProductoModel.class);
-
                         if (producto != null) {
-                            productoList.add(0, producto);
-
-                            if (producto.getValor() > 0) {
-                                totalIngresos += producto.getValor();
-                            } else {
-                                totalEgresos += producto.getValor();
-                            }
+                            productoList.add(producto);
                         }
                     } catch (Exception e) {
-                        e.printStackTrace(); // Para depuración, muestra errores en consola
+                        e.printStackTrace();
                     }
                 }
 
-                double diferencia = totalIngresos + totalEgresos;
-
-                // Actualizar los TextView con los valores calculados
-                TextView textIngresos = findViewById(R.id.textIngresos);
-                TextView textEgresos = findViewById(R.id.textEgresos);
-                TextView textDiferencia = findViewById(R.id.textDiferencia);
-
-                textIngresos.setText("Ingresos: $" + String.format(Locale.getDefault(), "%,.2f", totalIngresos));
-                textEgresos.setText("Egresos: $" + String.format(Locale.getDefault(), "%,.2f", Math.abs(totalEgresos)));
-                textDiferencia.setText("Diferencia: $" + String.format(Locale.getDefault(), "%,.2f", diferencia));
-
+                // Si el adaptador es nulo, lo inicializamos
                 if (adapter == null) {
                     adapter = new ProductoAdapter(MisDatos.this, productoList, MisDatos.this);
                     recyclerViewProductos.setAdapter(adapter);
-                } else {
-                    adapter.notifyDataSetChanged();
                 }
+
+                // Aplica el filtro por defecto al cargar los productos
+                String tipoFiltro = "Día"; // Este es el filtro por defecto, pero puedes cambiarlo según lo necesites.
+                String fechaFiltro = obtenerFechaSegunFiltro(tipoFiltro); // Este método te da la fecha correcta para el filtro
+
+                // Aplica el filtro sobre la lista de productos cargados
+                adapter.filtrarPorFecha(fechaFiltro, tipoFiltro);
+
+                // Calcula los totales después de aplicar el filtro
+                calcularTotales(adapter.getFilteredProductList());
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(MisDatos.this, "❌ Error al cargar productos", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MisDatos.this, "❌ Error al cargar productos: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e("cargarProductos", "Firebase error: " + error.getMessage());
             }
         });
+    }
+
+    public static void calcularTotales(List<ProductoModel> listaFiltrada) {
+        // Usamos un arreglo para almacenar los totales, de forma que puedan modificarse
+        final double[] totalIngresos = {0};  // Usamos un arreglo con un solo elemento
+        final double[] totalEgresos = {0};   // Usamos un arreglo con un solo elemento
+        final double[] diferencia = {0};     // Usamos un arreglo con un solo elemento
+
+        // Calcular los totales de ingresos y egresos
+        for (ProductoModel producto : listaFiltrada) {
+            if (producto.getValor() > 0) {
+                totalIngresos[0] += producto.getValor();
+            } else {
+                totalEgresos[0] += producto.getValor();
+            }
+        }
+
+        diferencia[0] = totalIngresos[0] + totalEgresos[0];
+
+        // Asegurarse de que la actualización de la UI se haga en el hilo principal
+        // Usar runOnUiThread si no estás en el hilo principal
+        if (context instanceof Activity) {
+            ((Activity) context).runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    // Actualiza los TextViews con los totales
+                    TextView textIngresos = ((Activity) context).findViewById(R.id.textIngresos);
+                    TextView textEgresos = ((Activity) context).findViewById(R.id.textEgresos);
+                    TextView textDiferencia = ((Activity) context).findViewById(R.id.textDiferencia);
+
+                    if (textIngresos != null && textEgresos != null && textDiferencia != null) {
+                        textIngresos.setText("Ingresos: $" + String.format(Locale.getDefault(), "%,.2f", totalIngresos[0]));
+                        textEgresos.setText("Egresos: $" + String.format(Locale.getDefault(), "%,.2f", Math.abs(totalEgresos[0])));
+                        textDiferencia.setText("Diferencia: $" + String.format(Locale.getDefault(), "%,.2f", diferencia[0]));
+                    } else {
+                        Log.e("calcularTotales", "One or more TextViews not found!");
+                    }
+                }
+            });
+        }
     }
 
     private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
