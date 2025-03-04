@@ -1,18 +1,13 @@
 package com.creativem.tiendacontrol.interfas;
-
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.ImageButton;
 import android.widget.TextView;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.helper.PuntoMil;
-import com.creativem.tiendacontrol.interfas.ProductoModel;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -53,14 +48,14 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
         holder.nombre.setText(producto.getNombre());
 
         // Convertir el precio de double a long antes de formatear
-        String precioFormateado = PuntoMil.getFormattedNumber((long) producto.getPrecio());
+        String precioFormateado = PuntoMil.getFormattedNumber((long) producto.getValor());
         holder.precio.setText(precioFormateado);
 
         // Mostrar la fecha formateada sin segundos
         holder.fechaHora.setText(producto.getFechaHora()); // Asegúrate de que esto es una fecha formateada correctamente
 
         // Diferenciar productos negativos y positivos
-        if (producto.getPrecio() < 0) {
+        if (producto.getValor() < 0) {
             holder.precio.setTextColor(context.getResources().getColor(R.color.endColor)); // Rojo
             holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.colorFondoNegativo)); // Fondo rojizo
         } else {

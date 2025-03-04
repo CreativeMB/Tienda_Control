@@ -1,6 +1,5 @@
 package com.creativem.tiendacontrol.interfas;
 
-import com.creativem.tiendacontrol.interfas.ProductoModel;
 import com.google.firebase.database.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -16,23 +15,20 @@ public class FirebaseHelper {
                 .getReference("users")
                 .child(userId)
                 .child("databases")
-                .child(newDatabase)
-                .child("productos");
+                .child(newDatabase);
     }
 
     // Obtener fecha y hora actual
     public String obtenerFechaHora() {
-        return new SimpleDateFormat("yy-MM-dd HH", Locale.getDefault()).format(new Date());
+        return new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
     }
 
-
-
-    // Obtener referencia de productos
+    // Obtener referencia de la base de datos del usuario
     public DatabaseReference obtenerReferenciaProductos() {
         return databaseReference;
     }
 
-    // Leer productos
+    // Leer datos
     public void obtenerProductos(ValueEventListener listener) {
         databaseReference.addListenerForSingleValueEvent(listener);
     }
@@ -43,10 +39,10 @@ public class FirebaseHelper {
     }
 
     // Editar producto
-    public void editarProducto(String idProducto, String nombre, double precio, String nota, DatabaseReference.CompletionListener listener) {
+    public void editarProducto(String idProducto, String nombre, double valor, String nota, DatabaseReference.CompletionListener listener) {
         Map<String, Object> updates = new HashMap<>();
         updates.put("nombre", nombre);
-        updates.put("precio", precio);
+        updates.put("valor", valor);  // 🔹 Se cambió "precio" por "valor"
         updates.put("nota", nota);
         updates.put("fechaHora", obtenerFechaHora());
 
@@ -57,8 +53,9 @@ public class FirebaseHelper {
     public void eliminarProducto(String idProducto, DatabaseReference.CompletionListener completionListener) {
         databaseReference.child(idProducto).removeValue(completionListener);
     }
-    public DatabaseReference getDatabaseReference() {
-        return databaseReference; // Asegúrate de que databaseReference está inicializado correctamente
-    }
 
+    // Obtener referencia de la base de datos
+    public DatabaseReference getDatabaseReference() {
+        return databaseReference;
+    }
 }

@@ -191,15 +191,21 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 double totalEgresos = 0;
 
                 for (DataSnapshot data : snapshot.getChildren()) {
-                    ProductoModel producto = data.getValue(ProductoModel.class);
-                    if (producto != null) {
-                        productoList.add(0, producto);
+                    try {
+                        // Intenta convertir cada entrada en un ProductoModel
+                        ProductoModel producto = data.getValue(ProductoModel.class);
 
-                        if (producto.getPrecio() > 0) {
-                            totalIngresos += producto.getPrecio();
-                        } else {
-                            totalEgresos += producto.getPrecio();
+                        if (producto != null) {
+                            productoList.add(0, producto);
+
+                            if (producto.getValor() > 0) {
+                                totalIngresos += producto.getValor();
+                            } else {
+                                totalEgresos += producto.getValor();
+                            }
                         }
+                    } catch (Exception e) {
+                        e.printStackTrace(); // Para depuración, muestra errores en consola
                     }
                 }
 
@@ -229,6 +235,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         });
     }
 
+
     private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle(productoExistente == null ? "" : "");
@@ -237,21 +244,21 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         builder.setView(vista);
 
         EditText inputNombre = vista.findViewById(R.id.inputNombre);
-        EditText inputPrecio = vista.findViewById(R.id.inputPrecio);
+        EditText inputValor = vista.findViewById(R.id.inputValor);
         EditText inputNota = vista.findViewById(R.id.inputNota);
         Switch switchTipo = vista.findViewById(R.id.switchTipo);
 
         if (productoExistente != null) {
             inputNombre.setText(productoExistente.getNombre());
-            inputPrecio.setText(String.valueOf(Math.abs(productoExistente.getPrecio())));
+            inputValor.setText(String.valueOf(Math.abs(productoExistente.getValor())));
             inputNota.setText(productoExistente.getNota());
-            switchTipo.setChecked(productoExistente.getPrecio() < 0);
+            switchTipo.setChecked(productoExistente.getValor() < 0);
         } else {
             switchTipo.setChecked(false);
         }
 
-        // Formatear el input de precio con TextWatcher
-        inputPrecio.addTextChangedListener(new TextWatcher() {
+        // Formatear el input de valor con TextWatcher
+        inputValor.addTextChangedListener(new TextWatcher() {
             private boolean isEditing = false;
 
             @Override
@@ -265,15 +272,15 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 if (isEditing) return;
                 isEditing = true;
 
-                String originalString = s.toString().replaceAll(",", ""); // Quitar comas previas
+                String originalString = s.toString().replaceAll(",", "");
                 if (!originalString.isEmpty()) {
                     try {
                         double value = Double.parseDouble(originalString);
                         String formattedString = PuntoMil.getFormattedNumber((long) value);
-                        inputPrecio.setText(formattedString);
-                        inputPrecio.setSelection(formattedString.length()); // Mantener cursor al final
+                        inputValor.setText(formattedString);
+                        inputValor.setSelection(formattedString.length());
                     } catch (NumberFormatException e) {
-                        inputPrecio.setText("");
+                        inputValor.setText("");
                     }
                 }
                 isEditing = false;
@@ -286,50 +293,48 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         AlertDialog dialog = builder.create();
         dialog.show();
 
-        // Manejo de tecla Enter en inputPrecio
-        inputPrecio.setOnEditorActionListener((v, actionId, event) -> {
+        inputValor.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE ||
                     (event != null && event.getKeyCode() == KeyEvent.KEYCODE_ENTER && event.getAction() == KeyEvent.ACTION_DOWN)) {
-                guardarActualizarProducto(dialog, inputNombre, inputPrecio, inputNota, switchTipo, productoExistente);
+                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
                 return true;
             }
             return false;
         });
 
         dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v ->
-                guardarActualizarProducto(dialog, inputNombre, inputPrecio, inputNota, switchTipo, productoExistente));
+                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente));
     }
 
-    // Método que maneja tanto "Guardar" como "Actualizar"
-    private void guardarActualizarProducto(AlertDialog dialog, EditText inputNombre, EditText inputPrecio, EditText inputNota, Switch switchTipo, ProductoModel productoExistente) {
+    private void guardarActualizarProducto(AlertDialog dialog, EditText inputNombre, EditText inputValor, EditText inputNota, Switch switchTipo, ProductoModel productoExistente) {
         String nombre = inputNombre.getText().toString().trim();
-        String precioStr = inputPrecio.getText().toString().trim().replace(",", ""); // Eliminar comas
+        String valorStr = inputValor.getText().toString().trim().replace(",", "");
         String nota = inputNota.getText().toString().trim();
 
-        if (nombre.isEmpty() || precioStr.isEmpty()) {
-            Toast.makeText(this, "⚠️ Nombre y precio son obligatorios", Toast.LENGTH_SHORT).show();
+        if (nombre.isEmpty() || valorStr.isEmpty()) {
+            Toast.makeText(this, "⚠️ Nombre y valor son obligatorios", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        double precio;
+        double valor;
         try {
-            precio = Double.parseDouble(precioStr);
+            valor = Double.parseDouble(valorStr);
         } catch (NumberFormatException e) {
-            Toast.makeText(this, "⚠️ Precio no válido", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "⚠️ Valor no válido", Toast.LENGTH_SHORT).show();
             return;
         }
 
         if (switchTipo.isChecked()) {
-            precio = -Math.abs(precio);
+            valor = -Math.abs(valor);
         }
 
         if (productoExistente == null) { // **Creación de producto nuevo**
             String id = firebaseHelper.getDatabaseReference().push().getKey(); // Genera ID único
 
-            if (id != null) { // Verifica que el ID no sea null
-                String fechaHora = new SimpleDateFormat("yy-MM-dd HH", Locale.getDefault()).format(new Date());
+            if (id != null) {
+                String fechaHora = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
 
-                ProductoModel nuevoProducto = new ProductoModel(id, nombre, precio, nota, fechaHora);
+                ProductoModel nuevoProducto = new ProductoModel(id, nombre, valor, nota, fechaHora);
 
                 firebaseHelper.agregarProducto(id, nuevoProducto, (error, ref) -> {
                     if (error == null) {
@@ -345,13 +350,13 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
         } else { // **Edición de producto existente**
             productoExistente.setNombre(nombre);
-            productoExistente.setPrecio(precio);
+            productoExistente.setValor(valor);
             productoExistente.setNota(nota);
 
             firebaseHelper.editarProducto(
                     productoExistente.getId(),
                     nombre,
-                    precio,
+                    valor,
                     nota,
                     (error, ref) -> {
                         if (error == null) {

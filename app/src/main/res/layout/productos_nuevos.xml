@@ -15,7 +15,7 @@
         android:inputType="textCapWords" />
 
     <EditText
-        android:id="@+id/inputPrecio"
+        android:id="@+id/inputValor"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="70dp"
