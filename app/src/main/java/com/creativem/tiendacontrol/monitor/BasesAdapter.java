@@ -84,7 +84,7 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         }
     }
     private void loadItemsFromDatabase(DatabaseReference databaseReference, DatabaseViewHolder databaseHolder, String databaseName) {
-        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
+        databaseReference.addValueEventListener(new ValueEventListener() { // ← Cambiar aquí
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double ingresos = 0;
@@ -103,20 +103,20 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                         Object valueObject = itemSnapshot.getValue();
                         if (valueObject instanceof HashMap) {
                             HashMap<?, ?> valueMap = (HashMap<?, ?>) valueObject;
-                            if (valueMap.containsKey("valor")) { // Ajusta "valor" si tu clave es diferente
+                            if (valueMap.containsKey("valor")) {
                                 Object valorObject = valueMap.get("valor");
-                                double valor = 0; // valor por defecto en caso de error de conversión.
-                                try{
+                                double valor = 0;
+                                try {
                                     if (valorObject instanceof Double) {
                                         valor = (Double) valorObject;
                                     } else if (valorObject instanceof Long) {
                                         valor = ((Long) valorObject).doubleValue();
                                     } else if (valorObject instanceof Number) {
-                                        valor = ((Number)valorObject).doubleValue();
+                                        valor = ((Number) valorObject).doubleValue();
                                     } else {
                                         Log.e(TAG, "Valor no es un número: " + valorObject.getClass());
                                     }
-                                } catch (Exception e){
+                                } catch (Exception e) {
                                     Log.e(TAG, "Error al convertir el valor: " + e.getMessage());
                                 }
 
@@ -159,6 +159,7 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         });
     }
+
 
     @Override
     public int getItemCount() {
