@@ -15,7 +15,7 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.helper.PuntoMil;
-import com.creativem.tiendacontrol.model.Items;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -27,6 +27,7 @@ import com.google.firebase.database.ValueEventListener;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
@@ -88,63 +89,75 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             // No es necesario hacer nada aquí, ya que la vista EmptyViewHolder se configura en el layout XML.
         }
     }
-    private void loadItemsFromDatabase(DatabaseReference databaseReference, DatabaseViewHolder databaseHolder, String databaseName){
-        databaseReference.addValueEventListener(new ValueEventListener() {
+    private void loadItemsFromDatabase(DatabaseReference databaseReference, DatabaseViewHolder databaseHolder, String databaseName) {
+        databaseReference.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double ingresos = 0;
                 double egresos = 0;
-                String fechaCreacion ="";
-                if (snapshot.hasChild("fechaCreacion")){
-                    Object fechaCreacionValue =  snapshot.child("fechaCreacion").getValue();
-                    if(fechaCreacionValue instanceof String){
-                        fechaCreacion = (String)fechaCreacionValue;
-                        Log.d(TAG, "Fecha de creación con timestamp: " + fechaCreacion);
-                    }
-                }
-                for (DataSnapshot itemsSnapshot : snapshot.getChildren()) {
-                    if(itemsSnapshot.getKey().equals("fechaCreacion") || itemsSnapshot.getKey().equals("timestamp")){
-                        continue;
-                    }
-                    Items item = itemsSnapshot.getValue(Items.class);
+                String fechaCreacion = "N/A";
 
-                    if (item != null) {
-                        if ("Ingreso".equals(item.getType())) {
-                            ingresos += item.getValor(); // Los ingresos se suman normalmente
-                        } else if ("Gasto".equals(item.getType())) {
-                            egresos += item.getValor(); // Los egresos ya son negativos
+                if (snapshot.hasChild("fechaCreacion")) {
+                    fechaCreacion = snapshot.child("fechaCreacion").getValue(String.class);
+                    if (fechaCreacion == null) fechaCreacion = "N/A";
+                }
+
+                if (snapshot.exists()) {
+                    for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
+                        if (itemSnapshot.getKey().equals("fechaCreacion") || itemSnapshot.getKey().equals("timestamp")) continue;
+
+                        Object valueObject = itemSnapshot.getValue();
+                        if (valueObject instanceof HashMap) {
+                            HashMap<?, ?> valueMap = (HashMap<?, ?>) valueObject;
+                            if (valueMap.containsKey("valor")) { // Ajusta "valor" si tu clave es diferente
+                                Object valorObject = valueMap.get("valor");
+                                double valor = 0; // valor por defecto en caso de error de conversión.
+                                try{
+                                    if (valorObject instanceof Double) {
+                                        valor = (Double) valorObject;
+                                    } else if (valorObject instanceof Long) {
+                                        valor = ((Long) valorObject).doubleValue();
+                                    } else if (valorObject instanceof Number) {
+                                        valor = ((Number)valorObject).doubleValue();
+                                    } else {
+                                        Log.e(TAG, "Valor no es un número: " + valorObject.getClass());
+                                    }
+                                } catch (Exception e){
+                                    Log.e(TAG, "Error al convertir el valor: " + e.getMessage());
+                                }
+
+                                if (valor >= 0) {
+                                    ingresos += valor;
+                                } else {
+                                    egresos += valor;
+                                }
+                            } else {
+                                Log.e(TAG, "El HashMap no contiene la clave 'valor'");
+                            }
+                        } else {
+                            Log.e(TAG, "El valor no es un HashMap: " + (valueObject != null ? valueObject.getClass() : "null"));
                         }
                     }
+                } else {
+                    Log.w(TAG, "Base de datos '" + databaseName + "' está vacía.");
                 }
 
-                Log.d("BasesAdapter", "Ingresos sin formato: " + ingresos);
-                Log.d("BasesAdapter", "Egresos sin formato: " + egresos);
+                double diferencia = ingresos + egresos;
 
-                // Calcula correctamente la diferencia
-                double diferencia = ingresos + egresos; // Sumamos egresos porque ya son negativos
-
-                // Formateamos los valores
                 String ingresosFormatted = PuntoMil.getFormattedNumber((long) ingresos);
-                String egresosFormatted = PuntoMil.getFormattedNumber((long) Math.abs(egresos)); // Mostramos egresos como positivos
+                String egresosFormatted = PuntoMil.getFormattedNumber((long) Math.abs(egresos));
                 String diferenciaFormateada = PuntoMil.getFormattedNumber((long) diferencia);
 
-                Log.d("BasesAdapter", "Ingresos formateados: " + ingresosFormatted);
-                Log.d("BasesAdapter", "Egresos formateados: " + egresosFormatted);
-                Log.d("BasesAdapter", "Diferencia: " + diferenciaFormateada);
-
-                // Mostrar los valores en los TextViews
                 databaseHolder.textViewDatabaseName.setText(databaseName);
                 databaseHolder.textViewFechaCreacion.setText("Creado: " + fechaCreacion);
                 databaseHolder.textViewIngresos.setText("Ingresos: $" + ingresosFormatted);
                 databaseHolder.textViewEgresos.setText("Egresos: $" + egresosFormatted);
-                databaseHolder.textViewDiferencia.setText("Ganancia: $" + diferenciaFormateada);
+                databaseHolder.textViewDiferencia.setText("Diferencia: $" + diferenciaFormateada);
 
-                // Cambiar el color del texto basado en el valor de la diferencia
-                int colorTexto = diferencia < 0
-                        ? ContextCompat.getColor(context, R.color.colorNegativo)
-                        : ContextCompat.getColor(context, R.color.colorPositivo);
+                int colorTexto = diferencia < 0 ? ContextCompat.getColor(context, R.color.colorNegativo) : ContextCompat.getColor(context, R.color.colorPositivo);
                 databaseHolder.textViewDiferencia.setTextColor(colorTexto);
             }
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Log.e(TAG, "Error al obtener datos", error.toException());
