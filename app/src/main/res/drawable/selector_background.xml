@@ -8,9 +8,9 @@
                         android:startColor="#FFD600"
                         android:endColor="#D50000"
                         android:angle="90" />
-                    <corners android:radius="10dp" />
-                    <size android:width="250dp"
-                        android:height="70dp" />
+                    <corners android:radius="5dp" />
+                    <size android:width="200dp"
+                        android:height="40dp" />
                 </shape>
             </item>
         </layer-list>
@@ -24,9 +24,9 @@
                         android:startColor="#C51162"
                         android:endColor="#FFAB00"
                         android:angle="90" />
-                    <corners android:radius="10dp" />
-                    <size android:width="250dp"
-                        android:height="70dp" />
+                    <corners android:radius="5dp" />
+                    <size android:width="200dp"
+                        android:height="40dp" />
                 </shape>
             </item>
         </layer-list>
@@ -40,9 +40,9 @@
                         android:startColor="@color/colorPrimary"
                         android:endColor="@color/colorPositivo"
                         android:angle="90" />
-                    <corners android:radius="10dp" />
-                    <size android:width="250dp"
-                        android:height="70dp" />
+                    <corners android:radius="5dp" />
+                    <size android:width="200dp"
+                        android:height="40dp" />
                 </shape>
             </item>
         </layer-list>

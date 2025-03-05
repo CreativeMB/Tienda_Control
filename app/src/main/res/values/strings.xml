@@ -64,7 +64,7 @@
         <item>Año</item>
     </string-array>
     <style name="SpinnerPersonalisado" parent="Widget.AppCompat.Spinner">
-        <item name="android:textSize">30sp</item>  <!-- Ajusta el tamaño aquí -->
+        <item name="android:textSize">35sp</item>  <!-- Ajusta el tamaño aquí -->
     </style>
 
 
