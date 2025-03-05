@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.model;
+package com.creativem.tiendacontrol.monitor;
 public class Perfil {
     private String id; // Identificador único del perfil
     private String userId; // UID del usuario autenticado

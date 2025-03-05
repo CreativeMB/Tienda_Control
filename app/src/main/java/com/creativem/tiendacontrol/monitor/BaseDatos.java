@@ -39,10 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.creativem.tiendacontrol.Login;
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.SessionManager;
-import com.creativem.tiendacontrol.adapter.BasesAdapter;
 import com.creativem.tiendacontrol.helper.ExcelExporter;
 import com.creativem.tiendacontrol.interfas.MisDatos;
 

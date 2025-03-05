@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
-import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -25,7 +24,6 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.helper.PuntoMil;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;

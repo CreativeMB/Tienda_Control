@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.model;
+package com.creativem.tiendacontrol.monitor;
 
 import static android.content.ContentValues.TAG;
 
@@ -13,11 +13,7 @@ import android.view.animation.AnimationUtils;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.creativem.tiendacontrol.Login;
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.SessionManager;
-import com.creativem.tiendacontrol.monitor.BaseDatos;
-import com.creativem.tiendacontrol.monitor.Inicio;
 
 
 public class AnimacionInicio extends AppCompatActivity {

@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol;
+package com.creativem.tiendacontrol.monitor;
 import android.content.Context;
 import android.content.SharedPreferences;
 

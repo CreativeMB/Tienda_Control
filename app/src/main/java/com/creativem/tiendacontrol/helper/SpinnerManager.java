@@ -7,7 +7,7 @@
 //import android.widget.TextView;
 //import android.widget.Toast;
 //
-//import com.creativem.tiendacontrol.model.Items;
+//import com.creativem.tiendacontrol.helper.Items;
 //
 //import java.text.DecimalFormat;
 //import java.text.DecimalFormatSymbols;

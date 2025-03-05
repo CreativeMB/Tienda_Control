@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.model;
+package com.creativem.tiendacontrol.helper;
 
 public class Items {
     private String id;  // Ahora es String

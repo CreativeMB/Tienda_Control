@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.adapter;
+package com.creativem.tiendacontrol.monitor;
 
 import android.content.Context;
 import android.util.Log;
@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.helper.PuntoMil;
+import com.creativem.tiendacontrol.interfas.PuntoMil;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
@@ -24,14 +24,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-import java.text.ParseException;
 
 public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
 

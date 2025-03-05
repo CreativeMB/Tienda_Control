@@ -3,7 +3,7 @@
 //import android.content.Context;
 //import android.content.SharedPreferences;
 //
-//import com.creativem.tiendacontrol.model.Items;
+//import com.creativem.tiendacontrol.helper.Items;
 //import com.google.common.reflect.TypeToken;
 //import com.google.gson.Gson;
 //

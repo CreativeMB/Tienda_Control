@@ -12,7 +12,6 @@ import android.os.Build;
 import androidx.core.app.NotificationCompat;
 
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.model.AnimacionInicio;
 
 
 public class Recordatorio extends BroadcastReceiver {
