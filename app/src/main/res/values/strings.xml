@@ -16,13 +16,14 @@
     <string name="home_view_title">Vista del Home</string>
     <string name="firebase_examples_title">Ejemplos Firebase</string>
     <string name="firestore_button">Firestore</string>
-    <string name="guardar">Guardar</string>
+    <string name="guardar">Guardar Predeterminado</string>
     <string name="Edicion">Administra</string>
     <string name="hint_Producto">Nombre Items:</string>
     <string name="hint_Valor">Valor:</string>
     <string name="hint_Detalles">Detalles:</string>
     <string name="hint_Cantidad">Cantidad:</string>
-    <string name="registrar">Registrar</string>
+    <string name="registrar">Nuevo Ingreso</string>
+    <string name="registrar2">Nuevo Egreso</string>
     <string name="fecha">Fecha:</string>
     //menu
     <string name="uno">Exportar Datos</string>
@@ -55,6 +56,17 @@
     <string name="code">Código</string>
     <string name="dona">Donar</string>
     <string name="salir">Salir</string>
+
+    <string-array name="filtro_opciones">
+        <item>Día</item>
+        <item>Semana</item>
+        <item>Mes</item>
+        <item>Año</item>
+        <item>Rango de fechas</item>
+    </string-array>
+    <style name="SpinnerPersonalisado" parent="Widget.AppCompat.Spinner">
+        <item name="android:textSize">35sp</item>  <!-- Ajusta el tamaño aquí -->
+    </style>
 
 
 </resources>

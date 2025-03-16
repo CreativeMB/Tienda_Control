@@ -34,14 +34,14 @@
         </provider>
 
         <activity
-            android:name=".PerfilEmpresa"
+            android:name=".monitor.PerfilEmpresa"
             android:exported="false" />
         <activity
-            android:name=".monitor.FiltroDiaMesAnoActivity"
-            android:exported="false"/>
-
+            android:name=".interfas.MisDatos"
+            android:windowSoftInputMode="stateHidden|adjustResize"
+            android:exported="false" />
         <activity
-            android:name=".Login"
+            android:name=".monitor.Login"
             android:exported="false" />
         <activity
             android:name=".monitor.LosLirios"
@@ -52,25 +52,18 @@
         <activity
             android:name=".monitor.Inicio"
             android:exported="false" />
-
         <receiver
             android:name=".monitor.Recordatorio"
             android:enabled="true"
             android:exported="false" />
-
-        <activity android:name=".model.Items" />
-        <activity android:name=".dialogFragment.IngresoDialogFragment" />
-        <activity android:name=".dialogFragment.GastoDialogFragment" />
-        <activity android:name=".dialogFragment.MenuDialogFragment" />
-        <activity android:name=".monitor.EdicionPin" />
-        <activity android:name=".monitor.DatosDatos" />
-        <activity android:name=".monitor.FiltroDiaMesAno" />
-        <activity android:name=".monitor.BaseDatos" />
-        <activity android:name=".monitor.Donar" />
-        <activity android:name=".monitor.Patron" />
-        <activity android:name=".dialogFragment.CalculadoraDialogFragment" />
+        <activity android:name=".monitor.EdicionPin"
+            android:exported="false" />
+        <activity android:name=".monitor.BaseDatos"
+            android:exported="false" />
+        <activity android:name=".monitor.Donar"
+            android:exported="false"/>
         <activity
-            android:name=".model.AnimacionInicio"
+            android:name=".monitor.AnimacionInicio"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

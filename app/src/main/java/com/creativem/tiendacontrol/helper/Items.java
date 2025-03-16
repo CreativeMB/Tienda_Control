@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.model;
+package com.creativem.tiendacontrol.helper;
 
 public class Items {
     private String id;  // Ahora es String
@@ -116,5 +116,9 @@ public class Items {
     }
     public String getFecha() {
         return fecha;
+    }
+
+    public void setFecha(String fecha) {  // <-- Agrega este método
+        this.fecha = fecha;
     }
 }

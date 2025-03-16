@@ -14,13 +14,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal">
+
             <android.widget.SearchView
                 android:id="@+id/txtBuscar"
                 android:layout_width="0dp"
                 android:layout_height="match_parent"
                 android:layout_weight="1"
                 android:layout_margin="0dp"
-                android:background="@drawable/buscador" />
+                android:background="@drawable/buscador"
+                android:focusable="false"
+                android:focusableInTouchMode="true"
+                android:clickable="true"
+                android:descendantFocusability="blocksDescendants"/>
 
             <TextView
                 android:id="@+id/textDiferencia"
@@ -31,8 +36,21 @@
                 android:textStyle="bold"
                 android:text="Ganancia"
                 android:textColor="#2196F3"
-                android:textSize="30sp" />
+                android:textSize="25sp" />
+            <Spinner
+                android:id="@+id/spinner_filtro"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="16dp"
+                android:minHeight="48dp"
+                style="@style/SpinnerPersonalisado"
+                android:paddingHorizontal="16dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/text_view_database_name" />
         </LinearLayout>
+
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/listaVentas"
             android:layout_width="match_parent"
@@ -54,7 +72,7 @@
                 android:text="Ingreso"
                 android:textStyle="bold"
                 android:textColor="@color/colorPositivo"
-                android:textSize="30sp" />
+                android:textSize="25sp" />
 
             <TextView
                 android:id="@+id/textEgresos"
@@ -65,14 +83,13 @@
                 android:textStyle="bold"
                 android:text="Egreso"
                 android:textColor="@color/colorNegativo"
-                android:textSize="30sp" />
+                android:textSize="25sp" />
         </LinearLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="10dp">
+            android:orientation="horizontal">
 
             <TextView
                 android:id="@+id/textView1"
@@ -82,7 +99,7 @@
                 android:gravity="center"
                 android:text="Total Ingreso"
                 android:textColor="#327A35"
-                android:textSize="18sp" />
+                android:textSize="12sp" />
 
             <TextView
                 android:id="@+id/textView3"
@@ -92,7 +109,7 @@
                 android:gravity="center"
                 android:text="Total Egreso"
                 android:textColor="@color/colorNegativo"
-                android:textSize="18sp" />
+                android:textSize="12sp" />
         </LinearLayout>
 
         <TextView
@@ -111,7 +128,7 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="200dp"
+        android:layout_marginBottom="150dp"
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/ingreso" />
@@ -122,7 +139,7 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="120dp"
+        android:layout_marginBottom="80dp"
         android:clickable="true"
         android:focusable="true"
         android:src="@drawable/egreso"/>
@@ -133,7 +150,7 @@
         android:layout_height="60dp"
         android:layout_gravity="bottom|end"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="300dp"
+        android:layout_marginBottom="260dp"
         android:clickable="true"
         android:focusable="true"
         android:layout_marginStart="-155dp"
@@ -142,13 +159,13 @@
         android:id="@+id/borrardados"
         android:layout_width="40dp"
         android:layout_height="40dp"
-        android:layout_gravity="bottom|end"
-        android:layout_marginEnd="16dp"
-        android:layout_marginBottom="380dp"
+        android:layout_gravity="bottom|start"
+        android:layout_marginStart="16dp"
+        android:layout_marginBottom="90dp"
         android:clickable="true"
         android:focusable="true"
-        android:layout_marginStart="-155dp"
         android:src="@drawable/eliminar" />
+
 
 
 </FrameLayout>

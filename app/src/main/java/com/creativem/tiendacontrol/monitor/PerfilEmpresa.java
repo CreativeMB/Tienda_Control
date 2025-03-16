@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol;
+package com.creativem.tiendacontrol.monitor;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,8 +7,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
-import com.creativem.tiendacontrol.model.Perfil;
-import com.creativem.tiendacontrol.monitor.BaseDatos;
+
+import com.creativem.tiendacontrol.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;

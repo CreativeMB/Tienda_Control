@@ -14,11 +14,12 @@
     <color name="colorSecondary">#565656</color> <!-- Color secundario -->
     <color name="colorOnSecondary">#FFFFFF</color> <!-- Texto sobre el color secundario -->
 
-    <color name="texcolor">#8C4A1D</color>
-    <color name="colorNegativo">#C00000</color>
-    <color name="colorPositivo">#4CAF50</color>
-    <color name="colorFondoNegativo">#93F44336</color>
-    <color name="colorFondoPositivo">#4CAF50</color>
+    <color name="fondoCAr">#ED615B5B</color>
+    <color name="texcolor">#E9FFA900</color>
+    <color name="colorNegativo">#BAD21616</color>
+    <color name="colorPositivo">#C04CAF50</color>
+    <color name="colorFondoNegativo">#5FFF0000</color>
+    <color name="colorFondoPositivo">#2500FF37</color>
 
     <color name="startColor">#2196F3</color> <!-- Ajusta el color de inicio del degradado -->
     <color name="endColor">#009688</color> <!-- Ajusta el color final del degradado -->

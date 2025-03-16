@@ -1,19 +1,18 @@
 package com.creativem.tiendacontrol.monitor;
 
-import android.Manifest;
+
 import android.app.AlarmManager;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
+
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
-import android.os.Handler;
+
 import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -27,13 +26,12 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
+
 import androidx.core.content.FileProvider;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -41,12 +39,10 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.creativem.tiendacontrol.Login;
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.SessionManager;
-import com.creativem.tiendacontrol.adapter.BasesAdapter;
 import com.creativem.tiendacontrol.helper.ExcelExporter;
-import com.creativem.tiendacontrol.model.AnimacionInicio;
+import com.creativem.tiendacontrol.interfas.MisDatos;
+
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.material.navigation.NavigationView;
 import com.google.android.material.timepicker.MaterialTimePicker;
@@ -82,14 +78,9 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatabaseClickListener {
 
-    private static final String LOGIN_STATUS = "loginStatus";
     private static final String PREFS_NAME = "CodePrefs";
     private static final String TAG = "BaseDatos";
-    private int completedTasks = 0;
-    private int totalTasks = 0;
-    private Uri fileUri;
     private List<String> databaseNames = new ArrayList<>();
-    private boolean allTasksCompleted = false;
     private FirebaseAuth mAuth;
     private GoogleSignInClient gso;
     private SessionManager sessionManager;
@@ -107,7 +98,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     private List<String> databaseList;
     private BasesAdapter adapter;
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    private String databasePath;
     private String userId;
 
 
@@ -204,10 +194,10 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         intent.setData(Uri.parse(url));
                         startActivity(intent);
                         return true;
-                    } else if (id == R.id.contabilidad) {
-                        // Acción para Donar
-                        Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAnoActivity.class);
-                        startActivity(intent);
+//                    } else if (id == R.id.contabilidad) {
+//                        // Acción para Donar
+//                        Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAnoActivity.class);
+//                        startActivity(intent);
                     } else if (id == R.id.exel) {
                         exportAllDatabasesSequentially();
                     }
@@ -641,25 +631,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             showToast("Base de datos actual: " + databaseName);
 
             // Abre la base de datos en la actividad correspondiente
-            Intent intent = new Intent(BaseDatos.this, DatosDatos.class);
-            intent.putExtra("databaseName", databaseName);
-            startActivity(intent);
-        } else {
-            showToast("Nombre de base de datos inválido");
-        }
-    }
-
-    private void editDatabase2(String databaseName) {
-        if (databaseName != null && !databaseName.isEmpty()) {
-            closeCurrentDatabase();
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(KEY_CURRENT_DATABASE, databaseName);
-            editor.putBoolean("KEY_DATABASE_SELECTED", true);
-            editor.apply();
-            showToast("Base de datos actual: " + databaseName);
-
-            // Abre la base de datos en la actividad correspondiente
-            Intent intent = new Intent(BaseDatos.this, DatosDatos.class);
+            Intent intent = new Intent(BaseDatos.this, MisDatos.class);
             intent.putExtra("databaseName", databaseName);
             startActivity(intent);
         } else {
@@ -723,13 +695,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         editor.apply();
     }
 
-    private interface OnStoragePermissionResultListener {
-        void onPermissionResult(boolean granted);
-    }
-
-    private void requestStoragePermission(OnStoragePermissionResultListener listener) {
-
-    }
     private void showTimePickerDialog() {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("America/Bogota"));
         int hour = calendar.get(Calendar.HOUR_OF_DAY);
