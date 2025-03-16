@@ -6,8 +6,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
@@ -86,16 +88,21 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
             Eliminar = itemView.findViewById(R.id.EliminarProducto);
         }
     }
-
-    public void filtrarPorFecha(String fechaFiltro, String tipoFiltro) {
+    public void filtrarPorFecha(String fechaFiltro, String tipoFiltro, @Nullable String fechaFin) {
         List<ProductoModel> listaFiltrada = new ArrayList<>();
+
+        // Formatos de fecha
         SimpleDateFormat dateFormatDia = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat dateFormatMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
         SimpleDateFormat dateFormatAño = new SimpleDateFormat("yyyy", Locale.getDefault());
         SimpleDateFormat dateFormatSemana = new SimpleDateFormat("yyyy-'W'ww", Locale.getDefault());
-        SimpleDateFormat dateFormatBD = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault());
+        SimpleDateFormat dateFormatBD = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()); // Formato en BD
+        SimpleDateFormat dateFormatBDComparacion = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()); // Solo fecha sin hora
+
         try {
-            Date fechaFiltroDate;
+            Date fechaFiltroDate = null;
+            Date fechaFinDate = null;
+
             switch (tipoFiltro) {
                 case "Día":
                     fechaFiltroDate = dateFormatDia.parse(fechaFiltro);
@@ -107,38 +114,65 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
                     fechaFiltroDate = dateFormatAño.parse(fechaFiltro);
                     break;
                 case "Semana":
-                    //Handle week filter separately
                     Calendar cal = Calendar.getInstance();
-                    cal.setTime(dateFormatDia.parse(fechaFiltro.substring(0,10))); //Parse start date
+                    cal.setTime(dateFormatDia.parse(fechaFiltro));
                     int weekOfYear = cal.get(Calendar.WEEK_OF_YEAR);
                     int year = cal.get(Calendar.YEAR);
-                    fechaFiltroDate = dateFormatSemana.parse(year + "-W" + weekOfYear); //Construct week date
+                    fechaFiltroDate = dateFormatSemana.parse(year + "-W" + weekOfYear);
+                    break;
+                case "Rango de Fechas":
+                    if (fechaFiltro == null || fechaFiltro.isEmpty() || fechaFin == null || fechaFin.isEmpty()) {
+                        Toast.makeText(context, "Debe seleccionar un rango de fechas válido.", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    fechaFiltroDate = dateFormatDia.parse(fechaFiltro);
+                    fechaFinDate = dateFormatDia.parse(fechaFin);
                     break;
                 default:
-                    return; // Filtro inválido
+                    return;
             }
 
             for (ProductoModel producto : productoList) {
-                if (cumpleFiltro(producto, fechaFiltroDate, tipoFiltro)) {
-                    listaFiltrada.add(producto);
-                }
+                try {
+                    Date fechaProducto = dateFormatBD.parse(producto.getFechaHora());
+                    Date fechaProductoComparacion = dateFormatBDComparacion.parse(producto.getFechaHora());
 
+                    if (fechaProducto == null || fechaProductoComparacion == null) continue;
+
+                    if (tipoFiltro.equals("Rango de Fechas")) {
+                        if (fechaFinDate != null &&
+                                fechaProductoComparacion.compareTo(fechaFiltroDate) >= 0 &&
+                                fechaProductoComparacion.compareTo(fechaFinDate) <= 0) {
+                            listaFiltrada.add(producto);
+                        }
+                    } else {
+                        if (cumpleFiltro(producto, fechaFiltroDate, tipoFiltro)) {
+                            listaFiltrada.add(producto);
+                        }
+                    }
+                } catch (ParseException e) {
+                    Log.e("filtrarPorFecha", "Error al parsear fecha del producto: " + producto.getFechaHora());
+                }
             }
-            // Ordena la lista filtrada por fecha de publicación (más reciente primero)
+
+            // Ordenar por fecha más reciente
             listaFiltrada.sort((p1, p2) -> {
                 try {
                     Date fecha1 = dateFormatBD.parse(p1.getFechaHora());
                     Date fecha2 = dateFormatBD.parse(p2.getFechaHora());
-                    return fecha2.compareTo(fecha1); // Ordena descendentemente (más reciente primero)
+                    return fecha2.compareTo(fecha1); // Orden descendente
                 } catch (ParseException e) {
-                    Log.e("filtrarPorFecha", "Error al ordenar por fecha: " + e.getMessage());
-                    return 0; // En caso de error, mantiene el orden original
+                    return 0;
                 }
             });
+
+            // Actualizar lista
             filteredProductList.clear();
             filteredProductList.addAll(listaFiltrada);
             notifyDataSetChanged();
             MisDatos.calcularTotales(filteredProductList);
+
+            Log.d("Filtro", "Filtrado aplicado. Elementos encontrados: " + filteredProductList.size());
 
         } catch (ParseException e) {
             Log.e("FiltrarPorFecha", "Error al parsear la fecha del filtro: " + e.getMessage());
@@ -147,38 +181,37 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
     }
 
 
-    // Corrección en el método cumpleFiltro
+    private boolean cumpleRangoFechas(ProductoModel producto, Date fechaInicio, Date fechaFin) {
+        SimpleDateFormat dateFormatBD = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault());
+
+
+        try {
+            Date fechaProducto = dateFormatBD.parse(producto.getFechaHora());
+            if (fechaProducto == null) return false;
+
+            // Validación correcta del rango de fechas
+            return (fechaProducto.equals(fechaInicio) || fechaProducto.after(fechaInicio)) &&
+                    (fechaProducto.equals(fechaFin) || fechaProducto.before(fechaFin));
+        } catch (ParseException e) {
+            Log.e("FiltrarPorFecha", "Error al comparar fechas: " + e.getMessage());
+            return false;
+        }
+    }
+
     private boolean cumpleFiltro(ProductoModel producto, Date fechaFiltroDate, String tipoFiltro) {
         SimpleDateFormat dateFormatDia = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat dateFormatMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
         SimpleDateFormat dateFormatAño = new SimpleDateFormat("yyyy", Locale.getDefault());
         SimpleDateFormat dateFormatSemana = new SimpleDateFormat("yyyy-'W'ww", Locale.getDefault());
-        SimpleDateFormat dateFormatBD = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()); // Formato de tu base de datos
+        SimpleDateFormat dateFormatBD = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault());
+
 
         try {
             String fechaProductoStr = producto.getFechaHora();
             if (fechaProductoStr == null || fechaProductoStr.isEmpty()) return false;
 
-            Date fechaProducto;
-            if (fechaProductoStr.contains(" - ")) { // Rango de fechas
-                String[] fechas = fechaProductoStr.split(" - ");
-                if (fechas.length == 2) {
-                    Date fechaInicio = dateFormatDia.parse(fechas[0].trim());
-                    Date fechaFin = dateFormatDia.parse(fechas[1].trim());
-                    Calendar calFiltro = Calendar.getInstance();
-                    calFiltro.setTime(fechaFiltroDate);
-                    Calendar calInicio = Calendar.getInstance();
-                    calInicio.setTime(fechaInicio);
-                    Calendar calFin = Calendar.getInstance();
-                    calFin.setTime(fechaFin);
-                    return !calFiltro.before(calInicio) && !calFiltro.after(calFin);
-
-                } else {
-                    return false;
-                }
-            } else {
-                fechaProducto = dateFormatBD.parse(fechaProductoStr);
-            }
+            Date fechaProducto = dateFormatBD.parse(fechaProductoStr);
+            if (fechaProducto == null) return false;
 
             switch (tipoFiltro) {
                 case "Día":

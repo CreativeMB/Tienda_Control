@@ -2,9 +2,11 @@ package com.creativem.tiendacontrol.interfas;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -25,6 +27,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.creativem.tiendacontrol.R;
 
+import com.google.android.material.datepicker.MaterialDatePicker;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.*;
 
@@ -34,6 +37,7 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import androidx.core.util.Pair;
 
 
 public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnProductoClickListener {
@@ -48,6 +52,8 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
     private String userId;
     private String baseDatosSeleccionada;
+    private String fechaInicioSeleccionada = null;
+    private String fechaFinSeleccionada = null;
 
     private Spinner spinnerFiltro;
     private ProductoAdapter miAdaptador;
@@ -96,19 +102,35 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             spinnerFiltro.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
                 public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                    String tipoFiltro = parent.getItemAtPosition(position).toString();
-                    adapter.filtrarPorFecha(obtenerFechaSegunFiltro(tipoFiltro), tipoFiltro); // Update adapter filter
+                    String tipoFiltro = parent.getItemAtPosition(position).toString().trim();
+                    Log.d("SpinnerFiltro", "Opción seleccionada: " + tipoFiltro);
+
+                    if (tipoFiltro.equalsIgnoreCase("Rango de Fechas")) {
+                        Log.d("SpinnerFiltro", "Llamando a mostrarDatePickerRango()"); // ✅ ESTE LOG DEBE APARECER
+                        mostrarDatePickerRango();
+
+                        // Restablecer el Spinner después de seleccionar el rango de fechas
+                        new Handler().postDelayed(() -> spinnerFiltro.setSelection(0), 500);
+
+                    } else {
+                        Log.d("SpinnerFiltro", "Filtrando datos por: " + tipoFiltro);
+                        Pair<String, String> fechas = obtenerFechaSegunFiltro(tipoFiltro);
+                        adapter.filtrarPorFecha(fechas.first, tipoFiltro, fechas.second);
+                    }
                 }
 
                 @Override
-                public void onNothingSelected(AdapterView<?> parent) {}
+                public void onNothingSelected(AdapterView<?> parent) {
+                    // No hacer nada si no se selecciona un elemento
+                }
             });
+
         } else {
             Log.e("MisDatos", "spinnerFiltro is NULL! Check your layout file.");
         }
     }
 
-    private String obtenerFechaSegunFiltro(String tipoFiltro) {
+    private Pair<String, String> obtenerFechaSegunFiltro(String tipoFiltro) {
         SimpleDateFormat dateFormatDia = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
         SimpleDateFormat dateFormatMes = new SimpleDateFormat("yyyy-MM", Locale.getDefault());
         SimpleDateFormat dateFormatAño = new SimpleDateFormat("yyyy", Locale.getDefault());
@@ -117,21 +139,32 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
         switch (tipoFiltro) {
             case "Día":
-                return dateFormatDia.format(calendar.getTime());
+                String fechaHoy = dateFormatDia.format(calendar.getTime());
+                return new Pair<>(fechaHoy, null);
+
             case "Semana":
                 calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY);
                 String inicioSemana = dateFormatDia.format(calendar.getTime());
                 calendar.add(Calendar.DATE, 6);
                 String finSemana = dateFormatDia.format(calendar.getTime());
-                return inicioSemana + " - " + finSemana;
+                return new Pair<>(inicioSemana, finSemana);
+
             case "Mes":
-                return dateFormatMes.format(calendar.getTime());
+                String fechaMes = dateFormatMes.format(calendar.getTime());
+                return new Pair<>(fechaMes, null);
+
             case "Año":
-                return dateFormatAño.format(calendar.getTime());
+                String fechaAño = dateFormatAño.format(calendar.getTime());
+                return new Pair<>(fechaAño, null);
+
+            case "Rango de Fechas":
+                return new Pair<>("", ""); // Se debe manejar aparte
+
             default:
-                return "";
+                return new Pair<>("", "");
         }
     }
+
     private void guardarBaseDatosSeleccionada(String nombreBase) {
         sharedPreferences.edit().putString(KEY_CURRENT_DATABASE, nombreBase).apply();
     }
@@ -183,10 +216,13 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
                 // Aplica el filtro por defecto al cargar los productos
                 String tipoFiltro = "Día"; // Este es el filtro por defecto, pero puedes cambiarlo según lo necesites.
-                String fechaFiltro = obtenerFechaSegunFiltro(tipoFiltro); // Este método te da la fecha correcta para el filtro
+                Pair<String, String> fechas = obtenerFechaSegunFiltro(tipoFiltro);
+                String fechaFiltro = fechas.first; // Fecha de inicio
+                String fechaFin = fechas.second;   // Fecha de fin (puede ser null)
 
-                // Aplica el filtro sobre la lista de productos cargados
-                adapter.filtrarPorFecha(fechaFiltro, tipoFiltro);
+                adapter.filtrarPorFecha(fechaFiltro, tipoFiltro, fechaFin);
+
+
 
                 // Calcula los totales después de aplicar el filtro
                 calcularTotales(adapter.getFilteredProductList());
@@ -362,7 +398,12 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                         dialog.dismiss();
                         productoList.add(0, nuevoProducto);
                         adapter.notifyItemInserted(0);
-                        adapter.filtrarPorFecha(obtenerFechaSegunFiltro(adapter.getCurrentFilter()), adapter.getCurrentFilter()); //Vuelve a aplicar el filtro
+                        Pair<String, String> fechas = obtenerFechaSegunFiltro(adapter.getCurrentFilter());
+                        String fechaFiltro = fechas.first; // Fecha de inicio
+                        String fechaFin = fechas.second;   // Fecha de fin (puede ser null)
+
+                        adapter.filtrarPorFecha(fechaFiltro, adapter.getCurrentFilter(), fechaFin);
+
                         MisDatos.calcularTotales(adapter.getFilteredProductList()); //Recalcula los totales
                         cargarProductos();
                     } else {
@@ -394,7 +435,40 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             );
         }
     }
+    private void mostrarDatePickerRango() {
+        Log.d("DatePicker", "mostrarDatePickerRango() llamado");
 
+        // Crear el selector de rango de fechas
+        MaterialDatePicker<Pair<Long, Long>> picker = MaterialDatePicker.Builder
+                .dateRangePicker()
+                .setTitleText("Seleccionar Rango de Fechas")
+                .build();
+
+        // Mostrar el selector
+        picker.show(getSupportFragmentManager(), "RangoFechaPicker");
+        picker.addOnPositiveButtonClickListener(selection -> {
+            if (selection != null && selection.first != null && selection.second != null) {
+                Log.d("DatePicker", "Timestamp Inicio: " + selection.first);
+                Log.d("DatePicker", "Timestamp Fin: " + selection.second);
+
+                // Formato de fecha compatible con la base de datos y el filtro
+                SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault());
+
+                // Convertir timestamps a Date y formatear
+                String fechaInicio = sdf.format(new Date(selection.first));
+                String fechaFin = sdf.format(new Date(selection.second));
+
+                Log.d("DatePicker", "Rango seleccionado (formateado): " + fechaInicio + " - " + fechaFin);
+
+                Toast.makeText(this, "Rango: " + fechaInicio + " - " + fechaFin, Toast.LENGTH_SHORT).show();
+
+                // Llamar a la función de filtrado en el adaptador
+                adapter.filtrarPorFecha(fechaInicio, "Rango de Fechas", fechaFin);
+            } else {
+                Log.e("DatePicker", "Error: Selección de fechas inválida");
+            }
+        });
+    }
 
 
 
