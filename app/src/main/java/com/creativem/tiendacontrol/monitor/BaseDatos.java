@@ -80,7 +80,6 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
 
     private static final String PREFS_NAME = "CodePrefs";
     private static final String TAG = "BaseDatos";
-    private List<String> databaseNames = new ArrayList<>();
     private FirebaseAuth mAuth;
     private GoogleSignInClient gso;
     private SessionManager sessionManager;
@@ -189,7 +188,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         Intent intent = new Intent(BaseDatos.this, Donar.class);
                         startActivity(intent);
                     } else if (id == R.id.manual) {
-                        String url = "https://www.floristerialoslirios.com/tienda-control";
+                        String url = "https://creativem.carrd.co/";
                         Intent intent = new Intent(Intent.ACTION_VIEW);
                         intent.setData(Uri.parse(url));
                         startActivity(intent);
@@ -475,10 +474,20 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
     }
 
     private boolean containsEmoji(String text) {
-        //Expresión regular para detectar emojis
-        return text.matches(".*[\\p{Emoji}].*");
-    }
+        if (text == null || text.isEmpty()) return false;
 
+        // Expresión regular con rangos Unicode de emojis comunes
+        String emojiPattern =
+                ".*[" +
+                        "\u203C-\u3299" +     // Símbolos varios
+                        "\uD83C\uDC04" +     // Mahjong tile
+                        "\uD83C\uD000-\uD83D\uDFFF" + // Emojis en bloques de símbolos y pictogramas
+                        "\uD83E\uDD00-\uD83E\uDDFF" + // Emojis más recientes
+                        "\uD83E\uDE00-\uD83E\uDEFF" + // Más emojis recientes
+                        "]+.*";
+
+        return text.matches(emojiPattern);
+    }
     private void checkAndCreateDatabase(String databaseName) {
         FirebaseAuth auth = FirebaseAuth.getInstance();
         FirebaseUser user = auth.getCurrentUser();

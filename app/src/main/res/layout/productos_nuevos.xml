@@ -1,75 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/root_layout"
-    android:padding="10dp">
+    android:fillViewport="true">
 
-    <EditText
-        android:id="@+id/inputValor"
+    <RelativeLayout
+        android:id="@+id/root_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="70dp"
-        android:gravity="center"
-        android:hint="Precio"
-        android:inputType="number"
-        android:nextFocusDown="@id/inputNombre"
-        android:imeOptions="actionNext"
-        android:layout_alignParentTop="true"
-        android:layout_marginTop="10dp" />
+        android:padding="10dp">
 
-    <EditText
-        android:id="@+id/inputNombre"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:textSize="50dp"
-        android:gravity="center"
-        android:hint="Nombre"
-        android:inputType="text"
-        android:nextFocusDown="@id/switchTipo"
-        android:nextFocusUp="@id/inputValor"
-        android:imeOptions="actionNext"
-        android:layout_below="@id/inputValor"
-        android:layout_marginTop="10dp" />
+        <EditText
+            android:id="@+id/inputValor"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="70dp"
+            android:gravity="center"
+            android:hint="Precio"
+            android:inputType="number"
+            android:nextFocusDown="@id/inputNombre"
+            android:imeOptions="actionNext"
+            android:layout_alignParentTop="true"
+            android:layout_marginTop="10dp" />
 
-    <Switch
-        android:id="@+id/switchTipo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="¿Es un gasto (negativo)?"
-        android:imeOptions="actionNext"
-        android:nextFocusDown="@id/inputNota"
-        android:nextFocusUp="@id/inputNombre"
-        android:layout_below="@id/inputNombre"
-        android:layout_marginTop="10dp" />
+        <EditText
+            android:id="@+id/inputNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="50dp"
+            android:gravity="center"
+            android:hint="Nombre"
+            android:inputType="text"
+            android:nextFocusDown="@id/switchTipo"
+            android:nextFocusUp="@id/inputValor"
+            android:imeOptions="actionNext"
+            android:layout_below="@id/inputValor"
+            android:layout_marginTop="10dp" />
 
-    <EditText
-        android:id="@+id/inputNota"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Nota"
-        android:inputType="textMultiLine"
-        android:nextFocusDown="@id/inputGuardar"
-        android:nextFocusUp="@id/switchTipo"
-        android:imeOptions="actionNext"
-        android:layout_below="@id/switchTipo"
-        android:layout_marginTop="10dp" />
+        <Switch
+            android:id="@+id/switchTipo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="¿Es un gasto (negativo)?"
+            android:imeOptions="actionNext"
+            android:nextFocusDown="@id/inputNota"
+            android:nextFocusUp="@id/inputNombre"
+            android:layout_below="@id/inputNombre"
+            android:layout_marginTop="10dp" />
 
-    <TextView
-        android:id="@+id/inputGuardar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:foregroundGravity="center"
-        android:layout_centerHorizontal="true"
-        android:text="Guardar"
-        android:background="@drawable/selector_background"
-        android:gravity="center"
-        android:padding="10dp"
-        android:textSize="18sp"
-        android:clickable="true"
-        android:focusable="true"
-        android:layout_below="@id/inputNota"
-        android:layout_marginTop="10dp" />
+        <EditText
+            android:id="@+id/inputNota"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nota"
+            android:inputType="textMultiLine"
+            android:nextFocusDown="@id/inputGuardar"
+            android:nextFocusUp="@id/switchTipo"
+            android:imeOptions="actionNext"
+            android:layout_below="@id/switchTipo"
+            android:layout_marginTop="10dp" />
 
+        <TextView
+            android:id="@+id/inputGuardar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:foregroundGravity="center"
+            android:layout_centerHorizontal="true"
+            android:text="Guardar"
+            android:background="@drawable/selector_background"
+            android:gravity="center"
+            android:padding="10dp"
+            android:textSize="18sp"
+            android:clickable="true"
+            android:focusable="true"
+            android:layout_below="@id/inputNota"
+            android:layout_marginTop="10dp" />
 
-</RelativeLayout>
+    </RelativeLayout>
+</ScrollView>

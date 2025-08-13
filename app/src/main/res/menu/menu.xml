@@ -18,9 +18,9 @@
         android:title="Donar"/>
     <item
         android:id="@+id/manual"
-        android:icon="@drawable/buscar"
+        android:icon="@drawable/pin"
         android:titleTextAppearance="@style/MenuItemTextStyle"
-        android:title="Manual"/>
+        android:title="Mis App"/>
 
     <item
         android:id="@+id/exel"
