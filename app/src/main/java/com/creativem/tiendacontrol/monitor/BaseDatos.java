@@ -199,7 +199,8 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
 //                        Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAnoActivity.class);
 //                        startActivity(intent);
                     } else if (id == R.id.exel) {
-                        exportAllDatabasesSequentially();
+                        descargarYExportarDatos();
+                        return true;
                     }
                     else if (id == R.id.salirItem) {
                         mAuth.signOut();
@@ -231,6 +232,58 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             Toast.makeText(this, "No se encuentra logueado el usuario", Toast.LENGTH_SHORT).show();
         }
     }
+    private void descargarYExportarDatos() {
+        String userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("Empresas")
+                .child(userId)
+                .child("basededatos");
+
+
+        ref.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                Map<String, List<Map<String, Object>>> datosPorBases = new HashMap<>();
+
+                for (DataSnapshot dbSnapshot : snapshot.getChildren()) {
+                    String nombreBase = dbSnapshot.getKey(); // Nombre para la hoja Excel
+                    List<Map<String, Object>> listaRegistros = new ArrayList<>();
+
+                    for (DataSnapshot itemSnapshot : dbSnapshot.getChildren()) {
+                        Map<String, Object> registro = new HashMap<>();
+                        registro.put("fechaHora", itemSnapshot.child("fechaHora").getValue(String.class));
+                        registro.put("id", itemSnapshot.child("id").getValue(String.class)); // Si no lo usas en Excel puedes eliminarlo
+                        registro.put("nombre", itemSnapshot.child("nombre").getValue(String.class));
+                        registro.put("nota", itemSnapshot.child("nota").getValue(String.class));
+                        registro.put("valor", itemSnapshot.child("valor").getValue(Double.class));
+                        listaRegistros.add(registro);
+                    }
+
+                    datosPorBases.put(nombreBase, listaRegistros);
+                }
+
+                try {
+                    // Crear nombre con fecha y hora actual
+                    String timestamp = new java.text.SimpleDateFormat("yyyy-MM-dd_HH-mm").format(new java.util.Date());
+                    String fileName = "Datos_" + timestamp;
+
+                    // Exportar y compartir el Excel con todas las bases en hojas separadas
+                    File excelFile = ExcelExporter.exportToExcel(BaseDatos.this, datosPorBases, fileName);
+                    ExcelExporter.shareExcel(BaseDatos.this, excelFile);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    Toast.makeText(BaseDatos.this, "Error al exportar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(BaseDatos.this, "Error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
 
     private void configurarRecyclerViewDatabases() { // Renamed for clarity
         int orientation = getResources().getConfiguration().orientation;
@@ -242,12 +295,84 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             layoutManager = new GridLayoutManager(this, calculateNoOfColumns());
         }
 
-        recyclerViewDatabases.setLayoutManager(layoutManager); // Use recyclerViewDatabases here
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        if (user == null) {
+            showToast("Usuario no autenticado");
+            return;
+        }
+        String userId = user.getUid();
 
         databaseList = new ArrayList<>();
-        adapter = new BasesAdapter(this, databaseList, this);
+        adapter = new BasesAdapter(
+                this,
+                databaseList,
+                databaseName -> { // OnDatabaseClickListener
+                    Intent intent = new Intent(BaseDatos.this, MisDatos.class);
+                    intent.putExtra("databaseName", databaseName);
+                    startActivity(intent);
+                },
+                databaseName -> { // OnDeleteClickListener
+                    confirmDeleteDatabase(databaseName);
+                }
+        );
+
+
+        recyclerViewDatabases.setLayoutManager(layoutManager);
         recyclerViewDatabases.setAdapter(adapter);
     }
+
+    private void confirmDeleteDatabase(String databaseName) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Confirmar eliminación")
+                .setMessage("¿Estás seguro de que deseas eliminar la base de datos " + databaseName + "?")
+                .setPositiveButton("Eliminar", (dialog, which) -> {
+                    deleteCustomDatabase(databaseName);
+                })
+                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+
+        // Cambiar colores de botones si quieres
+        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
+        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        if (positiveButton != null) {
+            positiveButton.setTextColor(getResources().getColor(R.color.colorNegativo));
+        }
+
+        if (negativeButton != null) {
+            negativeButton.setTextColor(getResources().getColor(R.color.colorPositivo));
+        }
+    }
+
+    private void deleteCustomDatabase(String databaseName) {
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (user == null) {
+            Toast.makeText(this, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        String userId = user.getUid();
+
+        DatabaseReference refToDelete = FirebaseDatabase.getInstance()
+                .getReference("Empresas")
+                .child(userId)
+                .child("basededatos")
+                .child(databaseName);
+
+        refToDelete.removeValue()
+                .addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Base de datos eliminada", Toast.LENGTH_SHORT).show();
+                    loadDatabases();  // Recargar lista tras borrar
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(this, "Error al eliminar: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+
 
     private int calculateNoOfColumns() {
         DisplayMetrics displayMetrics = getResources().getDisplayMetrics();
@@ -364,36 +489,39 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             return;
         }
 
-        // Create date string in Colombia time zone
+        String userId = user.getUid();
+
+        // Crear fecha en zona horaria de Colombia
         SimpleDateFormat sdfColombia = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         sdfColombia.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
-        String dateString = sdfColombia.format(new Date()); // Use new Date() for current time
+        String dateString = sdfColombia.format(new Date());
 
+        DatabaseReference userDatabasesRef = FirebaseDatabase.getInstance()
+                .getReference("Empresas")
+                .child(userId)
+                .child("basededatos");
 
-        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
-        Map<String,Object> databaseData = new HashMap<>();
+        Map<String, Object> databaseData = new HashMap<>();
         databaseData.put("timestamp", ServerValue.TIMESTAMP);
         databaseData.put("fechaCreacion", dateString);
-        userDatabasesRef.child(databaseName).setValue(databaseData).addOnCompleteListener(task -> {
 
+        userDatabasesRef.child(databaseName).setValue(databaseData).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 showToast("Base de datos creada en Firebase");
                 Log.d(TAG, "Base de datos creada en Firebase");
                 loadDatabases();
             } else {
                 showToast("Error al crear base de datos en Firebase: " + task.getException());
-                Log.e(TAG, "Error al crear base de datos en Firebase: " + task.getException());
+                Log.e(TAG, "Error al crear base de datos en Firebase: ", task.getException());
             }
         });
-
-
     }
+
 
 
     private void loadDatabases() {
         databaseList.clear();
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser user = auth.getCurrentUser();
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
         if (user == null) {
             Log.e(TAG, "Usuario no autenticado");
@@ -402,7 +530,11 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         }
 
         String userId = user.getUid();
-        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
+
+        // Cambiamos la referencia para que apunte a la estructura Empresas/{userId}/basededatos
+        DatabaseReference userDatabasesRef = database.getReference("Empresas")
+                .child(userId)
+                .child("basededatos");
 
         userDatabasesRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -443,251 +575,22 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             }
         });
     }
-        private void showToast(String message) {
+
+    private void showToast(String message) {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
+
 
     @Override
     public void onDatabaseClick(String databaseName) {
         if (databaseName != null && !databaseName.isEmpty()) {
-            showDatabaseOptionsDialog(databaseName);
+//            showDatabaseOptionsDialog(databaseName);
         } else {
             showToast("Nombre de base de datos inválido");
         }
     }
 
-    private void showDatabaseOptionsDialog(String databaseName) {
-        // Inflar el diseño personalizado
-        LayoutInflater inflater = LayoutInflater.from(this);
-        View dialogView = inflater.inflate(R.layout.menubasedatos, null);
 
-        // Encontrar los botones y elementos en el diseño inflado
-        TextView btnEditar = dialogView.findViewById(R.id.btnEditar);
-        TextView btnEliminar = dialogView.findViewById(R.id.btnEliminar);
-
-        // Crear el AlertDialog con el diseño inflado
-        AlertDialog dialog = new AlertDialog.Builder(this, R.style.TransparentDialogTheme)
-                .setView(dialogView)
-                .create();
-
-
-        // Configurar los eventos de clic
-        btnEditar.setOnClickListener(v -> {
-            editDatabase(databaseName);
-            dialog.dismiss();
-        });
-
-        btnEliminar.setOnClickListener(v -> {
-            confirmDeleteDatabase(databaseName);
-            dialog.dismiss();
-        });
-
-        // Mostrar el diálogo
-        dialog.show();
-    }
-    private void exportAllDatabasesSequentially() {
-        if (userId != null) {
-            Log.d(TAG, "Iniciando exportación secuencial de todas las bases de datos");
-            DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
-            userDatabasesRef.addListenerForSingleValueEvent(new ValueEventListener() {
-                @Override
-                public void onDataChange(@NonNull DataSnapshot snapshot) {
-                    if (snapshot.exists()) {
-                        databaseNames.clear(); // Limpiar la lista antes de añadir nuevos nombres
-                        for (DataSnapshot databaseSnapshot : snapshot.getChildren()) {
-                            String databaseName = databaseSnapshot.getKey();
-                            if (databaseName != null && !databaseName.isEmpty()) { //Comprobación de null y vacío
-                                databaseNames.add(databaseName);
-                            }
-                        }
-                        if (!databaseNames.isEmpty()) { //Comprobación de lista vacía
-                            XSSFWorkbook workbook = new XSSFWorkbook();
-                            exportDatabasesSequentially(workbook);
-                        } else {
-                            Log.e(TAG, "No se encontraron bases de datos para el usuario");
-                            Toast.makeText(BaseDatos.this, "No se encontraron bases de datos", Toast.LENGTH_SHORT).show();
-                        }
-                    } else {
-                        Log.e(TAG, "No se encontraron bases de datos para el usuario");
-                        Toast.makeText(BaseDatos.this, "No se encontraron bases de datos", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                @Override
-                public void onCancelled(@NonNull DatabaseError error) {
-                    Log.e(TAG, "Error al obtener la referencia a la base de datos en firebase " + error.getMessage());
-                    Toast.makeText(BaseDatos.this, "Error al obtener bases de datos", Toast.LENGTH_SHORT).show();
-                }
-            });
-        } else {
-            Log.e(TAG, "Error: userId es null en exportAllDatabasesSequentially");
-            Toast.makeText(this, "Error: No se pudo obtener el ID del usuario", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-
-    private void exportDatabasesSequentially(XSSFWorkbook workbook) {
-        if (databaseNames.isEmpty()) {
-            Log.d(TAG, "Proceso de exportación secuencial completado");
-            //Compartir el archivo SOLO CUANDO SE TERMINE TODO
-            String fileName = generateFileName("TodasLasBasesDeDatos");
-            File tempDir = getCacheDir();
-            File excelFile = null;
-            FileOutputStream outputStream = null;
-            try {
-                excelFile = new File(tempDir, fileName + ".xlsx");
-                outputStream = new FileOutputStream(excelFile);
-                workbook.write(outputStream);
-                Uri fileUri = FileProvider.getUriForFile(BaseDatos.this,
-                        getApplicationContext().getPackageName() + ".provider",
-                        excelFile);
-                shareExcelFile(fileUri);
-            } catch (IOException e) {
-                Log.e(TAG, "Error al crear o escribir el archivo: " + e.getMessage());
-                Toast.makeText(this, "Error al generar el archivo", Toast.LENGTH_SHORT).show();
-            } finally {
-                closeOutputStream(outputStream);
-                closeWorkbook(workbook);
-            }
-            return;
-        }
-
-        String databaseName = databaseNames.remove(0);
-        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
-        userDatabasesRef.child(databaseName).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                if (snapshot.exists()) {
-                    String databasePath = snapshot.getRef().toString();
-                    ExcelExporter exporter = new ExcelExporter(BaseDatos.this, databaseName, databasePath);
-                    exporter.exportToExcel(workbook, new ExcelExporter.OnCompleteListener() {
-                        @Override
-                        public void onComplete(Uri fileUri) {
-                            exportDatabasesSequentially(workbook);
-                        }
-                    });
-                } else {
-                    Log.e(TAG, "No se encuentra la referencia para " + databaseName);
-                    exportDatabasesSequentially(workbook);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e(TAG, "Error al obtener la referencia a la base de datos en firebase " + error.getMessage());
-                exportDatabasesSequentially(workbook);
-            }
-        });
-    }
-
-    private void shareExcelFile(Uri fileUri) {
-        if (fileUri != null) {
-            Intent shareIntent = new Intent(Intent.ACTION_SEND);
-            shareIntent.setType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            shareIntent.putExtra(Intent.EXTRA_STREAM, fileUri);
-            shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            startActivity(Intent.createChooser(shareIntent, "Compartir Excel"));
-        } else {
-            Log.e(TAG, "Error: fileUri es null en shareExcelFile");
-            Toast.makeText(this, "Error al compartir el archivo", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private String generateFileName(String baseName) {
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(new Date());
-        return baseName + "_" + timeStamp;
-    }
-
-    // Métodos auxiliares para cerrar streams y workbook de forma segura
-    private void closeOutputStream(FileOutputStream outputStream) {
-        if (outputStream != null) {
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                Log.e(TAG, "Error al cerrar el outputStream: " + e.getMessage());
-            }
-        }
-    }
-
-    private void closeWorkbook(XSSFWorkbook workbook) {
-        if (workbook != null) {
-            try {
-                workbook.close();
-            } catch (IOException e) {
-                Log.e(TAG, "Error al cerrar el workbook: " + e.getMessage());
-            }
-        }
-    }
-
-    private void editDatabase(String databaseName) {
-        Log.d(TAG, "editDatabase() ejecutado con databaseName: " + databaseName);
-        if (databaseName != null && !databaseName.isEmpty()) {
-            closeCurrentDatabase();
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putString(KEY_CURRENT_DATABASE, databaseName);
-            editor.putBoolean("KEY_DATABASE_SELECTED", true);
-            editor.apply();
-            Log.d(TAG, "Nombre de la base de datos guardado en SharedPreferences: " + databaseName);
-            showToast("Base de datos actual: " + databaseName);
-
-            // Abre la base de datos en la actividad correspondiente
-            Intent intent = new Intent(BaseDatos.this, MisDatos.class);
-            intent.putExtra("databaseName", databaseName);
-            startActivity(intent);
-        } else {
-            showToast("Nombre de base de datos inválido");
-        }
-    }
-
-    private void confirmDeleteDatabase(String databaseName) {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Confirmar eliminación")
-                .setMessage("¿Estás seguro de que deseas eliminar la base de datos " + databaseName + "?")
-                .setPositiveButton("Eliminar", (dialog, which) -> {
-                    deleteCustomDatabase(databaseName);
-                    loadDatabases();
-                })
-                .setNegativeButton("Cancelar", (dialog, which) -> dialog.dismiss());
-
-        AlertDialog dialog = builder.create();
-        dialog.show();
-
-        Button positiveButton = dialog.getButton(AlertDialog.BUTTON_POSITIVE);
-        Button negativeButton = dialog.getButton(AlertDialog.BUTTON_NEGATIVE);
-
-        if (positiveButton != null) {
-            positiveButton.setTextColor(getResources().getColor(R.color.colorNegativo));
-        }
-
-        if (negativeButton != null) {
-            negativeButton.setTextColor(getResources().getColor(R.color.colorPositivo));
-        }
-    }
-
-    public void deleteCustomDatabase(String databaseName) {
-        FirebaseAuth auth = FirebaseAuth.getInstance();
-        FirebaseUser user = auth.getCurrentUser();
-
-        if (user == null) {
-            Log.e(TAG, "Usuario no autenticado");
-            showToast("Usuario no autenticado");
-            return;
-        }
-
-        String userId = user.getUid();
-        DatabaseReference userDatabasesRef = database.getReference("users").child(userId).child("databases");
-
-        userDatabasesRef.child(databaseName).removeValue().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                showToast("Base de datos eliminada de Firebase");
-                Log.d(TAG, "Base de datos eliminada en Firebase");
-                loadDatabases();
-            } else {
-                showToast("Error al eliminar base de datos en Firebase: " + task.getException());
-                Log.e(TAG, "Error al eliminar base de datos en Firebase: " + task.getException());
-            }
-        });
-    }
     private void closeCurrentDatabase() {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.remove(KEY_CURRENT_DATABASE);

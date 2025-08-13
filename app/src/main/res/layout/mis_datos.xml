@@ -56,6 +56,34 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <LinearLayout
+        android:id="@+id/layoutMensajeVacio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="25dp">
+
+        <ImageView
+            android:layout_width="150dp"
+            android:layout_height="150dp"
+            android:src="@drawable/donar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="No hay ítems en esta vista. Prueba cambiar el filtro o agrega un nuevo registro para comenzar a controlar tus finanzas.\n\n¡Empieza ahora y verás tus resultados aquí!"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:layout_marginTop="16dp"/>
+
+    </LinearLayout>
+
     <!-- Contenedor flotante para ingresos, egresos y diferencia -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/layout_totales"

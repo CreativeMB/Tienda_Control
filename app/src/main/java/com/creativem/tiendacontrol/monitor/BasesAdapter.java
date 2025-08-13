@@ -15,7 +15,6 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.interfas.PuntoMil;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -23,7 +22,6 @@ import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
-
 import java.util.HashMap;
 import java.util.List;
 
@@ -36,18 +34,24 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
         void onDatabaseClick(String databaseName);
     }
 
+    public interface OnDeleteClickListener {
+        void onDeleteClick(String databaseName);
+    }
+
     private Context context;
     private List<String> databaseList;
-    private OnDatabaseClickListener listener;
+    private OnDatabaseClickListener clickListener;
+    private OnDeleteClickListener deleteClickListener;
     private static final String TAG = "BasesAdapter";
     private final FirebaseDatabase database = FirebaseDatabase.getInstance();
 
-
-    public BasesAdapter(Context context, List<String> databaseList, OnDatabaseClickListener listener) {
+    public BasesAdapter(Context context, List<String> databaseList,
+                        OnDatabaseClickListener clickListener,
+                        OnDeleteClickListener deleteClickListener) {
         this.context = context;
         this.databaseList = databaseList;
-        this.listener = listener;
-
+        this.clickListener = clickListener;
+        this.deleteClickListener = deleteClickListener;
     }
 
     @NonNull
@@ -68,23 +72,38 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             DatabaseViewHolder databaseHolder = (DatabaseViewHolder) holder;
             String databaseName = databaseList.get(position);
             FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if(user == null) {
-                Log.e(TAG,"Usuario no autenticado");
+            if (user == null) {
+                Log.e(TAG, "Usuario no autenticado");
                 Toast.makeText(context, "Usuario no autenticado", Toast.LENGTH_SHORT).show();
                 return;
             }
             String userId = user.getUid();
-            DatabaseReference databaseReference = database.getReference("users").child(userId).child("databases").child(databaseName);
+            DatabaseReference databaseReference = database.getReference("Empresas")
+                    .child(userId)
+                    .child("basededatos")
+                    .child(databaseName);
             loadItemsFromDatabase(databaseReference, databaseHolder, databaseName);
-            databaseHolder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
-            databaseHolder.itemView.setOnClickListener(v -> listener.onDatabaseClick(databaseName));
 
-        } else if (holder instanceof EmptyViewHolder) {
-            // No es necesario hacer nada aquí, ya que la vista EmptyViewHolder se configura en el layout XML.
+
+            // Ícono base de datos
+            databaseHolder.imageViewDatabaseIcon.setImageResource(R.drawable.database);
+            // Activar marquee en todos los TextView
+            databaseHolder.textViewDatabaseName.setSelected(true);
+            databaseHolder.textViewFechaCreacion.setSelected(true);
+            databaseHolder.textViewDiferencia.setSelected(true);
+            databaseHolder.textViewIngresos.setSelected(true);
+            databaseHolder.textViewEgresos.setSelected(true);
+
+            // Click para abrir
+            holder.itemView.setOnClickListener(v -> clickListener.onDatabaseClick(databaseName));
+
+            // Click para eliminar
+            databaseHolder.imgEliminar.setOnClickListener(v -> deleteClickListener.onDeleteClick(databaseName));
         }
     }
+
     private void loadItemsFromDatabase(DatabaseReference databaseReference, DatabaseViewHolder databaseHolder, String databaseName) {
-        databaseReference.addValueEventListener(new ValueEventListener() { // ← Cambiar aquí
+        databaseReference.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot snapshot) {
                 double ingresos = 0;
@@ -98,7 +117,8 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
 
                 if (snapshot.exists()) {
                     for (DataSnapshot itemSnapshot : snapshot.getChildren()) {
-                        if (itemSnapshot.getKey().equals("fechaCreacion") || itemSnapshot.getKey().equals("timestamp")) continue;
+                        if (itemSnapshot.getKey().equals("fechaCreacion") || itemSnapshot.getKey().equals("timestamp"))
+                            continue;
 
                         Object valueObject = itemSnapshot.getValue();
                         if (valueObject instanceof HashMap) {
@@ -125,15 +145,9 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                                 } else {
                                     egresos += valor;
                                 }
-                            } else {
-                                Log.e(TAG, "El HashMap no contiene la clave 'valor'");
                             }
-                        } else {
-                            Log.e(TAG, "El valor no es un HashMap: " + (valueObject != null ? valueObject.getClass() : "null"));
                         }
                     }
-                } else {
-                    Log.w(TAG, "Base de datos '" + databaseName + "' está vacía.");
                 }
 
                 double diferencia = ingresos + egresos;
@@ -143,12 +157,14 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
                 String diferenciaFormateada = PuntoMil.getFormattedNumber((long) diferencia);
 
                 databaseHolder.textViewDatabaseName.setText(databaseName);
-                databaseHolder.textViewFechaCreacion.setText("Creado: " + fechaCreacion);
+                databaseHolder.textViewFechaCreacion.setText(fechaCreacion);
                 databaseHolder.textViewIngresos.setText("Ingresos: $" + ingresosFormatted);
                 databaseHolder.textViewEgresos.setText("Egresos: $" + egresosFormatted);
-                databaseHolder.textViewDiferencia.setText("Diferencia: $" + diferenciaFormateada);
+                databaseHolder.textViewDiferencia.setText("$" + diferenciaFormateada);
 
-                int colorTexto = diferencia < 0 ? ContextCompat.getColor(context, R.color.colorNegativo) : ContextCompat.getColor(context, R.color.colorPositivo);
+                int colorTexto = diferencia < 0
+                        ? ContextCompat.getColor(context, R.color.colorNegativo)
+                        : ContextCompat.getColor(context, R.color.colorPositivo);
                 databaseHolder.textViewDiferencia.setTextColor(colorTexto);
             }
 
@@ -159,7 +175,6 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             }
         });
     }
-
 
     @Override
     public int getItemCount() {
@@ -181,7 +196,6 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
             gridLayoutManager.setSpanSizeLookup(new GridLayoutManager.SpanSizeLookup() {
                 @Override
                 public int getSpanSize(int position) {
-                    // La vista vacía (posición 0 cuando la lista está vacía) ocupa ambas columnas
                     return getItemViewType(position) == VIEW_TYPE_EMPTY ? 2 : 1;
                 }
             });
@@ -189,23 +203,19 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     }
 
     public static class DatabaseViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewDatabaseName;
-        TextView textViewIngresos;
-        TextView textViewEgresos;
-        TextView textViewDiferencia;
-        TextView textViewFechaCreacion;
+        TextView textViewDatabaseName, textViewIngresos, textViewEgresos, textViewDiferencia, textViewFechaCreacion;
         CardView cardView;
-        ImageView imageViewDatabaseIcon;
+        ImageView imageViewDatabaseIcon, imgEliminar;
 
         public DatabaseViewHolder(@NonNull View itemView) {
             super(itemView);
             textViewDatabaseName = itemView.findViewById(R.id.textViewDatabaseName);
             textViewFechaCreacion = itemView.findViewById(R.id.textViewFechaCreacion);
-            // Asegúrate de que estos IDs coincidan con los de tu layout itembasedatos.xml
             textViewIngresos = itemView.findViewById(R.id.textViewIngresos);
             textViewEgresos = itemView.findViewById(R.id.textViewEgresos);
             textViewDiferencia = itemView.findViewById(R.id.textViewDiferencia);
             imageViewDatabaseIcon = itemView.findViewById(R.id.imageViewDatabase);
+            imgEliminar = itemView.findViewById(R.id.eliminar);
             cardView = itemView.findViewById(R.id.cardView);
         }
     }

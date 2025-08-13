@@ -15,6 +15,7 @@ import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -44,6 +45,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
     private RecyclerView recyclerViewProductos;
     private ProductoAdapter adapter;
     private List<ProductoModel> productoList;
+    private LinearLayout layoutMensajeVacio;
     private FirebaseHelper firebaseHelper;
     private SharedPreferences sharedPreferences;
 
@@ -70,18 +72,40 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         adapter = new ProductoAdapter(context, productoList, this); // Initialize adapter here
 
         recyclerViewProductos = findViewById(R.id.recyclerViewProductos);
+        layoutMensajeVacio = findViewById(R.id.layoutMensajeVacio);
+
+
         recyclerViewProductos.setLayoutManager(new LinearLayoutManager(this));
-        recyclerViewProductos.setAdapter(adapter); // Set adapter to RecyclerView
+        recyclerViewProductos.setAdapter(adapter); // Asignar el adaptador
+
+
 
         TextView  textVentas = findViewById(R.id.Venta); //Get TextView AFTER setContentView
         textVentas.setOnClickListener(v -> mostrarDialogoCrearProducto(null));
 
         sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
         userId = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+// Recibes el nombre de la base de datos como antes
         baseDatosSeleccionada = getIntent().getStringExtra("databaseName");
+
+// Aquí podrías guardar el userId para usarlo en la referencia
+// (opcional, si quieres guardarlo en SharedPreferences)
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("userId", userId);
+        editor.apply();
+
         if (baseDatosSeleccionada == null || baseDatosSeleccionada.isEmpty()) {
             baseDatosSeleccionada = obtenerBaseDatosSeleccionada();
         }
+
+// Ya luego cuando uses la referencia en Firebase haz:
+        DatabaseReference refProductos = FirebaseDatabase.getInstance()
+                .getReference("Empresas")
+                .child(userId)                 // Aquí usas el userId
+                .child("basededatos")
+                .child(baseDatosSeleccionada);
+
 
         if (baseDatosSeleccionada.isEmpty()) {
             Toast.makeText(this, "⚠️ No hay base de datos seleccionada.", Toast.LENGTH_LONG).show();
@@ -116,6 +140,8 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                         Log.d("SpinnerFiltro", "Filtrando datos por: " + tipoFiltro);
                         Pair<String, String> fechas = obtenerFechaSegunFiltro(tipoFiltro);
                         adapter.filtrarPorFecha(fechas.first, tipoFiltro, fechas.second);
+                        actualizarVisibilidadLista();
+
                     }
                 }
 
@@ -127,6 +153,18 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
         } else {
             Log.e("MisDatos", "spinnerFiltro is NULL! Check your layout file.");
+        }
+    }
+
+    private void actualizarVisibilidadLista() {
+        if (adapter == null) return; // seguridad
+
+        if (adapter.getItemCount() == 0) {
+            layoutMensajeVacio.setVisibility(View.VISIBLE);
+            recyclerViewProductos.setVisibility(View.GONE);
+        } else {
+            layoutMensajeVacio.setVisibility(View.GONE);
+            recyclerViewProductos.setVisibility(View.VISIBLE);
         }
     }
 
@@ -222,6 +260,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
                 adapter.filtrarPorFecha(fechaFiltro, tipoFiltro, fechaFin);
 
+                actualizarVisibilidadLista();
 
 
                 // Calcula los totales después de aplicar el filtro

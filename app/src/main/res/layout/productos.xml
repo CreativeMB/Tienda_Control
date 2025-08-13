@@ -21,7 +21,12 @@
             android:text="Nombre del Producto"
             android:textSize="20sp"
             android:textStyle="bold"
-            />
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:scrollHorizontally="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
         <TextView
             android:id="@+id/PrecioProducto"
@@ -31,7 +36,12 @@
             android:text="Precio: $0.00"
             android:textSize="22sp"
             android:textStyle="bold"
-           />
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:scrollHorizontally="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
         <TextView
             android:id="@+id/FechaHoraProducto"
@@ -40,17 +50,15 @@
             android:layout_height="wrap_content"
             android:text="Fecha y Hora"
             android:textSize="18sp"
-            android:gravity="end"/>
+            android:gravity="end"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:scrollHorizontally="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
-        <TextView
-            android:id="@+id/EditarProducto"
-            android:layout_width="0dp"
-            android:layout_weight="1"
-            android:layout_height="wrap_content"
-            android:text="Editar"
-            android:textSize="12sp"
-            android:gravity="center"
-            android:layout_marginStart="8dp"/>
+
 
         <TextView
             android:id="@+id/EliminarProducto"
@@ -61,7 +69,13 @@
             android:textSize="12sp"
             android:textColor="@android:color/holo_red_dark"
             android:gravity="center"
-            android:layout_marginStart="8dp"/>
+            android:layout_marginStart="8dp"
+            android:singleLine="true"
+            android:ellipsize="marquee"
+            android:scrollHorizontally="true"
+            android:marqueeRepeatLimit="marquee_forever"
+            android:focusable="true"
+            android:focusableInTouchMode="true" />
 
     </LinearLayout>
 

@@ -50,14 +50,17 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ProductoModel producto = filteredProductList.get(position); // Usar la lista filtrada
+        ProductoModel producto = filteredProductList.get(position);
 
         holder.nombre.setText(producto.getNombre());
+        holder.nombre.setSelected(true); // Activa marquee
 
         String precioFormateado = PuntoMil.getFormattedNumber((long) producto.getValor());
         holder.precio.setText(precioFormateado);
+        holder.precio.setSelected(true); // Activa marquee
 
         holder.fechaHora.setText(producto.getFechaHora());
+        holder.fechaHora.setSelected(true); // Activa marquee
 
         if (producto.getValor() < 0) {
             holder.precio.setTextColor(context.getResources().getColor(R.color.endColor));
@@ -67,7 +70,8 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
             holder.itemView.setBackgroundColor(context.getResources().getColor(R.color.colorFondoPositivo));
         }
 
-        holder.Editar.setOnClickListener(v -> listener.onEditClick(producto));
+        holder.itemView.setOnClickListener(v -> listener.onEditClick(producto));
+
         holder.Eliminar.setOnClickListener(v -> listener.onDeleteClick(producto));
     }
 
@@ -84,7 +88,6 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
             nombre = itemView.findViewById(R.id.NombreProducto);
             precio = itemView.findViewById(R.id.PrecioProducto);
             fechaHora = itemView.findViewById(R.id.FechaHoraProducto);
-            Editar = itemView.findViewById(R.id.EditarProducto);
             Eliminar = itemView.findViewById(R.id.EliminarProducto);
         }
     }

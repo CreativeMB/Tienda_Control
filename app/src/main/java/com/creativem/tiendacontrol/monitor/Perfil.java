@@ -1,7 +1,8 @@
 package com.creativem.tiendacontrol.monitor;
+
 public class Perfil {
-    private String id; // Identificador único del perfil
-    private String userId; // UID del usuario autenticado
+    private String userId;       // UID del usuario autenticado (clave principal)
+    private String email;        // Email del usuario
     private String nombrePersona;
     private String nombreEmpresa;
     private String telefono;
@@ -14,9 +15,9 @@ public class Perfil {
     }
 
     // Constructor con todos los parámetros
-    public Perfil(String id, String userId, String nombrePersona, String nombreEmpresa, String telefono, String direccion, String pais, String ciudad) {
-        this.id = id;
-        this.userId = userId; // UID del usuario autenticado
+    public Perfil(String userId, String email, String nombrePersona, String nombreEmpresa, String telefono, String direccion, String pais, String ciudad) {
+        this.userId = userId;
+        this.email = email;
         this.nombrePersona = nombrePersona;
         this.nombreEmpresa = nombreEmpresa;
         this.telefono = telefono;
@@ -26,13 +27,6 @@ public class Perfil {
     }
 
     // Getters y setters
-    public String getId() {
-        return id;
-    }
-
-    public void setId(String id) {
-        this.id = id;
-    }
 
     public String getUserId() {
         return userId;
@@ -40,6 +34,14 @@ public class Perfil {
 
     public void setUserId(String userId) {
         this.userId = userId;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getNombrePersona() {
