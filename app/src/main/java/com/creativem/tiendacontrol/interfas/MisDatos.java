@@ -292,8 +292,6 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
 
         diferencia[0] = totalIngresos[0] + totalEgresos[0];
 
-        // Asegurarse de que la actualización de la UI se haga en el hilo principal
-        // Usar runOnUiThread si no estás en el hilo principal
         if (context instanceof Activity) {
             ((Activity) context).runOnUiThread(new Runnable() {
                 @Override
