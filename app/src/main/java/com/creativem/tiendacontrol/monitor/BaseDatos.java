@@ -39,6 +39,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.creativem.tiendacontrol.GraficoActivity;
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.helper.ExcelExporter;
 import com.creativem.tiendacontrol.interfas.MisDatos;
@@ -193,10 +194,10 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         intent.setData(Uri.parse(url));
                         startActivity(intent);
                         return true;
-//                    } else if (id == R.id.contabilidad) {
-//                        // Acción para Donar
-//                        Intent intent = new Intent(BaseDatos.this, FiltroDiaMesAnoActivity.class);
-//                        startActivity(intent);
+                    } else if (id == R.id.graficos) {
+                        // Acción para Donar
+                        Intent intent = new Intent(BaseDatos.this, GraficoActivity.class);
+                        startActivity(intent);
                     } else if (id == R.id.exel) {
                         descargarYExportarDatos();
                         return true;

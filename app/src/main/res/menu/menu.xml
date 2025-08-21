@@ -17,6 +17,11 @@
         android:titleTextAppearance="@style/MenuItemTextStyle"
         android:title="Donar"/>
     <item
+        android:id="@+id/graficos"
+        android:icon="@drawable/notificacion"
+        android:titleTextAppearance="@style/MenuItemTextStyle"
+        android:title="Graficos"/>
+    <item
         android:id="@+id/manual"
         android:icon="@drawable/pin"
         android:titleTextAppearance="@style/MenuItemTextStyle"
