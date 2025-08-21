@@ -14,6 +14,7 @@ import android.text.SpannableString;
 import android.text.TextWatcher;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
@@ -329,7 +330,8 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         builder.setView(vista);
 
         EditText inputValor = vista.findViewById(R.id.inputValor);
-        EditText inputNombre = vista.findViewById(R.id.inputNombre); // Ahora es un EditText normal
+        EditText inputNombre = vista.findViewById(R.id.inputNombre);
+        TextView tvSugerencia = vista.findViewById(R.id.tvSugerencia);
         EditText inputNota = vista.findViewById(R.id.inputNota);
         TextView inputGuardar = vista.findViewById(R.id.inputGuardar);
         Switch switchTipo = vista.findViewById(R.id.switchTipo);
@@ -337,143 +339,43 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         inputNombre.setImeOptions(EditorInfo.IME_ACTION_DONE);
         final AlertDialog dialog = builder.create();
 
-        inputNombre.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-            }
-            return false;
-        });
-        inputGuardar.setOnEditorActionListener((v, actionId, event) -> {
-            if (actionId == EditorInfo.IME_ACTION_DONE) {
-                // Llamar a la misma función para guardar o actualizar
-                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-                return true; // Se maneja la acción, no pasa más
-            }
-            return false; // Si no es "DONE", no hacer nada
-        });
+        // Configurar autocompletado inline
+        setupAutocompleteInline(inputNombre, tvSugerencia);
 
-// También manejar el clic en el botón
+        // Guardar con botón
         inputGuardar.setOnClickListener(v -> {
-            // Llamar a la misma función para guardar o actualizar cuando el usuario hace clic en el botón
+            String textoFinal = inputNombre.getText().toString();
+
+            // Si hay sugerencia visible y empieza con el texto del usuario, usar la sugerencia
+            if (tvSugerencia.getVisibility() == View.VISIBLE &&
+                    tvSugerencia.getText().toString().toLowerCase().startsWith(textoFinal.toLowerCase())) {
+                textoFinal = tvSugerencia.getText().toString();
+            }
+
+            // Reemplazar el EditText con la sugerencia aceptada
+            inputNombre.setText(textoFinal);
+            inputNombre.setSelection(textoFinal.length());
+
+            // Llamar a tu método de guardar o actualizar
             guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
         });
 
-
-        DatabaseReference ref = FirebaseDatabase.getInstance()
-                .getReference("Empresas")
-                .child(userId)
-                .child("basededatos")
-                .child(baseDatosSeleccionada);
-
-        Set<String> nombresUnicos = new HashSet<>();
-
-        // Escuchar cambios en Firebase para actualizar la lista de nombres únicos
-        ref.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                nombresUnicos.clear();
-                for (DataSnapshot ds : snapshot.getChildren()) {
-                    String nombre = ds.child("nombre").getValue(String.class);
-                    if (nombre != null && !nombre.isEmpty()) {
-                        nombresUnicos.add(nombre);
-                    }
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Log.e("Firebase", "Error al leer nombres únicos", error.toException());
-            }
-        });
-
-        // TextWatcher para sugerencia INLINE
-        inputNombre.addTextChangedListener(new TextWatcher() {
-            private boolean isUpdating = false;
-            private String currentSuggestion = null; // Almacenar la sugerencia actual
-            private int previousLength = 0;
-
-            @Override
-            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-                previousLength = s.length();
-            }
-
-            @Override
-            public void onTextChanged(CharSequence s, int start, int before, int count) { }
-
-            @Override
-            public void afterTextChanged(Editable s) {
-                if (isUpdating) return;
-
-                String userInput = s.toString().trim();
-                boolean textWasDeleted = userInput.length() < previousLength;
-
-                if (userInput.isEmpty()) {
-                    removeSuggestion(s); // Borrar sugerencia si no hay entrada
-                    return;
-                }
-
-                String suggestion = null;
-
-                // Buscar coincidencia que INICIE con la entrada
-                for (String nombre : nombresUnicos) {
-                    if (nombre.toLowerCase().startsWith(userInput.toLowerCase())) {
-                        suggestion = nombre;
-                        break;
-                    }
-                }
-
-                isUpdating = true;
-
-                if (suggestion != null && !textWasDeleted) {
-                    // Mostrar sugerencia inline
-                    showSuggestion(s, userInput, suggestion);
-                    currentSuggestion = suggestion; // Almacenar la sugerencia actual
-                } else {
-                    // Borrar sugerencia si no hay coincidencia o si se borró texto
-                    removeSuggestion(s);
-                    currentSuggestion = null; // Limpiar la sugerencia
-                }
-
-                isUpdating = false;
-                previousLength = s.length();
-            }
-
-            // Mostrar sugerencia inline
-            private void showSuggestion(Editable s, String userInput, String suggestion) {
-                if(suggestion.length() > userInput.length()) {
-                    SpannableString spannable = new SpannableString(suggestion);
-                    spannable.setSpan(new ForegroundColorSpan(Color.LTGRAY),
-                            userInput.length(), suggestion.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-                    s.replace(0, s.length(), spannable);
-                    inputNombre.setSelection(userInput.length());
-                }
-            }
-
-            // Borrar la sugerencia
-            private void removeSuggestion(Editable s) {
-                String userInput = s.toString(); // Obtener todo el texto
-                if (currentSuggestion != null && !currentSuggestion.isEmpty() && userInput.length() < currentSuggestion.length()) {
-                    final int selectionStart = inputNombre.getSelectionStart();
-                    final int selectionEnd = inputNombre.getSelectionEnd();
-                    inputNombre.post(() -> { // Usar post() para actualizar después del TextWatcher
-                        inputNombre.setText(userInput); // Reemplazar todo el texto con la entrada del usuario
-                        inputNombre.setSelection(selectionStart,selectionEnd); // Colocar el cursor al final
-                    });
-
-                }
-            }
-        });
-
-        // Guardar con teclado o botón
+        // Guardar con teclado físico (Enter / DONE)
         inputNombre.setOnEditorActionListener((v, actionId, event) -> {
             if (actionId == EditorInfo.IME_ACTION_DONE) {
+                // Igual que el botón: aceptar sugerencia si existe
+                String textoFinal = inputNombre.getText().toString();
+                if (tvSugerencia.getVisibility() == View.VISIBLE &&
+                        tvSugerencia.getText().toString().toLowerCase().startsWith(textoFinal.toLowerCase())) {
+                    textoFinal = tvSugerencia.getText().toString();
+                }
+                inputNombre.setText(textoFinal);
+                inputNombre.setSelection(textoFinal.length());
+
                 guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
+                return true;
             }
             return false;
-        });
-
-        inputGuardar.setOnClickListener(v -> {
-            guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
         });
 
         // Formatear valor con separadores de miles
@@ -499,12 +401,24 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                         inputValor.setText("");
                     }
                 }
+
                 isEditing = false;
             }
         });
 
         builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar",
-                (dialogInterface, which) -> guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente));
+                (dialogInterface, which) -> {
+                    // Al usar el botón nativo de AlertDialog también aceptamos la sugerencia
+                    String textoFinal = inputNombre.getText().toString();
+                    if (tvSugerencia.getVisibility() == View.VISIBLE &&
+                            tvSugerencia.getText().toString().toLowerCase().startsWith(textoFinal.toLowerCase())) {
+                        textoFinal = tvSugerencia.getText().toString();
+                    }
+                    inputNombre.setText(textoFinal);
+                    inputNombre.setSelection(textoFinal.length());
+
+                    guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
+                });
 
         builder.setNegativeButton("Cancelar", (dialogInterface, which) -> {});
 
@@ -521,93 +435,78 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         }
     }
 
-//    private void mostrarDialogoCrearProducto(final ProductoModel productoExistente) {
-//        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-//        builder.setTitle(productoExistente == null ? "" : "");
-//
-//        View vista = getLayoutInflater().inflate(R.layout.productos_nuevos, null);
-//        builder.setView(vista);
-//
-//        EditText inputValor = vista.findViewById(R.id.inputValor);
-//        AutoCompleteTextView inputNombre = vista.findViewById(R.id.inputNombre);
-//        EditText inputNota = vista.findViewById(R.id.inputNota);
-//        TextView inputGuardar = vista.findViewById(R.id.inputGuardar);
-//        Switch switchTipo = vista.findViewById(R.id.switchTipo);
-//
-//        inputNombre.setImeOptions(EditorInfo.IME_ACTION_DONE);
-//
-//        final AlertDialog dialog = builder.create();
-//
-//        inputNombre.setOnEditorActionListener((v, actionId, event) -> {
-//            if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-//            }
-//            return false;
-//        });
-//        inputGuardar.setOnEditorActionListener((v, actionId, event) -> {
-//            if (actionId == EditorInfo.IME_ACTION_DONE) {
-//                // Llamar a la misma función para guardar o actualizar
-//                guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-//                return true; // Se maneja la acción, no pasa más
-//            }
-//            return false; // Si no es "DONE", no hacer nada
-//        });
-//
-//// También manejar el clic en el botón
-//        inputGuardar.setOnClickListener(v -> {
-//            // Llamar a la misma función para guardar o actualizar cuando el usuario hace clic en el botón
-//            guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-//        });
-//
-//        inputValor.addTextChangedListener(new TextWatcher() {
-//            private boolean isEditing = false;
-//
-//            @Override
-//            public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-//
-//            @Override
-//            public void onTextChanged(CharSequence s, int start, int before, int count) {}
-//
-//            @Override
-//            public void afterTextChanged(Editable s) {
-//                if (isEditing) return;
-//                isEditing = true;
-//
-//                String originalString = s.toString().replaceAll("[^\\d]", "");
-//                if (!originalString.isEmpty()) {
-//                    try {
-//                        long value = Long.parseLong(originalString);
-//                        String formattedString = PuntoMil.getFormattedNumber(value); //  Asumiendo que PuntoMil existe
-//                        inputValor.setText(formattedString);
-//                        inputValor.setSelection(formattedString.length());
-//                    } catch (NumberFormatException e) {
-//                        inputValor.setText("");
-//                    }
-//                }
-//                isEditing = false;
-//            }
-//        });
-//
-//        builder.setPositiveButton(productoExistente == null ? "Guardar" : "Actualizar", (dialogInterface, which) -> {
-//            guardarActualizarProducto(dialog, inputNombre, inputValor, inputNota, switchTipo, productoExistente);
-//        });
-//
-//        builder.setNegativeButton("Cancelar", (dialogInterface, which) -> {}); // No necesita acción aquí
-//
-//        dialog.show();
-//
-//        if (productoExistente != null) {
-//            inputNombre.setText(productoExistente.getNombre());
-//            long valorEntero = (long) Math.abs(productoExistente.getValor());
-//            inputValor.setText(String.valueOf(valorEntero));
-//            inputNota.setText(productoExistente.getNota());
-//            switchTipo.setChecked(productoExistente.getValor() < 0);
-//        } else {
-//            switchTipo.setChecked(false);
-//        }
-//    }
+    // ----------------------------
+// Autocompletado inline
+// ----------------------------
+    private void setupAutocompleteInline(EditText inputNombre, TextView tvSugerencia) {
+        DatabaseReference ref = FirebaseDatabase.getInstance()
+                .getReference("Empresas")
+                .child(userId)
+                .child("basededatos")
+                .child(baseDatosSeleccionada);
 
+        Set<String> nombresUnicos = new HashSet<>();
 
+        // Traer nombres únicos de Firebase
+        ref.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                nombresUnicos.clear();
+                for (DataSnapshot ds : snapshot.getChildren()) {
+                    String nombre = ds.child("nombre").getValue(String.class);
+                    if (nombre != null && !nombre.isEmpty()) {
+                        nombresUnicos.add(nombre);
+                    }
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Log.e("Firebase", "Error al leer nombres únicos", error.toException());
+            }
+        });
+
+        inputNombre.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                String userInput = s.toString().trim();
+                String suggestion = "";
+
+                // Buscar la primera coincidencia
+                for (String nombre : nombresUnicos) {
+                    if (nombre.toLowerCase().startsWith(userInput.toLowerCase()) && !nombre.equalsIgnoreCase(userInput)) {
+                        suggestion = nombre;
+                        break;
+                    }
+                }
+
+                if (!suggestion.isEmpty() && !userInput.isEmpty()) {
+                    // Mostrar la parte que falta en gris
+                    tvSugerencia.setText(userInput + suggestion.substring(userInput.length()));
+                    tvSugerencia.setVisibility(View.VISIBLE);
+                } else {
+                    tvSugerencia.setText("");
+                    tvSugerencia.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+
+        // Para aceptar la sugerencia al presionar TAB o ENTER (opcional)
+        inputNombre.setOnKeyListener((v, keyCode, event) -> {
+            if ((keyCode == KeyEvent.KEYCODE_TAB || keyCode == KeyEvent.KEYCODE_ENTER) &&
+                    tvSugerencia.getVisibility() == View.VISIBLE) {
+                inputNombre.setText(tvSugerencia.getText());
+                inputNombre.setSelection(inputNombre.getText().length());
+                tvSugerencia.setVisibility(View.INVISIBLE);
+                return true;
+            }
+            return false;
+        });
+    }
+    // ----------------------------
     private void guardarActualizarProducto(AlertDialog dialog, EditText inputNombre, EditText inputValor, EditText inputNota, Switch switchTipo, ProductoModel productoExistente) {
         String nombre = inputNombre.getText().toString().trim();
         String nota = inputNota.getText().toString().trim();
