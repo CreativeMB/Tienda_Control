@@ -140,7 +140,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                     String tipoFiltro = parent.getItemAtPosition(position).toString().trim();
                     Log.d("SpinnerFiltro", "Opción seleccionada: " + tipoFiltro);
 
-                    if (tipoFiltro.equalsIgnoreCase("Rango de Fechas")) {
+                    if (tipoFiltro.equalsIgnoreCase("Fechas")) {
                         Log.d("SpinnerFiltro", "Llamando a mostrarDatePickerRango()");
                         mostrarDatePickerRango();
 
