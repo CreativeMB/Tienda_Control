@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:background="@android:color/white"
+    android:layout_margin="6dp"
+    android:elevation="2dp">
+
+    <TextView
+        android:id="@+id/txtTitulo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pagar Luz"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"/>
+
+    <TextView
+        android:id="@+id/txtHora"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="08:30 AM"
+        android:textSize="16sp"
+        android:textColor="@android:color/darker_gray"
+        android:layout_marginTop="4dp"/>
+
+    <TextView
+        android:id="@+id/txtRepeticion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Diario"
+        android:textSize="14sp"
+        android:textColor="@android:color/holo_blue_dark"
+        android:layout_marginTop="2dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="end"
+        android:layout_marginTop="6dp">
+
+        <Switch
+            android:id="@+id/switchActivo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Activo"/>
+
+        <ImageButton
+            android:id="@+id/btnEliminar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@android:drawable/ic_delete"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:contentDescription="Eliminar"
+            android:tint="@android:color/holo_red_dark"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+</LinearLayout>

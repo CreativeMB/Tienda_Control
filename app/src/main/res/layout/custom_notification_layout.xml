@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="8dp"
+    android:background="?attr/colorSurface"
+    android:gravity="center_vertical">
+
+    <!-- Icono grande o logo personalizado -->
+    <ImageView
+        android:id="@+id/notification_icon_large"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="12dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/icono" /> <!-- Asegúrate de que este drawable exista y sea adecuado -->
+
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <!-- Título del recordatorio -->
+        <TextView
+            android:id="@+id/notification_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceHeadlineSmall"
+            android:textStyle="bold"
+            android:textColor="?attr/colorOnSurface"
+            android:text="Título del Recordatorio"
+            android:maxLines="1"
+            android:ellipsize="end"/>
+
+        <!-- Mensaje/contenido del recordatorio -->
+        <TextView
+            android:id="@+id/notification_message"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAppearance="?attr/textAppearanceBodyMedium"
+            android:textColor="?attr/colorOnSurfaceVariant"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:text="Mensaje detallado del recordatorio o su descripción." />
+
+    </LinearLayout>
+
+</LinearLayout>

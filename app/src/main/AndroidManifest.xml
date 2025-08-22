@@ -2,18 +2,44 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <!-- PERMISOS -->
+    <!-- Permiso para acceso a internet, si tu app lo necesita -->
     <uses-permission android:name="android.permission.INTERNET" />
+
+    <!-- Permiso para notificaciones en Android 13 (API 33) y superior -->
+    <!-- Se solicita en tiempo de ejecución en MisRecordatoriosActivity -->
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
+    <!-- Permiso para programar alarmas exactas (requerido desde Android 12/API 31) -->
+    <!-- Importante: en Android 13+, este permiso NO se concede automáticamente y
+         el usuario debe otorgarlo manualmente desde la configuración si se detecta que no lo tiene.
+         Deberías verificarlo con AlarmManager.canScheduleExactAlarms() y guiar al usuario. -->
+    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+
+    <!-- Permiso para recibir el evento de arranque del dispositivo para re-programar alarmas -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+
+    <!-- Permisos de almacenamiento (Revisa si realmente los necesitas con estas intensidades) -->
+    <!-- MANAGE_EXTERNAL_STORAGE es muy intrusivo y requiere aprobación especial de Google Play.
+         Considera usar Scoped Storage si tu app no necesita acceso amplio a todos los archivos. -->
     <uses-permission
         android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
         tools:ignore="ScopedStorage" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <!-- WRITE_EXTERNAL_STORAGE y READ_EXTERNAL_STORAGE están obsoletos para targetSdkVersion 29+.
+         Si usas Scoped Storage, ya no son necesarios para el almacenamiento primario. -->
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/> <!-- Limitar para API < 29 si no necesitas Scoped Storage -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="28"/> <!-- Limitar para API < 29 si no necesitas Scoped Storage -->
+
+
+    <!-- Permiso para vibrar el dispositivo (para notificaciones, por ejemplo) -->
     <uses-permission android:name="android.permission.VIBRATE" />
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+
+    <!-- Permiso para REQUEST_INSTALL_PACKAGES (si tu app instala APKs) -->
     <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES" />
+
 
     <application
         android:allowBackup="true"
@@ -22,21 +48,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/TiendaControl"
-        tools:targetApi="31">
+        tools:targetApi="31"> <!-- Asegúrate de que targetApi coincida con tu compileSdkVersion -->
+
+        <!-- ACTIVIDADES -->
+        <activity
+            android:name=".notificacion.MisRecordatoriosActivity"
+            android:exported="false" />
         <activity
             android:name=".GraficoActivity"
             android:exported="false" />
-
-        <provider
-            android:name="androidx.core.content.FileProvider"
-            android:authorities="com.creativem.tiendacontrol.fileprovider"
-            android:exported="false"
-            android:grantUriPermissions="true">
-            <meta-data
-                android:name="android.support.FILE_PROVIDER_PATHS"
-                android:resource="@xml/file_paths" />
-        </provider>
-
         <activity
             android:name=".monitor.PerfilEmpresa"
             android:exported="false" />
@@ -56,12 +76,6 @@
         <activity
             android:name=".monitor.Inicio"
             android:exported="false" />
-
-        <receiver
-            android:name=".monitor.Recordatorio"
-            android:enabled="true"
-            android:exported="false" />
-
         <activity
             android:name=".monitor.EdicionPin"
             android:exported="false" />
@@ -76,10 +90,52 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <!-- ¡CORRECCIÓN! Las acciones BOOT_COMPLETED y QUICKBOOT_POWERON son para BroadcastReceivers, no para Activities.
+                 Han sido movidas al BootReceiver. -->
         </activity>
+
+
+        <!-- PROVEEDORES -->
+        <provider
+            android:name="androidx.core.content.FileProvider"
+            android:authorities="com.creativem.tiendacontrol.fileprovider"
+            android:exported="false"
+            android:grantUriPermissions="true">
+            <meta-data
+                android:name="android.support.FILE_PROVIDER_PATHS"
+                android:resource="@xml/file_paths" />
+        </provider>
+
+
+        <!-- RECEIVERS -->
+        <!-- Declaración del NotificacionReceiver para manejar las notificaciones -->
+        <receiver
+            android:name=".notificacion.NotificacionReceiver"
+            android:enabled="true"
+            android:exported="false" />
+
+        <!-- Declaración del BootReceiver para re-programar alarmas al iniciar el dispositivo -->
+        <receiver
+            android:name=".notificacion.BootReceiver"
+            android:enabled="true"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.QUICKBOOT_POWERON" />
+                <!-- Agrega esta categoría para asegurar la compatibilidad con algunas implementaciones del sistema -->
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </receiver>
+
+        <!-- ¡CORRECCIÓN! Esta declaración es incorrecta. Una Activity no puede ser un Receiver. Eliminado.
+        <receiver
+            android:name=".MisRecordatoriosActivity"
+            android:enabled="true"
+            android:exported="false" />
+        -->
+
     </application>
 
 </manifest>

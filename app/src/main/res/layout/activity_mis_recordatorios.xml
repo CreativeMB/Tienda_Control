@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <EditText
+        android:id="@+id/etNombreRecordatorio"
+        android:hint="Nombre del recordatorio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Spinner
+        android:id="@+id/spFrecuencia"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:entries="@array/frecuencias" />
+
+    <Button
+        android:id="@+id/btnAgregarRecordatorio"
+        android:text="Agregar Recordatorio"
+        android:layout_width="match_parent"
+        android:background="@drawable/selector_background"
+        android:layout_height="wrap_content" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewRecordatorios"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:paddingTop="8dp"/>
+
+</LinearLayout>

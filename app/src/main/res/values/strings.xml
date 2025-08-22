@@ -70,4 +70,15 @@
     </style>
 
 
+        <string-array name="frecuencias">
+            <item>Diario</item>
+            <item>Semanal</item>
+            <item>Mensual</item>
+        </string-array>
+
+
+
+
+
+
 </resources>
