@@ -62,7 +62,7 @@
         <item>Semana</item>
         <item>Mes</item>
         <item>Año</item>
-        <item>Rango de fechas</item>
+        <item>Fechas</item>
     </string-array>
 
     <style name="SpinnerPersonalisado" parent="Widget.AppCompat.Spinner">

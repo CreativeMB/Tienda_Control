@@ -135,7 +135,7 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
                         cumple = sdfAño.format(fechaProducto).equals(sdfAño.format(fechaInicio));
                         break;
 
-                    case "Rango de Fechas":
+                    case "Fechas":
                         cumple = !fechaProducto.before(fechaInicio) && !fechaProducto.after(fechaFin);
                         break;
                 }

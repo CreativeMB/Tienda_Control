@@ -140,7 +140,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                     String tipoFiltro = parent.getItemAtPosition(position).toString().trim();
                     Log.d("SpinnerFiltro", "Opción seleccionada: " + tipoFiltro);
 
-                    if (tipoFiltro.equalsIgnoreCase("Rango de Fechas")) {
+                    if (tipoFiltro.equalsIgnoreCase("Fechas")) {
                         Log.d("SpinnerFiltro", "Llamando a mostrarDatePickerRango()");
                         mostrarDatePickerRango();
 
@@ -623,7 +623,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 Toast.makeText(this, "Rango: " + fechaInicio + " - " + fechaFin, Toast.LENGTH_LONG).show();
 
                 // Filtrar en adaptador
-                adapter.filtrarPorFecha(fechaInicio, fechaFin, "Rango de Fechas");
+                adapter.filtrarPorFecha(fechaInicio, fechaFin, "Fechas");
                 actualizarVisibilidadLista();
             } else {
                 Log.e("DatePicker", "Error: Selección de fechas inválida");

@@ -137,10 +137,8 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
         imageManual.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                // URL al que quieres dirigir al usuario
-                String url = "https://www.floristerialoslirios.com/tienda-control";
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(url));
+                // Acción graficos
+                Intent intent = new Intent(BaseDatos.this, GraficoActivity.class);
                 startActivity(intent);
             }
         });
@@ -195,7 +193,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         startActivity(intent);
                         return true;
                     } else if (id == R.id.graficos) {
-                        // Acción para Donar
+                        // Acción graficos
                         Intent intent = new Intent(BaseDatos.this, GraficoActivity.class);
                         startActivity(intent);
                     } else if (id == R.id.exel) {
