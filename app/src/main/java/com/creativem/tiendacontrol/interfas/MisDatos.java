@@ -46,6 +46,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 
 import androidx.core.util.Pair;
 import android.widget.AutoCompleteTextView;
@@ -172,6 +173,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         } else {
             Log.e("MisDatos", "spinnerFiltro is NULL! Check your layout file.");
         }
+
     }
 
     private void actualizarVisibilidadLista() {
@@ -606,31 +608,29 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
         // Mostrar el selector
         picker.show(getSupportFragmentManager(), "RangoFechaPicker");
 
+        // Listener al confirmar selección
         picker.addOnPositiveButtonClickListener(selection -> {
             if (selection != null && selection.first != null && selection.second != null) {
-                Log.d("DatePicker", "Timestamp Inicio: " + selection.first);
-                Log.d("DatePicker", "Timestamp Fin: " + selection.second);
-
-                // Formato de fecha compatible con el adaptador
+                // Crear formato de fecha en zona horaria UTC
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
 
-                // Convertir timestamps a fechas
+                // Convertir timestamps directamente a fecha
                 String fechaInicio = sdf.format(new Date(selection.first));
                 String fechaFin = sdf.format(new Date(selection.second));
 
-                Log.d("DatePicker", "Rango seleccionado: " + fechaInicio + " - " + fechaFin);
-                Toast.makeText(this, "Rango: " + fechaInicio + " - " + fechaFin, Toast.LENGTH_SHORT).show();
+                Log.d("DatePicker", "Rango seleccionado corregido: " + fechaInicio + " - " + fechaFin);
+                Toast.makeText(this, "Rango: " + fechaInicio + " - " + fechaFin, Toast.LENGTH_LONG).show();
 
-                // 🔹 Llamar al método del adaptador para filtrar por rango
+                // Filtrar en adaptador
                 adapter.filtrarPorFecha(fechaInicio, fechaFin, "Rango de Fechas");
-
-                // 🔹 Actualizar visibilidad del RecyclerView si tienes un método para eso
                 actualizarVisibilidadLista();
-
             } else {
                 Log.e("DatePicker", "Error: Selección de fechas inválida");
             }
         });
+
+
     }
 
 
