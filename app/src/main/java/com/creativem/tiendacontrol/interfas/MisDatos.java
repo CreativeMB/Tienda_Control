@@ -140,7 +140,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                     String tipoFiltro = parent.getItemAtPosition(position).toString().trim();
                     Log.d("SpinnerFiltro", "Opción seleccionada: " + tipoFiltro);
 
-                    if (tipoFiltro.equalsIgnoreCase("Fechas")) {
+                    if (tipoFiltro.equalsIgnoreCase("Rango de Fechas")) {
                         Log.d("SpinnerFiltro", "Llamando a mostrarDatePickerRango()");
                         mostrarDatePickerRango();
 
@@ -557,20 +557,23 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                 firebaseHelper.agregarProducto(id, nuevoProducto, (error, ref) -> {
                     if (error == null) {
                         dialog.dismiss();
-                        productoList.add(0, nuevoProducto);
-                        adapter.notifyItemInserted(0);
-                        Pair<String, String> fechas = obtenerFechaSegunFiltro(adapter.getCurrentFilter());
-                        String fechaFiltro = fechas.first; // Fecha de inicio
-                        String fechaFin = fechas.second;   // Fecha de fin (puede ser null)
 
-                        adapter.filtrarPorFecha(fechaFiltro, adapter.getCurrentFilter(), fechaFin);
-
-                        MisDatos.calcularTotales(adapter.getFilteredProductList()); //Recalcula los totales
+                        // ✅ No añadir manualmente a la lista aquí (cargarProductos lo hará)
                         cargarProductos();
+
+                        // ✅ Aplicar el filtro correcto después de recargar
+                        Pair<String, String> fechas = obtenerFechaSegunFiltro(adapter.getCurrentFilter());
+                        String fechaInicio = fechas.first;
+                        String fechaFin = fechas.second;
+
+                        adapter.filtrarPorFecha(fechaInicio, fechaFin, adapter.getCurrentFilter());
+
+                        MisDatos.calcularTotales(adapter.getFilteredProductList());
                     } else {
                         Toast.makeText(MisDatos.this, "❌ Error al agregar producto", Toast.LENGTH_SHORT).show();
                     }
                 });
+
             } else {
                 Toast.makeText(this, "⚠️ No se pudo generar un ID único", Toast.LENGTH_SHORT).show();
             }
