@@ -47,7 +47,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
-public class GraficoActivity extends AppCompatActivity {
+public class Grafico extends AppCompatActivity {
     private PieChart pieChartPositivos, pieChartNegativos;
     private LinearLayout legendPositivos, legendNegativos;
     private Spinner spinnerBases;
@@ -58,7 +58,6 @@ public class GraficoActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.grafico);
 
         // Referencias a los gráficos y leyendas
@@ -103,13 +102,13 @@ public class GraficoActivity extends AppCompatActivity {
                 }
 
                 if (bases.isEmpty()) {
-                    Toast.makeText(GraficoActivity.this, "No se encontraron bases disponibles", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Grafico.this, "No se encontraron bases disponibles", Toast.LENGTH_SHORT).show();
                     pieChartPositivos.clear();
                     pieChartNegativos.clear();
                     return;
                 }
 
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(GraficoActivity.this,
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(Grafico.this,
                         android.R.layout.simple_spinner_item, bases);
                 adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
                 spinnerBases.setAdapter(adapter);
@@ -131,7 +130,7 @@ public class GraficoActivity extends AppCompatActivity {
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(GraficoActivity.this, "Error al cargar bases: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(Grafico.this, "Error al cargar bases: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -176,13 +175,13 @@ public class GraficoActivity extends AppCompatActivity {
                 } else {
                     pieChartPositivos.clear();
                     pieChartNegativos.clear();
-                    Toast.makeText(GraficoActivity.this, "No hay datos en la base seleccionada", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(Grafico.this, "No hay datos en la base seleccionada", Toast.LENGTH_SHORT).show();
                 }
             }
 
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(GraficoActivity.this, "Error al cargar datos: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                Toast.makeText(Grafico.this, "Error al cargar datos: " + error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }

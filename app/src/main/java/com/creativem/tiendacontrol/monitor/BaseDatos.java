@@ -130,7 +130,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             @Override
             public void onClick(View v) {
                 // Acción graficos
-                Intent intent = new Intent(BaseDatos.this, GraficoActivity.class);
+                Intent intent = new Intent(BaseDatos.this, Grafico.class);
                 startActivity(intent);
             }
         });
@@ -186,7 +186,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
                         return true;
                     } else if (id == R.id.graficos) {
                         // Acción graficos
-                        Intent intent = new Intent(BaseDatos.this, GraficoActivity.class);
+                        Intent intent = new Intent(BaseDatos.this, Grafico.class);
                         startActivity(intent);
                     } else if (id == R.id.exel) {
                         descargarYExportarDatos();

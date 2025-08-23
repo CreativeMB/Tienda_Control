@@ -23,7 +23,7 @@
 
     <color name="startColor">#2196F3</color> <!-- Ajusta el color de inicio del degradado -->
     <color name="endColor">#009688</color> <!-- Ajusta el color final del degradado -->
-    <color name="Buton">#00AAFC</color> <!-- Tu color original del botón -->
+    <color name="Buton">#8F7094FF</color> <!-- Tu color original del botón -->
     <color name="black">#000000</color> <!-- Color del texto del botón -->
     <color name="buttonTextColor">#FF6D00</color> <!-- Color del texto del botón -->
     <color name="white">#FFFFFF</color>

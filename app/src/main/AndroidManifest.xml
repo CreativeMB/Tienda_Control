@@ -55,7 +55,7 @@
             android:name=".notificacion.MisRecordatorios"
             android:exported="false" />
         <activity
-            android:name=".monitor.GraficoActivity"
+            android:name=".monitor.Grafico"
             android:exported="false" />
         <activity
             android:name=".monitor.PerfilEmpresa"
