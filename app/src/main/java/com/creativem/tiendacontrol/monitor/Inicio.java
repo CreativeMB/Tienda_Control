@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.creativem.tiendacontrol.R;
+import com.creativem.tiendacontrol.pin.InicioPin;
+import com.creativem.tiendacontrol.pin.Patron;
 
 public class Inicio extends AppCompatActivity {
     private Patron patron;

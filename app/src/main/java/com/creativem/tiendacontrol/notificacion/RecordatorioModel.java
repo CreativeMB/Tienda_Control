@@ -1,14 +1,14 @@
 package com.creativem.tiendacontrol.notificacion;
 
-import java.io.Serializable; // Implementar Serializable para pasar objetos en Intent si fuera necesario
+import java.io.Serializable;
 
 public class RecordatorioModel implements Serializable {
-    private int id; // ID único para cada recordatorio
+    private int id;
     private String titulo;
-    private String hora; // Hora en formato "hh:mm AM/PM"
-    private String repeticion; // Ej: "Diario", "Semanal", "Mensual", "Una vez"
+    private String hora;
+    private String repeticion;
     private boolean activo;
-    private long initialTriggerMillis; // Almacena el tiempo en milisegundos de la primera vez que se programó (útil para repeticiones)
+    private long initialTriggerMillis;
 
     // Constructor completo
     public RecordatorioModel(int id, String titulo, String hora, String repeticion, boolean activo, long initialTriggerMillis) {
@@ -21,56 +21,27 @@ public class RecordatorioModel implements Serializable {
     }
 
     // Getters
-    public int getId() {
-        return id;
-    }
-
-    public String getTitulo() {
-        return titulo;
-    }
-
-    public String getHora() {
-        return hora;
-    }
-
-    public String getRepeticion() {
-        return repeticion;
-    }
-
-    public boolean isActivo() {
-        return activo;
-    }
-
-    public long getInitialTriggerMillis() {
-        return initialTriggerMillis;
-    }
+    public int getId() { return id; }
+    public String getTitulo() { return titulo; }
+    public String getHora() { return hora; }
+    public String getRepeticion() { return repeticion; }
+    public boolean isActivo() { return activo; }
+    public long getInitialTriggerMillis() { return initialTriggerMillis; }
 
     // Setters
-    public void setId(int id) {
-        this.id = id;
+    public void setId(int id) { this.id = id; }
+    public void setTitulo(String titulo) { this.titulo = titulo; }
+    public void setHora(String hora) { this.hora = hora; }
+    public void setRepeticion(String repeticion) { this.repeticion = repeticion; }
+    public void setActivo(boolean activo) { this.activo = activo; }
+    public void setInitialTriggerMillis(long initialTriggerMillis) { this.initialTriggerMillis = initialTriggerMillis; }
+
+    // Alias para mayor claridad
+    public void setTriggerTime(long triggerTime) {
+        this.initialTriggerMillis = triggerTime;
     }
 
-    public void setTitulo(String titulo) {
-        this.titulo = titulo;
-    }
-
-    public void setHora(String hora) {
-        this.hora = hora;
-    }
-
-    public void setRepeticion(String repeticion) {
-        this.repeticion = repeticion;
-    }
-
-    public void setActivo(boolean activo) {
-        this.activo = activo;
-    }
-
-    public void setInitialTriggerMillis(long initialTriggerMillis) {
-        this.initialTriggerMillis = initialTriggerMillis;
-    }
-
-    // Sobrescribir equals y hashCode para comparar RecordatorioModels por su ID
+    // equals y hashCode por id
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

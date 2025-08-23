@@ -14,7 +14,7 @@ import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.interfas.PuntoMil;
+import com.creativem.tiendacontrol.misdatos.PuntoMil;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -58,10 +58,10 @@ public class BasesAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> 
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         if (viewType == VIEW_TYPE_ITEM) {
-            View view = LayoutInflater.from(context).inflate(R.layout.itembasedatos, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.item_basedatos, parent, false);
             return new DatabaseViewHolder(view);
         } else {
-            View view = LayoutInflater.from(context).inflate(R.layout.baseinicio, parent, false);
+            View view = LayoutInflater.from(context).inflate(R.layout.base_inicio, parent, false);
             return new EmptyViewHolder(view);
         }
     }

@@ -83,7 +83,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/menuprincipal"
+        app:headerLayout="@layout/menu_principal"
         app:itemTextAppearance="@style/MenuItemTextStyle"
         app:menu="@menu/menu" />
 

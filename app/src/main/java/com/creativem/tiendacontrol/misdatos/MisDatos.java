@@ -1,18 +1,13 @@
-package com.creativem.tiendacontrol.interfas;
+package com.creativem.tiendacontrol.misdatos;
 
 import android.app.Activity;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
-import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.TextWatcher;
-import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
@@ -21,7 +16,6 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.EditText;
 import android.widget.LinearLayout;
-import android.widget.PopupMenu;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
@@ -49,7 +43,6 @@ import java.util.Set;
 import java.util.TimeZone;
 
 import androidx.core.util.Pair;
-import android.widget.AutoCompleteTextView;
 
 
 public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnProductoClickListener {

@@ -1,10 +1,12 @@
-package com.creativem.tiendacontrol.monitor;
+package com.creativem.tiendacontrol.pin;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.widget.Toast;
 import android.app.KeyguardManager;
+
+import com.creativem.tiendacontrol.monitor.BaseDatos;
 
 public class Patron {
 

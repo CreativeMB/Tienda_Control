@@ -58,6 +58,13 @@ public class RecordatorioAdapter extends RecyclerView.Adapter<RecordatorioAdapte
         holder.switchActivo.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (listener != null) listener.onSwitchChange(recordatorio, isChecked);
         });
+        // Editar al hacer clic en el ítem
+        holder.itemView.setOnClickListener(v -> {
+            if (context instanceof MisRecordatoriosActivity) {
+                ((MisRecordatoriosActivity) context).mostrarDialogoEditarRecordatorio(recordatorio);
+            }
+        });
+
     }
 
 
@@ -85,4 +92,5 @@ public class RecordatorioAdapter extends RecyclerView.Adapter<RecordatorioAdapte
             btnEliminar = itemView.findViewById(R.id.btnEliminar);
         }
     }
+
 }

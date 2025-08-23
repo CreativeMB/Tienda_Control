@@ -11,6 +11,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.util.Log; // Importar Log
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
@@ -50,7 +53,7 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_mis_recordatorios);
+        setContentView(R.layout.mis_recordatorios);
         Log.d(TAG, "onCreate: Activity started.");
 
         recyclerView = findViewById(R.id.recyclerViewRecordatorios);
@@ -310,5 +313,119 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
             Log.w(TAG, "eliminarRecordatorio: No se encontró el recordatorio con ID " + recordatorio.getId());
         }
     }
+    public void mostrarDialogoEditarRecordatorio(final RecordatorioModel recordatorio) {
+        // Inflar el layout (usa el mismo estilo que para crear, pero con IDs *_Editar)
+        LayoutInflater inflater = LayoutInflater.from(this);
+        View vista = inflater.inflate(R.layout.editar_recordatorio, null);
+
+        EditText etNombre = vista.findViewById(R.id.etNombreRecordatorioEditar);
+        Spinner spFrecuencia = vista.findViewById(R.id.spFrecuenciaEditar);
+        Button btnActualizar = vista.findViewById(R.id.btnActualizarRecordatorio);
+
+        // Prellenar datos actuales
+        etNombre.setText(recordatorio.getTitulo());
+
+        // Adaptador del spinner
+        ArrayAdapter<CharSequence> adapterSpinner = ArrayAdapter.createFromResource(
+                this, R.array.frecuencias, android.R.layout.simple_spinner_item);
+        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spFrecuencia.setAdapter(adapterSpinner);
+
+        // Seleccionar la frecuencia actual
+        int pos = adapterSpinner.getPosition(recordatorio.getRepeticion());
+        if (pos >= 0) spFrecuencia.setSelection(pos);
+
+        AlertDialog dialog = new AlertDialog.Builder(this)
+                .setView(vista)
+                .create();
+
+        btnActualizar.setOnClickListener(v -> {
+            String nuevoNombre = etNombre.getText().toString().trim();
+            String nuevaFrecuencia = spFrecuencia.getSelectedItem().toString();
+
+            if (nuevoNombre.isEmpty()) {
+                Toast.makeText(this, "Ingrese un nombre", Toast.LENGTH_SHORT).show();
+                return;
+            }
+
+            // Abrir el TimePicker como cuando se crea
+            Calendar calendarActual = Calendar.getInstance();
+            int horaActual = calendarActual.get(Calendar.HOUR_OF_DAY);
+            int minutoActual = calendarActual.get(Calendar.MINUTE);
+
+            TimePickerDialog timePicker = new TimePickerDialog(
+                    this,
+                    (view, hourOfDay, minute) -> {
+                        Calendar fechaHoraSeleccionada = Calendar.getInstance();
+                        fechaHoraSeleccionada.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        fechaHoraSeleccionada.set(Calendar.MINUTE, minute);
+                        fechaHoraSeleccionada.set(Calendar.SECOND, 0);
+                        fechaHoraSeleccionada.set(Calendar.MILLISECOND, 0);
+
+                        if (nuevaFrecuencia.equalsIgnoreCase("Fecha") || nuevaFrecuencia.equalsIgnoreCase("Una vez")) {
+                            // Si es fecha o una vez → abrir DatePicker
+                            DatePickerDialog datePicker = new DatePickerDialog(
+                                    this,
+                                    (dp, year, month, dayOfMonth) -> {
+                                        fechaHoraSeleccionada.set(Calendar.YEAR, year);
+                                        fechaHoraSeleccionada.set(Calendar.MONTH, month);
+                                        fechaHoraSeleccionada.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+
+                                        if (fechaHoraSeleccionada.getTimeInMillis() <= System.currentTimeMillis()) {
+                                            Toast.makeText(this, "La fecha/hora ya pasó", Toast.LENGTH_LONG).show();
+                                            return;
+                                        }
+
+                                        // Actualizar recordatorio
+                                        actualizarRecordatorio(recordatorio, nuevoNombre, nuevaFrecuencia, fechaHoraSeleccionada);
+                                        dialog.dismiss();
+                                    },
+                                    calendarActual.get(Calendar.YEAR),
+                                    calendarActual.get(Calendar.MONTH),
+                                    calendarActual.get(Calendar.DAY_OF_MONTH)
+                            );
+                            datePicker.show();
+                        } else {
+                            // Para Diario, Semanal, Mensual
+                            long triggerMillis = calcularProximoTrigger(fechaHoraSeleccionada, nuevaFrecuencia);
+                            actualizarRecordatorio(recordatorio, nuevoNombre, nuevaFrecuencia, fechaHoraSeleccionada);
+                            dialog.dismiss();
+                        }
+                    },
+                    horaActual, minutoActual, false
+            );
+            timePicker.show();
+        });
+
+        dialog.show();
+    }
+
+   public void actualizarRecordatorio(RecordatorioModel recordatorio, String nombre, String frecuencia, Calendar fechaHoraSeleccionada) {
+        SimpleDateFormat sdfDisplay;
+
+        if (frecuencia.equalsIgnoreCase("Fecha") || frecuencia.equalsIgnoreCase("Una vez")) {
+            sdfDisplay = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+        } else {
+            sdfDisplay = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+        }
+
+        String displayTexto = sdfDisplay.format(fechaHoraSeleccionada.getTime());
+
+        recordatorio.setTitulo(nombre);
+        recordatorio.setRepeticion(frecuencia);
+        recordatorio.setHora(displayTexto); // aquí guardas lo visible
+        recordatorio.setActivo(true);
+        recordatorio.setTriggerTime(fechaHoraSeleccionada.getTimeInMillis());
+
+        PrefsHelper.guardarLista(this, listaRecordatorios);
+        adapter.notifyDataSetChanged();
+
+        AlarmScheduler.cancelAlarm(this, recordatorio);
+        checkAndScheduleAlarm(recordatorio);
+
+        Toast.makeText(this, "Recordatorio actualizado", Toast.LENGTH_SHORT).show();
+    }
+
+
 
 }

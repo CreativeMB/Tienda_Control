@@ -1,19 +1,14 @@
 package com.creativem.tiendacontrol.monitor;
 
 
-import android.app.AlarmManager;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 
 import android.content.res.Configuration;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 
-import android.provider.Settings;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.Pair;
@@ -27,7 +22,6 @@ import android.widget.Toast;
 
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -37,16 +31,14 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.creativem.tiendacontrol.GraficoActivity;
 import com.creativem.tiendacontrol.notificacion.MisRecordatoriosActivity;
 import com.creativem.tiendacontrol.R;
-import com.creativem.tiendacontrol.helper.ExcelExporter;
-import com.creativem.tiendacontrol.interfas.MisDatos;
+import com.creativem.tiendacontrol.exel.ExcelExporter;
+import com.creativem.tiendacontrol.misdatos.MisDatos;
 
+import com.creativem.tiendacontrol.pin.EdicionPin;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.material.navigation.NavigationView;
-import com.google.android.material.timepicker.MaterialTimePicker;
-import com.google.android.material.timepicker.TimeFormat;
 
 import java.io.File;
 import java.io.IOException;

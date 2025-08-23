@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.monitor;
+package com.creativem.tiendacontrol.pin;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.creativem.tiendacontrol.R;
+import com.creativem.tiendacontrol.monitor.BaseDatos;
 
 public class InicioPin extends AppCompatActivity {
     private EditText editTextAccessCode;
@@ -22,7 +23,7 @@ public class InicioPin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.entrapin);
+        setContentView(R.layout.entra_pin);
 
         // Inicializa las vistas
         editTextAccessCode = findViewById(R.id.AccesoPin);

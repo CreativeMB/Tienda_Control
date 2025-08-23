@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.interfas;
+package com.creativem.tiendacontrol.misdatos;
 
 public class ProductoModel {
     private String id;

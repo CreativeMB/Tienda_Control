@@ -72,7 +72,7 @@ public class NotificacionReceiver extends BroadcastReceiver {
                 .setStyle(new NotificationCompat.DecoratedCustomViewStyle());
 
         try {
-            RemoteViews customNotificationLayout = new RemoteViews(context.getPackageName(), R.layout.custom_notification_layout);
+            RemoteViews customNotificationLayout = new RemoteViews(context.getPackageName(), R.layout.notification_recordatorio);
 
 
             // Establecer el icono GRANDE DENTRO de tu layout personalizado

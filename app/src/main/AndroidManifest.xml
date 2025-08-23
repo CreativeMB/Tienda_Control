@@ -55,13 +55,13 @@
             android:name=".notificacion.MisRecordatoriosActivity"
             android:exported="false" />
         <activity
-            android:name=".GraficoActivity"
+            android:name=".monitor.GraficoActivity"
             android:exported="false" />
         <activity
             android:name=".monitor.PerfilEmpresa"
             android:exported="false" />
         <activity
-            android:name=".interfas.MisDatos"
+            android:name=".misdatos.MisDatos"
             android:exported="false"
             android:windowSoftInputMode="stateHidden|adjustResize" />
         <activity
@@ -71,13 +71,13 @@
             android:name=".monitor.LosLirios"
             android:exported="false" />
         <activity
-            android:name=".monitor.InicioPin"
+            android:name=".pin.InicioPin"
             android:exported="false" />
         <activity
             android:name=".monitor.Inicio"
             android:exported="false" />
         <activity
-            android:name=".monitor.EdicionPin"
+            android:name=".pin.EdicionPin"
             android:exported="false" />
         <activity
             android:name=".monitor.BaseDatos"

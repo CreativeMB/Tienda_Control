@@ -27,7 +27,7 @@ public class PerfilEmpresa extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.perfilempresa);
+        setContentView(R.layout.perfil_empresa);
 
         // Inicializar vistas
         etNombrePersona = findViewById(R.id.etNombrePersona);

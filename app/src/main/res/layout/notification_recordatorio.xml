@@ -2,7 +2,6 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="#FFFFFFFF"
     android:gravity="center_vertical"
     android:orientation="horizontal"
     android:padding="8dp">
@@ -30,7 +29,6 @@
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Título del Recordatorio"
-            android:textColor="#FF000000"
             android:textSize="16sp"
             android:textStyle="bold" />
 
@@ -41,7 +39,6 @@
             android:layout_height="wrap_content"
             android:ellipsize="end"
             android:text="Mensaje detallado del recordatorio o su descripción."
-            android:textColor="#FF666666"
             android:textSize="14sp" />
 
     </LinearLayout>

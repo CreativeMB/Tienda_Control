@@ -1,4 +1,4 @@
-package com.creativem.tiendacontrol.monitor;
+package com.creativem.tiendacontrol.pin;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -11,6 +11,8 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.creativem.tiendacontrol.R;
+import com.creativem.tiendacontrol.monitor.BaseDatos;
+import com.creativem.tiendacontrol.monitor.Inicio;
 
 public class EdicionPin extends AppCompatActivity {
     private EditText editTextCode; // Campo para ingresar el nuevo código de acceso
@@ -22,7 +24,7 @@ public class EdicionPin extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.edicionpin); // Establece el diseño de la actividad
+        setContentView(R.layout.edicion_pin); // Establece el diseño de la actividad
 
         // Inicializa las vistas
         editTextCode = findViewById(R.id.editTextCode);

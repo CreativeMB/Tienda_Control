@@ -1,6 +1,5 @@
-package com.creativem.tiendacontrol;
+package com.creativem.tiendacontrol.monitor;
 
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -24,14 +23,12 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.content.FileProvider;
 
-import com.github.mikephil.charting.animation.Easing;
+import com.creativem.tiendacontrol.R;
 import com.github.mikephil.charting.charts.PieChart;
-import com.github.mikephil.charting.components.Legend;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.PercentFormatter;
-import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DataSnapshot;
@@ -49,7 +46,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Random;
 
 public class GraficoActivity extends AppCompatActivity {
     private PieChart pieChartPositivos, pieChartNegativos;
@@ -63,7 +59,7 @@ public class GraficoActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_grafico);
+        setContentView(R.layout.grafico);
 
         // Referencias a los gráficos y leyendas
         pieChartPositivos = findViewById(R.id.pieChartPositivos);
