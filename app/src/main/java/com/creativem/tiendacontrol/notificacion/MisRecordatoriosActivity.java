@@ -34,7 +34,7 @@ import java.util.Locale;
 
 public class MisRecordatoriosActivity extends AppCompatActivity {
 
-    private static final String TAG = "AlarmScheduler"; // TAG para Logcat
+    private static final String TAG = "MisRecordatoriosActivity"; // TAG corregido
 
     private RecyclerView recyclerView;
     private RecordatorioAdapter adapter;
@@ -132,100 +132,124 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
 
     private void mostrarTimePicker() {
         String nombre = etNombre.getText().toString().trim();
-        String frecuencia = spFrecuencia.getSelectedItem().toString();
+        String frecuencia = spFrecuencia.getSelectedItem().toString(); // Ej: "Diario", "Semanal", "Mensual", "Fecha", "Una vez"
 
         if (nombre.isEmpty()) {
             Toast.makeText(this, "Ingrese un nombre", Toast.LENGTH_SHORT).show();
+            Log.w(TAG, "mostrarTimePicker: Nombre de recordatorio vacío.");
             return;
         }
+        Log.d(TAG, "mostrarTimePicker: Nombre='" + nombre + "', Frecuencia='" + frecuencia + "'");
 
-        Calendar calendar = Calendar.getInstance();
-        int horaActual = calendar.get(Calendar.HOUR_OF_DAY);
-        int minutoActual = calendar.get(Calendar.MINUTE);
+        Calendar calendarActual = Calendar.getInstance(); // Calendar para la hora actual del TimePicker
+        int horaActual = calendarActual.get(Calendar.HOUR_OF_DAY);
+        int minutoActual = calendarActual.get(Calendar.MINUTE);
 
-        // Primero seleccionamos la hora
         TimePickerDialog timePicker = new TimePickerDialog(
                 this,
                 (view, hourOfDay, minute) -> {
-                    Calendar fechaSeleccion = Calendar.getInstance();
-                    fechaSeleccion.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    fechaSeleccion.set(Calendar.MINUTE, minute);
-                    fechaSeleccion.set(Calendar.SECOND, 0);
-                    fechaSeleccion.set(Calendar.MILLISECOND, 0);
+                    Calendar fechaHoraSeleccionada = Calendar.getInstance();
+                    fechaHoraSeleccionada.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    fechaHoraSeleccionada.set(Calendar.MINUTE, minute);
+                    fechaHoraSeleccionada.set(Calendar.SECOND, 0);
+                    fechaHoraSeleccionada.set(Calendar.MILLISECOND, 0);
 
-                    // Si la frecuencia es "Fecha", mostrar DatePicker después del TimePicker
-                    if (frecuencia.equalsIgnoreCase("Fecha")) {
+                    // Si la frecuencia es "Fecha" (one-time date) o "Una vez" (one-time date and time)
+                    if (frecuencia.equalsIgnoreCase("Fecha") || frecuencia.equalsIgnoreCase("Una vez")) {
                         DatePickerDialog datePicker = new DatePickerDialog(
                                 this,
                                 (dp, year, month, dayOfMonth) -> {
-                                    fechaSeleccion.set(Calendar.YEAR, year);
-                                    fechaSeleccion.set(Calendar.MONTH, month);
-                                    fechaSeleccion.set(Calendar.DAY_OF_MONTH, dayOfMonth);
+                                    fechaHoraSeleccionada.set(Calendar.YEAR, year);
+                                    fechaHoraSeleccionada.set(Calendar.MONTH, month);
+                                    fechaHoraSeleccionada.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
-                                    String fechaHoraTexto = sdf.format(fechaSeleccion.getTime());
+                                    // Formatear la fecha y hora completa para mostrar en la lista
+                                    SimpleDateFormat sdfCompleta = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+                                    String fechaHoraTexto = sdfCompleta.format(fechaHoraSeleccionada.getTime());
+                                    Log.d(TAG, "DatePicker: Fecha y hora seleccionada para 'Fecha'/'Una vez': " + fechaHoraTexto);
 
-                                    agregarRecordatorio(nombre, frecuencia, fechaSeleccion.getTimeInMillis(), fechaHoraTexto);
+                                    // Para "Fecha" y "Una vez", el triggerMillis es la fecha y hora exacta seleccionada.
+                                    // Comprobar si ya pasó. Si es así, advertir y no agregar.
+                                    if (fechaHoraSeleccionada.getTimeInMillis() <= System.currentTimeMillis()) {
+                                        Toast.makeText(this, "La fecha y hora seleccionada ya pasó. No se puede programar.", Toast.LENGTH_LONG).show();
+                                        Log.w(TAG, "mostrarTimePicker: No se agregó recordatorio 'Fecha'/'Una vez' porque la fecha/hora ya pasó.");
+                                        return; // No agregar recordatorio si ya pasó la fecha
+                                    }
+
+                                    agregarRecordatorio(nombre, frecuencia, fechaHoraSeleccionada.getTimeInMillis(), fechaHoraTexto);
                                 },
-                                calendar.get(Calendar.YEAR),
-                                calendar.get(Calendar.MONTH),
-                                calendar.get(Calendar.DAY_OF_MONTH)
+                                calendarActual.get(Calendar.YEAR), // Usar calendarActual para la fecha inicial del DatePicker
+                                calendarActual.get(Calendar.MONTH),
+                                calendarActual.get(Calendar.DAY_OF_MONTH)
                         );
                         datePicker.show();
                     } else {
-                        // Para diario, semanal, mensual
-                        long triggerMillis = calcularProximoTrigger(fechaSeleccion, frecuencia);
-                        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-                        String horaTexto = sdf.format(fechaSeleccion.getTime());
+                        // Para "Diario", "Semanal", "Mensual"
+                        long triggerMillis = calcularProximoTrigger(fechaHoraSeleccionada, frecuencia);
+                        SimpleDateFormat sdfHora = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                        String horaTexto = sdfHora.format(fechaHoraSeleccionada.getTime()); // Solo la hora para el display string
+                        Log.d(TAG, "TimePicker: Hora seleccionada para repetitivo: " + horaTexto);
 
                         agregarRecordatorio(nombre, frecuencia, triggerMillis, horaTexto);
                     }
-
                 },
                 horaActual,
                 minutoActual,
-                false
+                false // false = TimePicker en formato AM/PM
         );
 
         timePicker.show();
     }
 
     /**
-     * Calcula el próximo trigger según la frecuencia
+     * Calcula el próximo trigger para recordatorios repetitivos (Diario, Semanal, Mensual).
+     * Toma la fecha y hora seleccionada (del TimePicker) como base y la avanza si ya pasó hoy.
+     * @param fechaHoraBase Calendar con la hora seleccionada para el día actual.
+     * @param frecuencia La frecuencia de repetición ("Diario", "Semanal", "Mensual").
+     * @return El tiempo en milisegundos para la próxima ocurrencia de la alarma.
      */
-    private long calcularProximoTrigger(Calendar fecha, String frecuencia) {
+    private long calcularProximoTrigger(Calendar fechaHoraBase, String frecuencia) {
         Calendar now = Calendar.getInstance();
+        now.set(Calendar.SECOND, 0); // Normalizar segundos y milisegundos para una comparación justa
+        now.set(Calendar.MILLISECOND, 0);
 
-        switch (frecuencia.toLowerCase()) {
-            case "día":
-                if (fecha.before(now)) {
-                    fecha.add(Calendar.DAY_OF_MONTH, 1);
-                }
-                break;
-            case "semana":
-                if (fecha.before(now)) {
-                    fecha.add(Calendar.WEEK_OF_YEAR, 1);
-                }
-                break;
-            case "mes":
-                if (fecha.before(now)) {
-                    fecha.add(Calendar.MONTH, 1);
-                }
-                break;
+        // Si la hora y fecha base ya han pasado o es el mismo minuto que ahora,
+        // avanzamos a la próxima ocurrencia para asegurar que siempre sea en el futuro.
+        if (fechaHoraBase.getTimeInMillis() <= now.getTimeInMillis()) {
+            Log.d(TAG, "calcularProximoTrigger: Hora base (" + new SimpleDateFormat("dd/MM HH:mm:ss").format(fechaHoraBase.getTime()) + ") ya pasó o es igual a la actual (" + new SimpleDateFormat("dd/MM HH:mm:ss").format(now.getTime()) + "). Ajustando para la próxima ocurrencia.");
+            switch (frecuencia) {
+                case "Diario":
+                    fechaHoraBase.add(Calendar.DAY_OF_YEAR, 1);
+                    break;
+                case "Semanal":
+                    fechaHoraBase.add(Calendar.WEEK_OF_YEAR, 1);
+                    break;
+                case "Mensual":
+                    fechaHoraBase.add(Calendar.MONTH, 1);
+                    break;
+                // "Fecha" y "Una vez" no llegan a este método.
+                default:
+                    Log.e(TAG, "calcularProximoTrigger: Frecuencia desconocida para recordatorio repetitivo: " + frecuencia);
+                    fechaHoraBase.add(Calendar.DAY_OF_YEAR, 1); // Fallback seguro
+                    break;
+            }
         }
-
-        return fecha.getTimeInMillis();
+        Log.d(TAG, "calcularProximoTrigger: Próximo trigger calculado (inicial): "
+                + new SimpleDateFormat("dd/MM/yyyy hh:mm:ss", Locale.getDefault()).format(fechaHoraBase.getTimeInMillis())
+                + " para frecuencia: " + frecuencia);
+        return fechaHoraBase.getTimeInMillis();
     }
 
     private void agregarRecordatorio(String nombre, String frecuencia, long triggerMillis, String displayTexto) {
         RecordatorioModel recordatorio = new RecordatorioModel(
-                (int) System.currentTimeMillis(),
+                (int) System.currentTimeMillis(), // Generar un ID único
                 nombre,
-                displayTexto,
+                displayTexto, // Esto puede ser solo la hora, o la fecha y hora completa
                 frecuencia,
                 true,
-                triggerMillis
+                triggerMillis // Ya contiene el tiempo calculado para la primera alarma
         );
+        Log.d(TAG, "agregarRecordatorio: Agregando Recordatorio ID " + recordatorio.getId() + ", Frecuencia: " + frecuencia + ", Display: " + displayTexto + ", Trigger: " + new SimpleDateFormat("dd/MM/yyyy HH:mm:ss").format(triggerMillis));
 
         listaRecordatorios.add(recordatorio);
         adapter.notifyItemInserted(listaRecordatorios.size() - 1);

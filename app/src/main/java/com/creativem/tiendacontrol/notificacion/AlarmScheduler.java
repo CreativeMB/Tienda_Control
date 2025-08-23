@@ -33,8 +33,8 @@ public class AlarmScheduler {
         }
 
         Intent intent = new Intent(context, NotificacionReceiver.class);
-        intent.putExtra("titulo", "Tarea Pendiente");
-        intent.putExtra("mensaje", recordatorio.getTitulo());
+        intent.putExtra("titulo", "Tarea Pendiente"); // Título genérico para la notificación
+        intent.putExtra("mensaje", recordatorio.getTitulo()); // El título del recordatorio como mensaje principal
         intent.putExtra("recordatorio_id", recordatorio.getId());
         intent.putExtra("recordatorio_model", recordatorio); // Pasar el objeto completo (Serializable)
 
@@ -46,12 +46,12 @@ public class AlarmScheduler {
         );
 
         long triggerAtMillis = calculateNextTriggerTime(recordatorio);
-        Log.d(TAG, "scheduleAlarm: Tiempo de disparo calculado para ID " + recordatorio.getId() + ": " + triggerAtMillis + " (" + (triggerAtMillis > 0 ? new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(triggerAtMillis) : "N/A") + ")");
+        Log.d(TAG, "scheduleAlarm: Tiempo de disparo calculado para ID " + recordatorio.getId() + ": " + triggerAtMillis + " (" + (triggerAtMillis > 0 ? new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(triggerAtMillis) : "N/A - Ya pasó/inválido") + ")");
 
 
         if (triggerAtMillis <= 0) {
-            Log.d(TAG, "scheduleAlarm: No se puede programar la alarma para " + recordatorio.getTitulo() + ". Tiempo inválido o recordatorio 'Una vez' que ya pasó.");
-            cancelAlarm(context, recordatorio);
+            Log.d(TAG, "scheduleAlarm: No se puede programar la alarma para " + recordatorio.getTitulo() + ". Tiempo inválido o recordatorio 'Una vez'/'Fecha' que ya pasó.");
+            cancelAlarm(context, recordatorio); // Asegurarse de cancelar si ya no debe programarse
             return;
         }
 
@@ -89,65 +89,73 @@ public class AlarmScheduler {
         Log.d(TAG, "cancelAlarm: Alarma ID " + recordatorio.getId() + " cancelada exitosamente.");
     }
 
+    /**
+     * Calcula el próximo tiempo de disparo para la alarma basado en la repetición
+     * usando initialTriggerMillis como la fecha y hora base.
+     *
+     * @param recordatorio El RecordatorioModel.
+     * @return El tiempo en milisegundos para la próxima alarma, o -1 si no se debe programar.
+     */
     public static long calculateNextTriggerTime(RecordatorioModel recordatorio) {
         Calendar calendar = Calendar.getInstance();
-        int[] horaMin = convertirHoraAMPM(recordatorio.getHora()); // Usa la nueva función de conversión
-        int horaRecordatorio = horaMin[0];
-        int minutoRecordatorio = horaMin[1];
+        // Establecer el calendario con el initialTriggerMillis guardado en el modelo
+        calendar.setTimeInMillis(recordatorio.getInitialTriggerMillis());
 
-        calendar.set(Calendar.HOUR_OF_DAY, horaRecordatorio);
-        calendar.set(Calendar.MINUTE, minutoRecordatorio);
-        calendar.set(Calendar.SECOND, 0);
-        calendar.set(Calendar.MILLISECOND, 0);
-
-        long initialCalculatedTriggerAtMillis = calendar.getTimeInMillis();
-        Log.d(TAG, "calculateNextTriggerTime: Hora del recordatorio seteada (en Calendar antes de ajustes): "
-                + new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(initialCalculatedTriggerAtMillis));
+        Log.d(TAG, "calculateNextTriggerTime: Initial Recordatorio Trigger Time (from model): "
+                + new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(calendar.getTimeInMillis()));
         Log.d(TAG, "calculateNextTriggerTime: System.currentTimeMillis() en este momento: "
                 + new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(System.currentTimeMillis()));
 
+        // --- Manejo de recordatorios de una sola vez ("Fecha" y "Una vez") ---
+        if (recordatorio.getRepeticion().equalsIgnoreCase("Fecha") || recordatorio.getRepeticion().equalsIgnoreCase("Una vez")) {
+            // Si la fecha y hora del recordatorio ya pasaron
+            if (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+                Log.d(TAG, "calculateNextTriggerTime: Recordatorio '" + recordatorio.getRepeticion() + "' en el pasado. No se programa.");
+                return -1; // Ya pasó, no programar
+            }
+            Log.d(TAG, "calculateNextTriggerTime: Recordatorio '" + recordatorio.getRepeticion() + "' en el futuro. Programando tal cual.");
+            return calendar.getTimeInMillis(); // Es un evento futuro de una sola vez
+        }
 
-        long triggerAtMillis = initialCalculatedTriggerAtMillis;
-
-        // Si la hora calculada es en el pasado (ya pasó hoy o es igual en el mismo minuto),
-        // avanzar al día siguiente o próxima ocurrencia.
-        // Se añade un pequeño buffer (ej. 1 segundo) para evitar que una alarma programada
-        // en el mismo minuto pero unos segundos después se considere "pasada".
-        // La condición ideal es 'estrictamente mayor'.
-        if (triggerAtMillis <= (System.currentTimeMillis() + 1000) ) { // Añade 1 segundo de buffer
-            Log.d(TAG, "calculateNextTriggerTime: La hora del recordatorio ya pasó HOY (o es muy cercana). Ajustando para la próxima ocurrencia.");
+        // --- Manejo de recordatorios repetitivos ("Diario", "Semanal", "Mensual") ---
+        // Avanzar el calendario hasta que el tiempo del recordatorio esté en el futuro.
+        // Se usa un bucle 'while' porque podría haber pasado múltiples veces si la app estuvo inactiva.
+        while (calendar.getTimeInMillis() <= System.currentTimeMillis()) {
+            Log.d(TAG, "calculateNextTriggerTime: El tiempo de recordatorio actual (" + new SimpleDateFormat("dd/MM HH:mm:ss").format(calendar.getTime()) + ") ya pasó. Avanzando a la próxima ocurrencia.");
             switch (recordatorio.getRepeticion()) {
                 case "Diario":
                     calendar.add(Calendar.DAY_OF_YEAR, 1);
-                    Log.d(TAG, "calculateNextTriggerTime: Repetición Diario, ajustado a mañana.");
+                    Log.d(TAG, "calculateNextTriggerTime: Repetición Diario, avanzado un día.");
                     break;
                 case "Semanal":
                     calendar.add(Calendar.WEEK_OF_YEAR, 1);
-                    Log.d(TAG, "calculateNextTriggerTime: Repetición Semanal, ajustado a la próxima semana.");
+                    Log.d(TAG, "calculateNextTriggerTime: Repetición Semanal, avanzado una semana.");
                     break;
                 case "Mensual":
+                    // Esto es más complejo si quieres mantener el mismo día del mes exacto.
+                    // Aquí simplemente avanzamos un mes.
                     calendar.add(Calendar.MONTH, 1);
-                    Log.d(TAG, "calculateNextTriggerTime: Repetición Mensual, ajustado al próximo mes.");
+                    Log.d(TAG, "calculateNextTriggerTime: Repetición Mensual, avanzado un mes.");
                     break;
-                case "Una vez":
-                    Log.d(TAG, "calculateNextTriggerTime: Repetición 'Una vez', y la hora ya pasó. Retornando -1 (no se programa).");
-                    return -1;
                 default:
-                    calendar.add(Calendar.DAY_OF_YEAR, 1);
-                    Log.d(TAG, "calculateNextTriggerTime: Repetición desconocida, ajustado a mañana.");
-                    break;
+                    // Esto no debería suceder si "Fecha" y "Una vez" están manejados arriba.
+                    Log.e(TAG, "calculateNextTriggerTime: Repetición desconocida en bucle repetitivo: " + recordatorio.getRepeticion());
+                    return -1; // Error o repetición desconocida, detener programación.
             }
-            triggerAtMillis = calendar.getTimeInMillis();
         }
+
+        long finalTriggerMillis = calendar.getTimeInMillis();
         Log.d(TAG, "calculateNextTriggerTime: Próximo tiempo de disparo FINAL: "
-                + new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(triggerAtMillis));
-        return triggerAtMillis;
+                + new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(finalTriggerMillis));
+        return finalTriggerMillis;
     }
 
-    // --- Versión MEJORADA de convertirHoraAMPM usando SimpleDateFormat ---
     public static int[] convertirHoraAMPM(String horaAMPM) {
-        // El formato "hh:mm a" es el que genera tu TimePicker (06:25 p. m.)
-        // y SimpleDateFormat es robusto para parsear esto en diferentes locales.
+        // Este método se usa si RecordatorioModel.getHora() SÓLO CONTIENE HORA AM/PM (ej. "06:25 p. m.")
+        // Si RecordatorioModel.getHora() para "Fecha" ahora contiene "dd/MM/yyyy hh:mm a",
+        // entonces este método no será llamado para ese caso, ya que calculateNextTriggerTime usa initialTriggerMillis.
+        // Para los repetitivos, donde 'hora' es "hh:mm a", este método sigue siendo válido.
+
         SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
         Calendar calendar = Calendar.getInstance();
 
@@ -160,8 +168,7 @@ public class AlarmScheduler {
             return new int[]{hora, minuto};
         } catch (ParseException e) {
             Log.e(TAG, "convertirHoraAMPM: Error al parsear hora '" + horaAMPM + "': " + e.getMessage());
-            // En caso de error, retorna un valor por defecto o maneja el error.
-            // Por ejemplo, puedes retornar la hora actual o [0,0]
+            // En caso de error, retorna la hora actual como fallback.
             Calendar now = Calendar.getInstance();
             return new int[]{now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE)};
         }
