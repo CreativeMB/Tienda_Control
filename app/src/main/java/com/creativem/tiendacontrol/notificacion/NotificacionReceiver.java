@@ -6,8 +6,11 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Build;
 import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
 
@@ -42,10 +45,10 @@ public class NotificacionReceiver extends BroadcastReceiver {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
-                    "Recordatorios",
+                    "Tarea Pendiente",
                     NotificationManager.IMPORTANCE_HIGH
             );
-            channel.setDescription("Canal para recordatorios de TiendaControl");
+            channel.setDescription("Canal para Tarea Pendiente de TiendaControl");
             notificationManager.createNotificationChannel(channel);
             Log.d(TAG, "onReceive: Canal de notificación creado/verificado.");
         }
@@ -61,19 +64,41 @@ public class NotificacionReceiver extends BroadcastReceiver {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // Crear la notificación
+
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, CHANNEL_ID)
-                .setSmallIcon(R.drawable.icono) // Asegúrate de que este drawable exista
-                .setContentTitle(titulo != null ? titulo : "Recordatorio")
-                .setContentText(mensaje != null ? mensaje : recordatorioModel.getTitulo())
+                .setSmallIcon(R.drawable.contabilidad)
                 .setPriority(NotificationCompat.PRIORITY_HIGH)
                 .setAutoCancel(true)
                 .setDefaults(NotificationCompat.DEFAULT_ALL)
-                .setContentIntent(pendingIntentActivity);
+                .setContentIntent(pendingIntentActivity)
+                .setStyle(new NotificationCompat.DecoratedCustomViewStyle());
+
+        try {
+            RemoteViews customNotificationLayout = new RemoteViews(context.getPackageName(), R.layout.custom_notification_layout);
+
+
+            // Establecer el icono GRANDE DENTRO de tu layout personalizado
+            customNotificationLayout.setImageViewResource(R.id.notification_icon_large, R.drawable.icono);
+
+
+            // Establecer los textos DENTRO de tu layout personalizado
+            customNotificationLayout.setTextViewText(R.id.notification_title, titulo != null ? titulo : "Tarea Pendiente");
+            customNotificationLayout.setTextViewText(R.id.notification_message, mensaje != null ? mensaje : recordatorioModel.getTitulo());
+
+
+            builder.setCustomContentView(customNotificationLayout);
+
+
+        } catch (Exception e) {
+            // Si el RemoteViews falla, volvemos a mostrar la notificación estándar (fallback)
+            builder.setContentTitle(titulo != null ? titulo : "Tarea Pendiente");
+            builder.setContentText(mensaje != null ? mensaje : recordatorioModel.getTitulo());
+        }
+        // --- FIN DE LA PERSONALIZACIÓN DE LA NOTIFICACIÓN ---
+
 
         if (notificationManager != null) {
             notificationManager.notify(recordatorioId, builder.build());
-            Log.d(TAG, "onReceive: Notificación mostrada para recordatorio ID: " + recordatorioId);
         } else {
             Log.e(TAG, "onReceive: NotificationManager es nulo, no se pudo mostrar la notificación.");
         }

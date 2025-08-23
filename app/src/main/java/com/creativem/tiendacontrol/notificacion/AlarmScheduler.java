@@ -33,7 +33,7 @@ public class AlarmScheduler {
         }
 
         Intent intent = new Intent(context, NotificacionReceiver.class);
-        intent.putExtra("titulo", "Recordatorio");
+        intent.putExtra("titulo", "Tarea Pendiente");
         intent.putExtra("mensaje", recordatorio.getTitulo());
         intent.putExtra("recordatorio_id", recordatorio.getId());
         intent.putExtra("recordatorio_model", recordatorio); // Pasar el objeto completo (Serializable)
