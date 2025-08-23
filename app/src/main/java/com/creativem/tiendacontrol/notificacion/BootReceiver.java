@@ -13,9 +13,6 @@ public class BootReceiver extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (Intent.ACTION_BOOT_COMPLETED.equals(intent.getAction()) ||
                 "android.intent.action.QUICKBOOT_POWERON".equals(intent.getAction())) {
-//
-//            Log.d(TAG, "Dispositivo iniciado. Reprogramando recordatorios...");
-//            Toast.makeText(context, "Reprogramando recordatorios...", Toast.LENGTH_LONG).show();
 
             List<RecordatorioModel> recordatorios = PrefsHelper.cargarLista(context);
             for (RecordatorioModel recordatorio : recordatorios) {

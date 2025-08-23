@@ -44,6 +44,8 @@ public class RecordatorioAdapter extends RecyclerView.Adapter<RecordatorioAdapte
 
         holder.txtTitulo.setText(recordatorio.getTitulo());
         holder.txtHora.setText(recordatorio.getHora());
+        holder.txtHora.setSelected(true); // <-- aquí usamos holder.txtHora
+
         holder.txtRepeticion.setText(recordatorio.getRepeticion());
         holder.switchActivo.setChecked(recordatorio.isActivo());
 
@@ -57,6 +59,7 @@ public class RecordatorioAdapter extends RecyclerView.Adapter<RecordatorioAdapte
             if (listener != null) listener.onSwitchChange(recordatorio, isChecked);
         });
     }
+
 
     @Override
     public int getItemCount() {

@@ -1,6 +1,7 @@
 package com.creativem.tiendacontrol.notificacion;
 
 import android.app.AlarmManager;
+import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -135,56 +136,51 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
 
         if (nombre.isEmpty()) {
             Toast.makeText(this, "Ingrese un nombre", Toast.LENGTH_SHORT).show();
-            Log.w(TAG, "mostrarTimePicker: Nombre de recordatorio vacío.");
             return;
         }
-        Log.d(TAG, "mostrarTimePicker: Nombre='" + nombre + "', Frecuencia='" + frecuencia + "'");
 
         Calendar calendar = Calendar.getInstance();
         int horaActual = calendar.get(Calendar.HOUR_OF_DAY);
         int minutoActual = calendar.get(Calendar.MINUTE);
 
+        // Primero seleccionamos la hora
         TimePickerDialog timePicker = new TimePickerDialog(
                 this,
                 (view, hourOfDay, minute) -> {
-                    SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-                    Calendar selectedTime = Calendar.getInstance();
-                    selectedTime.set(Calendar.HOUR_OF_DAY, hourOfDay);
-                    selectedTime.set(Calendar.MINUTE, minute);
-                    String horaTexto = sdf.format(selectedTime.getTime());
-                    Log.d(TAG, "TimePicker: Hora seleccionada (24h) " + hourOfDay + ":" + minute + ", Formateada: " + horaTexto);
+                    Calendar fechaSeleccion = Calendar.getInstance();
+                    fechaSeleccion.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                    fechaSeleccion.set(Calendar.MINUTE, minute);
+                    fechaSeleccion.set(Calendar.SECOND, 0);
+                    fechaSeleccion.set(Calendar.MILLISECOND, 0);
 
-                    RecordatorioModel tempRecordatorio = new RecordatorioModel(0, nombre, horaTexto, frecuencia, true, 0);
-                    long initialTriggerMillis = AlarmScheduler.calculateNextTriggerTime(tempRecordatorio);
-                    Log.d(TAG, "TimePicker: InitialTriggerMillis calculado: " + initialTriggerMillis + " (" + new SimpleDateFormat("dd/MM HH:mm").format(initialTriggerMillis) + ")");
+                    // Si la frecuencia es "Fecha", mostrar DatePicker después del TimePicker
+                    if (frecuencia.equalsIgnoreCase("Fecha")) {
+                        DatePickerDialog datePicker = new DatePickerDialog(
+                                this,
+                                (dp, year, month, dayOfMonth) -> {
+                                    fechaSeleccion.set(Calendar.YEAR, year);
+                                    fechaSeleccion.set(Calendar.MONTH, month);
+                                    fechaSeleccion.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-                    if(initialTriggerMillis == -1){
-                        Toast.makeText(this, "La hora seleccionada ya pasó y el recordatorio es 'Una vez'. No se agregó.", Toast.LENGTH_LONG).show();
-                        Log.d(TAG, "TimePicker: No se agregó recordatorio 'Una vez' porque la hora ya pasó.");
-                        return;
+                                    SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy hh:mm a", Locale.getDefault());
+                                    String fechaHoraTexto = sdf.format(fechaSeleccion.getTime());
+
+                                    agregarRecordatorio(nombre, frecuencia, fechaSeleccion.getTimeInMillis(), fechaHoraTexto);
+                                },
+                                calendar.get(Calendar.YEAR),
+                                calendar.get(Calendar.MONTH),
+                                calendar.get(Calendar.DAY_OF_MONTH)
+                        );
+                        datePicker.show();
+                    } else {
+                        // Para diario, semanal, mensual
+                        long triggerMillis = calcularProximoTrigger(fechaSeleccion, frecuencia);
+                        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+                        String horaTexto = sdf.format(fechaSeleccion.getTime());
+
+                        agregarRecordatorio(nombre, frecuencia, triggerMillis, horaTexto);
                     }
 
-                    RecordatorioModel recordatorio = new RecordatorioModel(
-                            (int) System.currentTimeMillis(),
-                            nombre,
-                            horaTexto,
-                            frecuencia,
-                            true,
-                            initialTriggerMillis
-                    );
-                    Log.d(TAG, "TimePicker: Nuevo Recordatorio creado con ID " + recordatorio.getId());
-
-                    listaRecordatorios.add(recordatorio);
-                    adapter.notifyItemInserted(listaRecordatorios.size() - 1);
-                    PrefsHelper.guardarLista(this, listaRecordatorios);
-                    Log.d(TAG, "TimePicker: Recordatorio guardado y lista actualizada.");
-
-                    checkAndScheduleAlarm(recordatorio);
-
-                    etNombre.setText("");
-                    spFrecuencia.setSelection(0);
-
-                    Toast.makeText(this, "Recordatorio agregado", Toast.LENGTH_SHORT).show();
                 },
                 horaActual,
                 minutoActual,
@@ -192,6 +188,55 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
         );
 
         timePicker.show();
+    }
+
+    /**
+     * Calcula el próximo trigger según la frecuencia
+     */
+    private long calcularProximoTrigger(Calendar fecha, String frecuencia) {
+        Calendar now = Calendar.getInstance();
+
+        switch (frecuencia.toLowerCase()) {
+            case "día":
+                if (fecha.before(now)) {
+                    fecha.add(Calendar.DAY_OF_MONTH, 1);
+                }
+                break;
+            case "semana":
+                if (fecha.before(now)) {
+                    fecha.add(Calendar.WEEK_OF_YEAR, 1);
+                }
+                break;
+            case "mes":
+                if (fecha.before(now)) {
+                    fecha.add(Calendar.MONTH, 1);
+                }
+                break;
+        }
+
+        return fecha.getTimeInMillis();
+    }
+
+    private void agregarRecordatorio(String nombre, String frecuencia, long triggerMillis, String displayTexto) {
+        RecordatorioModel recordatorio = new RecordatorioModel(
+                (int) System.currentTimeMillis(),
+                nombre,
+                displayTexto,
+                frecuencia,
+                true,
+                triggerMillis
+        );
+
+        listaRecordatorios.add(recordatorio);
+        adapter.notifyItemInserted(listaRecordatorios.size() - 1);
+        PrefsHelper.guardarLista(this, listaRecordatorios);
+
+        checkAndScheduleAlarm(recordatorio);
+
+        etNombre.setText("");
+        spFrecuencia.setSelection(0);
+
+        Toast.makeText(this, "Recordatorio agregado", Toast.LENGTH_SHORT).show();
     }
 
     private void checkAndScheduleAlarm(RecordatorioModel recordatorio) {
@@ -241,4 +286,5 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
             Log.w(TAG, "eliminarRecordatorio: No se encontró el recordatorio con ID " + recordatorio.getId());
         }
     }
+
 }

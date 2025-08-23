@@ -70,11 +70,13 @@
     </style>
 
 
-        <string-array name="frecuencias">
-            <item>Diario</item>
-            <item>Semanal</item>
-            <item>Mensual</item>
-        </string-array>
+    <string-array name="frecuencias">
+        <item>Día</item>
+        <item>Semana</item>
+        <item>Mes</item>
+        <item>Fecha</item>
+    </string-array>
+
 
 
 

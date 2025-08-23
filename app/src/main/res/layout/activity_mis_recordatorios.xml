@@ -1,28 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:padding="16dp"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#F5F5F5">
 
-    <EditText
-        android:id="@+id/etNombreRecordatorio"
-        android:hint="Nombre del recordatorio"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
-
-    <Spinner
-        android:id="@+id/spFrecuencia"
+    <!-- CardView para modernizar -->
+    <androidx.cardview.widget.CardView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:entries="@array/frecuencias" />
+        card_view:cardCornerRadius="8dp"
+        card_view:cardElevation="6dp"
+        android:padding="16dp"
+        android:layout_marginBottom="16dp">
 
-    <Button
-        android:id="@+id/btnAgregarRecordatorio"
-        android:text="Agregar Recordatorio"
-        android:layout_width="match_parent"
-        android:background="@drawable/selector_background"
-        android:layout_height="wrap_content" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:padding="15dp"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <EditText
+                android:id="@+id/etNombreRecordatorio"
+                android:hint="Tarea Pendiente"
+                android:textSize="20sp"
+                android:textColor="#333333"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:padding="20dp"
+                android:layout_marginBottom="12dp"/>
+
+            <Spinner
+                android:id="@+id/spFrecuencia"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:entries="@array/frecuencias"
+                android:background="@drawable/selector_background"
+                android:layout_marginBottom="18dp"/>
+
+            <Button
+                android:id="@+id/btnAgregarRecordatorio"
+                android:text="Agregar Tarea Pendiente"
+                android:textColor="#FFFFFF"
+                android:textSize="18sp"
+                android:layout_width="match_parent"
+                android:background="@drawable/selector_background"
+                android:layout_height="wrap_content"/>
+
+        </LinearLayout>
+    </androidx.cardview.widget.CardView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerViewRecordatorios"
