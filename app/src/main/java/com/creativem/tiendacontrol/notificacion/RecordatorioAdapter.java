@@ -60,8 +60,8 @@ public class RecordatorioAdapter extends RecyclerView.Adapter<RecordatorioAdapte
         });
         // Editar al hacer clic en el ítem
         holder.itemView.setOnClickListener(v -> {
-            if (context instanceof MisRecordatoriosActivity) {
-                ((MisRecordatoriosActivity) context).mostrarDialogoEditarRecordatorio(recordatorio);
+            if (context instanceof MisRecordatorios) {
+                ((MisRecordatorios) context).mostrarDialogoEditarRecordatorio(recordatorio);
             }
         });
 

@@ -7,7 +7,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <!-- Permiso para notificaciones en Android 13 (API 33) y superior -->
-    <!-- Se solicita en tiempo de ejecución en MisRecordatoriosActivity -->
+    <!-- Se solicita en tiempo de ejecución en MisRecordatorios -->
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
     <!-- Permiso para programar alarmas exactas (requerido desde Android 12/API 31) -->
@@ -52,7 +52,7 @@
 
         <!-- ACTIVIDADES -->
         <activity
-            android:name=".notificacion.MisRecordatoriosActivity"
+            android:name=".notificacion.MisRecordatorios"
             android:exported="false" />
         <activity
             android:name=".monitor.GraficoActivity"
@@ -131,7 +131,7 @@
 
         <!-- ¡CORRECCIÓN! Esta declaración es incorrecta. Una Activity no puede ser un Receiver. Eliminado.
         <receiver
-            android:name=".MisRecordatoriosActivity"
+            android:name=".MisRecordatorios"
             android:enabled="true"
             android:exported="false" />
         -->

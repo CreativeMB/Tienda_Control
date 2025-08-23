@@ -17,6 +17,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 import android.Manifest;
 
@@ -35,9 +36,9 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MisRecordatoriosActivity extends AppCompatActivity {
+public class MisRecordatorios extends AppCompatActivity {
 
-    private static final String TAG = "MisRecordatoriosActivity"; // TAG corregido
+    private static final String TAG = "MisRecordatorios"; // TAG corregido
 
     private RecyclerView recyclerView;
     private RecordatorioAdapter adapter;
@@ -45,7 +46,7 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
 
     private EditText etNombre;
     private Spinner spFrecuencia;
-    private Button btnAgregar;
+    private TextView texAgregar;
 
     private ActivityResultLauncher<String> requestNotificationPermission;
     private ActivityResultLauncher<Intent> requestExactAlarmPermission;
@@ -59,7 +60,7 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.recyclerViewRecordatorios);
         etNombre = findViewById(R.id.etNombreRecordatorio);
         spFrecuencia = findViewById(R.id.spFrecuencia);
-        btnAgregar = findViewById(R.id.btnAgregarRecordatorio);
+        texAgregar = findViewById(R.id.btnAgregarRecordatorio);
 
         requestNotificationPermission = registerForActivityResult(
                 new ActivityResultContracts.RequestPermission(),
@@ -114,12 +115,12 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
             public void onSwitchChange(RecordatorioModel recordatorio, boolean activo) {
                 Log.d(TAG, "onSwitchChange: Recordatorio ID " + recordatorio.getId() + " cambió a activo=" + activo);
                 recordatorio.setActivo(activo);
-                PrefsHelper.guardarLista(MisRecordatoriosActivity.this, listaRecordatorios);
+                PrefsHelper.guardarLista(MisRecordatorios.this, listaRecordatorios);
 
                 if (activo) {
                     checkAndScheduleAlarm(recordatorio);
                 } else {
-                    AlarmScheduler.cancelAlarm(MisRecordatoriosActivity.this, recordatorio);
+                    AlarmScheduler.cancelAlarm(MisRecordatorios.this, recordatorio);
                 }
             }
         });
@@ -127,7 +128,7 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
 
-        btnAgregar.setOnClickListener(v -> {
+        texAgregar.setOnClickListener(v -> {
             Log.d(TAG, "Botón Agregar Recordatorio clicado.");
             mostrarTimePicker();
         });
@@ -320,7 +321,7 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
 
         EditText etNombre = vista.findViewById(R.id.etNombreRecordatorioEditar);
         Spinner spFrecuencia = vista.findViewById(R.id.spFrecuenciaEditar);
-        Button btnActualizar = vista.findViewById(R.id.btnActualizarRecordatorio);
+        TextView texActualizar = vista.findViewById(R.id.btnActualizarRecordatorio);
 
         // Prellenar datos actuales
         etNombre.setText(recordatorio.getTitulo());
@@ -339,7 +340,7 @@ public class MisRecordatoriosActivity extends AppCompatActivity {
                 .setView(vista)
                 .create();
 
-        btnActualizar.setOnClickListener(v -> {
+        texActualizar.setOnClickListener(v -> {
             String nuevoNombre = etNombre.getText().toString().trim();
             String nuevaFrecuencia = spFrecuencia.getSelectedItem().toString();
 

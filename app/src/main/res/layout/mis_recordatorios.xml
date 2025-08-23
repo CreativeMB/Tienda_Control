@@ -47,12 +47,14 @@
                     android:layout_weight="1"
                     android:layout_marginEnd="8dp"/>
 
-                <Button
+                <TextView
                     android:id="@+id/btnAgregarRecordatorio"
                     android:text="Agregar"
+                    android:gravity="center_horizontal"
                     android:textSize="16sp"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:background="@drawable/selector_background"
                     android:layout_weight="1"/>
             </LinearLayout>
 

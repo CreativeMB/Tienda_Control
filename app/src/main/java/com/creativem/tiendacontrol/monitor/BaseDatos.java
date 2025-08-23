@@ -31,7 +31,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
-import com.creativem.tiendacontrol.notificacion.MisRecordatoriosActivity;
+import com.creativem.tiendacontrol.notificacion.MisRecordatorios;
 import com.creativem.tiendacontrol.R;
 import com.creativem.tiendacontrol.exel.ExcelExporter;
 import com.creativem.tiendacontrol.misdatos.MisDatos;
@@ -122,7 +122,7 @@ public class BaseDatos extends AppCompatActivity implements BasesAdapter.OnDatab
             startActivity(databaseIntent);
         });
         iconRecordatorio.setOnClickListener(view -> {
-            Intent databaseIntent = new Intent(this, MisRecordatoriosActivity.class);
+            Intent databaseIntent = new Intent(this, MisRecordatorios.class);
             startActivity(databaseIntent);
         });
 
