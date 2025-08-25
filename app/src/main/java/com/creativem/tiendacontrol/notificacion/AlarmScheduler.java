@@ -124,14 +124,17 @@ public class AlarmScheduler {
             Log.d(TAG, "calculateNextTriggerTime: El tiempo de recordatorio actual (" + new SimpleDateFormat("dd/MM HH:mm:ss").format(calendar.getTime()) + ") ya pasó. Avanzando a la próxima ocurrencia.");
             switch (recordatorio.getRepeticion()) {
                 case "Diario":
+                case "Día":
                     calendar.add(Calendar.DAY_OF_YEAR, 1);
                     Log.d(TAG, "calculateNextTriggerTime: Repetición Diario, avanzado un día.");
                     break;
                 case "Semanal":
+                case "Semana":
                     calendar.add(Calendar.WEEK_OF_YEAR, 1);
                     Log.d(TAG, "calculateNextTriggerTime: Repetición Semanal, avanzado una semana.");
                     break;
                 case "Mensual":
+                case "Mes":
                     // Esto es más complejo si quieres mantener el mismo día del mes exacto.
                     // Aquí simplemente avanzamos un mes.
                     calendar.add(Calendar.MONTH, 1);

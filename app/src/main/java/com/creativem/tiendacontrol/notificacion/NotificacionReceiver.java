@@ -20,7 +20,7 @@ import java.util.List;
 public class NotificacionReceiver extends BroadcastReceiver {
 
     private static final String CHANNEL_ID = "recordatorios_channel";
-    private static final String TAG = "NotificacionReceiver";
+    private static final String TAG = "alarma";
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -112,16 +112,36 @@ public class NotificacionReceiver extends BroadcastReceiver {
         }
 
         if (recordatorioDesdePrefs != null && recordatorioDesdePrefs.isActivo()) {
-            if (!recordatorioDesdePrefs.getRepeticion().equalsIgnoreCase("Una vez")) {
-                Log.d(TAG, "onReceive: Recordatorio ID " + recordatorioId + " es repetitivo y activo. Reprogramando próxima alarma.");
+            String rep = recordatorioDesdePrefs.getRepeticion();
+
+            if (rep.equalsIgnoreCase("Una vez") || rep.equalsIgnoreCase("Fecha")) {
+                Log.d(TAG, "onReceive: Recordatorio ID " + recordatorioId +
+                        " es 'Una vez/Fecha'. No se reprograma.");
+                AlarmScheduler.cancelAlarm(context, recordatorioDesdePrefs);
+
+            } else if (rep.equalsIgnoreCase("Diario") || rep.equalsIgnoreCase("Día")) {
+                Log.d(TAG, "onReceive: Reprogramando recordatorio diario -> ID " + recordatorioId);
                 AlarmScheduler.scheduleAlarm(context, recordatorioDesdePrefs);
+
+            } else if (rep.equalsIgnoreCase("Semanal") || rep.equalsIgnoreCase("Semana")) {
+                Log.d(TAG, "onReceive: Reprogramando recordatorio semanal -> ID " + recordatorioId);
+                AlarmScheduler.scheduleAlarm(context, recordatorioDesdePrefs);
+
+            } else if (rep.equalsIgnoreCase("Mensual") || rep.equalsIgnoreCase("Mes")) {
+                Log.d(TAG, "onReceive: Reprogramando recordatorio mensual -> ID " + recordatorioId);
+                AlarmScheduler.scheduleAlarm(context, recordatorioDesdePrefs);
+
             } else {
-                Log.d(TAG, "onReceive: Recordatorio ID " + recordatorioId + " es 'Una vez' y ha sido disparado. No se reprograma.");
+                Log.d(TAG, "onReceive: Repetición no reconocida -> " + rep +
+                        ". No se reprograma automáticamente.");
                 AlarmScheduler.cancelAlarm(context, recordatorioDesdePrefs);
             }
+
         } else {
-            Log.d(TAG, "onReceive: Recordatorio ID " + recordatorioId + " no encontrado en preferencias o está inactivo. No se reprograma.");
+            Log.d(TAG, "onReceive: Recordatorio ID " + recordatorioId +
+                    " no encontrado en preferencias o está inactivo. Cancelando alarma.");
             AlarmScheduler.cancelAlarm(context, recordatorioModel);
         }
+
     }
 }
