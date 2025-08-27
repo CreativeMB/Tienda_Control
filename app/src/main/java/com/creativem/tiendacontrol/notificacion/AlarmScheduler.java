@@ -152,28 +152,4 @@ public class AlarmScheduler {
                 + new SimpleDateFormat("dd/MM HH:mm:ss", Locale.getDefault()).format(finalTriggerMillis));
         return finalTriggerMillis;
     }
-
-    public static int[] convertirHoraAMPM(String horaAMPM) {
-        // Este método se usa si RecordatorioModel.getHora() SÓLO CONTIENE HORA AM/PM (ej. "06:25 p. m.")
-        // Si RecordatorioModel.getHora() para "Fecha" ahora contiene "dd/MM/yyyy hh:mm a",
-        // entonces este método no será llamado para ese caso, ya que calculateNextTriggerTime usa initialTriggerMillis.
-        // Para los repetitivos, donde 'hora' es "hh:mm a", este método sigue siendo válido.
-
-        SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance();
-
-        try {
-            Date date = sdf.parse(horaAMPM);
-            calendar.setTime(date);
-            int hora = calendar.get(Calendar.HOUR_OF_DAY);
-            int minuto = calendar.get(Calendar.MINUTE);
-            Log.d(TAG, "convertirHoraAMPM: Parseado '" + horaAMPM + "' --> Hora 24h: " + hora + ", Minuto: " + minuto);
-            return new int[]{hora, minuto};
-        } catch (ParseException e) {
-            Log.e(TAG, "convertirHoraAMPM: Error al parsear hora '" + horaAMPM + "': " + e.getMessage());
-            // En caso de error, retorna la hora actual como fallback.
-            Calendar now = Calendar.getInstance();
-            return new int[]{now.get(Calendar.HOUR_OF_DAY), now.get(Calendar.MINUTE)};
-        }
-    }
 }

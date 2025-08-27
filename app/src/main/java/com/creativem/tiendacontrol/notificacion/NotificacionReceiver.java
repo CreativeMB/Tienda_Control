@@ -6,6 +6,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.media.AudioAttributes;
+import android.net.Uri;
 import android.os.Build;
 import android.util.Log;
 import android.widget.RemoteViews;
@@ -41,15 +43,29 @@ public class NotificacionReceiver extends BroadcastReceiver {
                 context.getSystemService(Context.NOTIFICATION_SERVICE);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && notificationManager != null) {
+            // 🔊 URI al sonido personalizado en res/raw/
+            Uri sonidoUri = Uri.parse("android.resource://" + context.getPackageName() + "/" + R.raw.recordatorio);
+
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
                     "Tarea Pendiente",
                     NotificationManager.IMPORTANCE_HIGH
             );
             channel.setDescription("Canal para Tarea Pendiente de TiendaControl");
+
+            // 🔊 Configurar sonido personalizado
+            channel.setSound(
+                    sonidoUri,
+                    new AudioAttributes.Builder()
+                            .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                            .setUsage(AudioAttributes.USAGE_ALARM) // 👈 lo trata como alarma
+                            .build()
+            );
+
             notificationManager.createNotificationChannel(channel);
-            Log.d(TAG, "onReceive: Canal de notificación creado/verificado.");
+            Log.d(TAG, "onReceive: Canal de notificación creado/verificado con sonido personalizado.");
         }
+
 
         // --- CAMBIO CLAVE AQUÍ: Apuntar a la actividad principal (AnimacionInicio.class) ---
         Intent notificationIntent = new Intent(context, AnimacionInicio.class); // <-- CAMBIO AQUI
