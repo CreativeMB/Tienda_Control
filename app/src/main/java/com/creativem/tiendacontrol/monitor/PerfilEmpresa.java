@@ -27,7 +27,7 @@ public class PerfilEmpresa extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.perfilempresa);
+        setContentView(R.layout.perfil_empresa);
 
         // Inicializar vistas
         etNombrePersona = findViewById(R.id.etNombrePersona);
@@ -53,35 +53,34 @@ public class PerfilEmpresa extends AppCompatActivity {
             return;
         }
 
-        String userId = user.getUid(); // Obtener el UID del usuario autenticado
-        String perfilId = databaseReference.push().getKey(); // Generar un ID único para el perfil
+        String userId = user.getUid(); // Usar UID del usuario autenticado
 
-        if (perfilId != null) {
-            Perfil perfil = new Perfil(
-                    perfilId,
-                    userId, // UID del usuario
-                    etNombrePersona.getText().toString(),
-                    etNombreEmpresa.getText().toString(),
-                    etTelefono.getText().toString(),
-                    etDireccion.getText().toString(),
-                    etPais.getText().toString(),
-                    etCiudad.getText().toString()
-            );
+        String email = user.getEmail(); // opcional, si quieres guardar el email
 
-            databaseReference.child(perfilId).setValue(perfil)
-                    .addOnCompleteListener(task -> {
-                        if (task.isSuccessful()) {
-                            Toast.makeText(this, "Perfil guardado exitosamente", Toast.LENGTH_SHORT).show();
-                            Intent intent = new Intent(PerfilEmpresa.this, BaseDatos.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Log.e(TAG, "Error al guardar el perfil", task.getException());
-                            Toast.makeText(this, "Error al guardar el perfil", Toast.LENGTH_SHORT).show();
-                        }
-                    });
-        } else {
-            Toast.makeText(this, "Error al generar clave para el perfil", Toast.LENGTH_SHORT).show();
-        }
+        Perfil perfil = new Perfil(
+                userId, // usar userId como ID
+                email,
+                etNombrePersona.getText().toString(),
+                etNombreEmpresa.getText().toString(),
+                etTelefono.getText().toString(),
+                etDireccion.getText().toString(),
+                etPais.getText().toString(),
+                etCiudad.getText().toString()
+        );
+
+        // Guardar perfil en "Empresas/userId"
+        databaseReference.child(userId).setValue(perfil)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(this, "Perfil guardado exitosamente", Toast.LENGTH_SHORT).show();
+                        Intent intent = new Intent(PerfilEmpresa.this, BaseDatos.class);
+                        startActivity(intent);
+                        finish();
+                    } else {
+                        Log.e(TAG, "Error al guardar el perfil", task.getException());
+                        Toast.makeText(this, "Error al guardar el perfil", Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
+
 }

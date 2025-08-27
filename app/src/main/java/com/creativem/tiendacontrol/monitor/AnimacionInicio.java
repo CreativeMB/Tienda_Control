@@ -24,7 +24,7 @@ public class AnimacionInicio extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.animacioninicio);
+        setContentView(R.layout.animacion_inicio);
         sessionManager = new SessionManager(this); // Inicializa SessionManager aquí
         Log.d("AnimacionInicio", "AnimacionInicio - onCreate llamado");
 

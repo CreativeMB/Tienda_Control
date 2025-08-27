@@ -10,6 +10,7 @@
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
+
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/recyclerViewDatabases"
             android:layout_width="match_parent"
@@ -17,54 +18,27 @@
             android:paddingTop="16dp" />
 
         <ImageView
-            android:id="@+id/recordatorio"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="20dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/recordatorio"
-            android:elevation="8dp"/>
-
-        <ImageView
-            android:id="@+id/database"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom|end"
-            android:layout_marginEnd="16dp"
-            android:layout_marginBottom="100dp"
-            android:clickable="true"
-            android:focusable="true"
-            android:src="@drawable/database"
-            android:elevation="8dp"/>
-
-        <ImageView
             android:id="@+id/donacion"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom|start"
-            android:layout_marginStart="30dp"
-            android:layout_marginBottom="20dp"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_marginEnd="16dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginBottom="295dp"
             android:clickable="true"
             android:focusable="true"
             android:src="@drawable/donacion"
             android:elevation="8dp"/>
 
-        <TextView
-            android:id="@+id/textDonaciones"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="bottom|start"
-            android:layout_marginStart="2dp"
-            android:layout_marginBottom="80dp"
+        <ImageView
+            android:id="@+id/manual"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="225dp"
             android:clickable="true"
             android:focusable="true"
-            android:text="¡Tu apoyo nos impulsa! 🙌"
-            android:textSize="10sp"
-            android:elevation="8dp"/>
-
+            android:src="@drawable/manual" />
 
         <ImageView
             android:id="@+id/menu"
@@ -72,22 +46,33 @@
             android:layout_height="50dp"
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="190dp"
+            android:layout_marginBottom="155dp"
             android:clickable="true"
             android:focusable="true"
-            android:src="@drawable/menu"
-            app:maxImageSize="25dp"/>
+            android:src="@drawable/menu"/>
         <ImageView
-            android:id="@+id/manual"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:id="@+id/database"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
             android:layout_gravity="bottom|end"
             android:layout_marginEnd="16dp"
-            android:layout_marginBottom="270dp"
+            android:layout_marginBottom="85dp"
             android:clickable="true"
             android:focusable="true"
-            android:src="@drawable/manual"
-            app:maxImageSize="25dp"/>
+            android:src="@drawable/database"
+            android:elevation="8dp"/>
+
+        <ImageView
+            android:id="@+id/recordatorio"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_gravity="bottom|end"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="15dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:src="@drawable/recordatorio"
+            android:elevation="8dp"/>
 
     </FrameLayout>
 
@@ -98,7 +83,7 @@
         android:layout_height="match_parent"
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
-        app:headerLayout="@layout/menuprincipal"
+        app:headerLayout="@layout/menu_principal"
         app:itemTextAppearance="@style/MenuItemTextStyle"
         app:menu="@menu/menu" />
 

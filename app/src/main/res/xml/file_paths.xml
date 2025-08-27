@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Permite compartir archivos de la carpeta de almacenamiento interno de la app -->
+    <external-files-path
+        name="external_files"
+        path="." />
+
+    <!-- Si quieres también desde Downloads -->
+    <external-path
+        name="external_downloads"
+        path="Download/" />
+</paths>
