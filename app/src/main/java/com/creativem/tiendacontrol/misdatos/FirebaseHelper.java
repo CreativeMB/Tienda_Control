@@ -25,8 +25,9 @@ public class FirebaseHelper {
     }
     // Leer datos
     public void obtenerProductos(ValueEventListener listener) {
-        databaseReference.addListenerForSingleValueEvent(listener);
+        databaseReference.addValueEventListener(listener);
     }
+
 
     // Agregar producto
     public void agregarProducto(String idProducto, ProductoModel producto, DatabaseReference.CompletionListener listener) {
