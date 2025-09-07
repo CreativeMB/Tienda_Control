@@ -543,10 +543,7 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             String id = firebaseHelper.getDatabaseReference().push().getKey(); // Genera ID único
 
             if (id != null) {
-                // ✅ Formato de fecha en 12 horas con AM/PM y zona horaria de Colombia
-                SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd hh:mm a", Locale.getDefault());
-                sdf.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
-                String fechaHora = sdf.format(new Date());
+                String fechaHora = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
 
                 ProductoModel nuevoProducto = new ProductoModel(id, nombre, valor, nota, fechaHora);
 
