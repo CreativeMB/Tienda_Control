@@ -50,14 +50,30 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
         ProductoModel producto = filteredProductList.get(position);
 
         holder.nombre.setText(producto.getNombre());
-        holder.nombre.setSelected(true); // Activa marquee
+        holder.nombre.setSelected(true);
 
         String precioFormateado = PuntoMil.getFormattedNumber((long) producto.getValor());
         holder.precio.setText(precioFormateado);
-        holder.precio.setSelected(true); // Activa marquee
+        holder.precio.setSelected(true);
 
-        holder.fechaHora.setText(producto.getFechaHora());
-        holder.fechaHora.setSelected(true); // Activa marquee
+        // 🔹 Formatear fecha a AM/PM si existe
+        if (producto.getFechaHora() != null && !producto.getFechaHora().isEmpty()) {
+            try {
+                // Primero parseamos lo que venga de Firebase
+                SimpleDateFormat sdfEntrada = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault());
+                // Luego lo mostramos en formato 12h AM/PM
+                SimpleDateFormat sdfSalida = new SimpleDateFormat("yy-MM-dd hh:mm a", Locale.getDefault());
+                sdfSalida.setTimeZone(java.util.TimeZone.getTimeZone("America/Bogota"));
+
+                Date fecha = sdfEntrada.parse(producto.getFechaHora());
+                holder.fechaHora.setText(fecha != null ? sdfSalida.format(fecha) : producto.getFechaHora());
+            } catch (Exception e) {
+                holder.fechaHora.setText(producto.getFechaHora()); // fallback
+            }
+        } else {
+            holder.fechaHora.setText("");
+        }
+        holder.fechaHora.setSelected(true);
 
         if (producto.getValor() < 0) {
             holder.precio.setTextColor(context.getResources().getColor(R.color.endColor));
@@ -68,9 +84,9 @@ public class ProductoAdapter extends RecyclerView.Adapter<ProductoAdapter.ViewHo
         }
 
         holder.itemView.setOnClickListener(v -> listener.onEditClick(producto));
-
         holder.Eliminar.setOnClickListener(v -> listener.onDeleteClick(producto));
     }
+
 
     @Override
     public int getItemCount() {

@@ -20,9 +20,13 @@ public class FirebaseHelper {
     }
 
     // Obtener fecha y hora actual
+    // Obtener fecha y hora actual en formato AM/PM, zona horaria Colombia
     public String obtenerFechaHora() {
-        return new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd hh:mm a", Locale.getDefault());
+        sdf.setTimeZone(java.util.TimeZone.getTimeZone("America/Bogota"));
+        return sdf.format(new Date());
     }
+
     // Leer datos
     public void obtenerProductos(ValueEventListener listener) {
         databaseReference.addValueEventListener(listener);

@@ -543,7 +543,10 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
             String id = firebaseHelper.getDatabaseReference().push().getKey(); // Genera ID único
 
             if (id != null) {
-                String fechaHora = new SimpleDateFormat("yy-MM-dd HH:mm", Locale.getDefault()).format(new Date());
+                // ✅ Formato de fecha en 12 horas con AM/PM y zona horaria de Colombia
+                SimpleDateFormat sdf = new SimpleDateFormat("yy-MM-dd hh:mm a", Locale.getDefault());
+                sdf.setTimeZone(TimeZone.getTimeZone("America/Bogota"));
+                String fechaHora = sdf.format(new Date());
 
                 ProductoModel nuevoProducto = new ProductoModel(id, nombre, valor, nota, fechaHora);
 
@@ -551,23 +554,22 @@ public class MisDatos extends AppCompatActivity implements ProductoAdapter.OnPro
                     if (error == null) {
                         dialog.dismiss();
 
-                        // ✅ No añadir manualmente a la lista aquí (cargarProductos lo hará)
                         cargarProductos();
 
-                        // ✅ Aplicar el filtro correcto después de recargar
+                        // ✅ Mantener el filtro activo
                         Pair<String, String> fechas = obtenerFechaSegunFiltro(adapter.getCurrentFilter());
                         String fechaInicio = fechas.first;
                         String fechaFin = fechas.second;
 
                         adapter.filtrarPorFecha(fechaInicio, fechaFin, adapter.getCurrentFilter());
-
                         MisDatos.calcularTotales(adapter.getFilteredProductList());
                     } else {
                         Toast.makeText(MisDatos.this, "❌ Error al agregar producto", Toast.LENGTH_SHORT).show();
                     }
                 });
 
-            } else {
+
+        } else {
                 Toast.makeText(this, "⚠️ No se pudo generar un ID único", Toast.LENGTH_SHORT).show();
             }
 
